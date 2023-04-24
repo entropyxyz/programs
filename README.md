@@ -22,6 +22,10 @@ This will build a valid constraints program for the Entropy constraints runtime,
 
 To write your own constraints, you can use any language that compiles to WebAssembly, such as Rust, C++, or AssemblyScript. You will need to define a function that takes a transaction request or message as input and returns a result indicating whether the constraints are satisfied.
 
+## Conventions
+
+Packages should use the `ec` prefix, which stands for "Entropy Constraints". For example, `ec-core` is the "Entropy Constraints Core" package, and `ec-acl` is the "Entropy Constraints Access Control List" package.
+
 <!-- 
 The function should be exported and have the following signature:
 

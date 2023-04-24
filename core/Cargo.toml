@@ -1,5 +1,5 @@
 [package]
-name   ="entropy-constraints-core"
+name   ="ec-core"
 version="0.1.0"
 edition="2021"
 
