@@ -1,6 +1,6 @@
 #![cfg(test)]
 
-use constraints_core::{Acl, AclKind};
+use ec_core::{Acl, AclKind};
 use ethers_core::types::{NameOrAddress, TransactionRequest, H160};
 
 use crate::Evaluate;

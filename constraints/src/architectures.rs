@@ -1,6 +1,6 @@
 //! This includes the supported architectures and traits for adding new ones.
 
-use constraints_core::Arch;
+use ec_core::Arch;
 pub use evm::*;
 use serde::{Deserialize, Serialize};
 

@@ -1,6 +1,6 @@
 //! Contains the traits and implementations of each supported constraint.
 
-use constraints_core::{Acl, AclKind};
+use ec_core::{Acl, AclKind};
 use ethers_core::types::{NameOrAddress, H160};
 
 use crate::{Architecture, Error, Evm};

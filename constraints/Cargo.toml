@@ -9,7 +9,6 @@ edition="2021"
 thiserror="1.0"
 
 # parsing
-
 serde         ={ version="1.0.147", default-features=false, features=["derive"] }
 serde_json    ={ version="1.0", default-features=false, features=["alloc"] }
 ec-core ={ path="../core", default-features=false }
@@ -29,7 +28,7 @@ default=["std"]
 std=[
   "serde/std",
   "serde_json/std",
-  "constraints-core/std",
+  "ec-core/std",
   "sp-core/std",
   "rlp/std",
   "primitive-types/std",
