@@ -21,8 +21,11 @@ impl Evaluate<Evm> for Acl<[u8; 20]> {
             };
         }
 
-        let converted_addresses: Vec<NameOrAddress> =
-            self.addresses.into_iter().map(|a| NameOrAddress::Address(H160::from(a))).collect();
+        let converted_addresses: Vec<NameOrAddress> = self
+            .addresses
+            .into_iter()
+            .map(|a| NameOrAddress::Address(H160::from(a)))
+            .collect();
 
         match (converted_addresses.contains(&tx.to.unwrap()), self.kind) {
             (true, AclKind::Allow) => Ok(()),

@@ -1,9 +1,9 @@
-use core::fmt::Debug;
 use alloc::vec::Vec;
+use core::fmt::Debug;
 
 pub use acl::*;
-use codec::{Decode, Encode};
 use codec::MaxEncodedLen;
+use codec::{Decode, Encode};
 use scale_info::TypeInfo;
 use serde::{Deserialize, Serialize};
 
@@ -45,7 +45,11 @@ mod acl {
     impl<A: Default> Default for Acl<A> {
         fn default() -> Self {
             let addresses = Vec::<A>::default();
-            Self { addresses, kind: AclKind::Allow, allow_null_recipient: false }
+            Self {
+                addresses,
+                kind: AclKind::Allow,
+                allow_null_recipient: false,
+            }
         }
     }
 }

@@ -58,7 +58,9 @@ pub mod evm {
     }
 
     impl GetSender<Evm> for <Evm as Architecture>::TransactionRequest {
-        fn sender(&self) -> Option<<Evm as Architecture>::Address> { self.from }
+        fn sender(&self) -> Option<<Evm as Architecture>::Address> {
+            self.from
+        }
     }
 
     impl GetReceiver<Evm> for <Evm as Architecture>::TransactionRequest {
@@ -76,7 +78,9 @@ pub mod evm {
     }
 
     impl GetArch for <Evm as Architecture>::TransactionRequest {
-        fn arch() -> Arch { Arch::Evm }
+        fn arch() -> Arch {
+            Arch::Evm
+        }
     }
 
     impl Parse<Evm> for <Evm as Architecture>::TransactionRequest {
@@ -96,8 +100,10 @@ pub mod evm {
                     )),
                     _ => Ok(tx),
                 },
-                Err(e) =>
-                    Err(Error::InvalidTransactionRequest(format!("Unable to decode string: {}", e))),
+                Err(e) => Err(Error::InvalidTransactionRequest(format!(
+                    "Unable to decode string: {}",
+                    e
+                ))),
             }
         }
     }

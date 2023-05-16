@@ -1,5 +1,2 @@
 [workspace]
-members = [
-    "constraints",
-    "core",
-]
+members = ["constraints", "core"]
