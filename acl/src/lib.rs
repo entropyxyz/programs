@@ -5,11 +5,10 @@ use core::fmt::Debug;
 
 use codec::MaxEncodedLen;
 use codec::{Decode, Encode};
+use ec_core::{Architecture, Error as CoreError, Evaluate};
+use ec_evm::{Evm, NameOrAddress, H160};
 use scale_info::TypeInfo;
 use serde::{Deserialize, Serialize};
-use ec_core::{Architecture, Evaluate, Error as CoreError};
-use ec_evm::{Evm, NameOrAddress, H160};
-
 
 /// An access control list (Allow/Deny lists).
 #[derive(

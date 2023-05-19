@@ -1,11 +1,10 @@
 //! This module contains the EVM architecture and its associated types. Since it implements Architecture, constraints written around the Architecture trait can be used with EVM.
 
 use ec_core::{Architecture, Error as CoreError, GetReceiver, GetSender, Parse};
-use serde::{Deserialize, Serialize};
 pub use ethers_core::types::transaction::request::TransactionRequest as EvmTransactionRequest;
 pub use ethers_core::types::{NameOrAddress, H160};
 use rlp::Rlp;
-
+use serde::{Deserialize, Serialize};
 
 /// EVM Architecture
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -38,7 +37,9 @@ impl GetReceiver<Evm> for <Evm as Architecture>::TransactionRequest {
 }
 
 impl Parse<Evm> for <Evm as Architecture>::TransactionRequest {
-    fn parse(hex_rlp_raw_tx: String) -> Result<<Evm as Architecture>::TransactionRequest, CoreError> {
+    fn parse(
+        hex_rlp_raw_tx: String,
+    ) -> Result<<Evm as Architecture>::TransactionRequest, CoreError> {
         let bytes = hex::decode(hex_rlp_raw_tx.replace("0x", "")).map_err(|e| {
             CoreError::InvalidTransactionRequest(format!("Unable to parse to RLP: {}", e))
         })?;

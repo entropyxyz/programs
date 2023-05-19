@@ -16,7 +16,7 @@ pub enum Arch {
 }
 
 /// Represents a user's constraints
-/// DEPRECATED: This will be removed with V1 constraints removal 
+/// DEPRECATED: This will be removed with V1 constraints removal
 #[derive(Default, Encode, Decode, Debug, PartialEq, Eq, Clone, TypeInfo)]
 pub struct Constraints {
     pub evm_acl: Option<Acl<[u8; 20]>>,
