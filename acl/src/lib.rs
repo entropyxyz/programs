@@ -5,7 +5,7 @@ use core::fmt::Debug;
 
 use codec::MaxEncodedLen;
 use codec::{Decode, Encode};
-use ec_core::{Architecture, Error as CoreError, Evaluate};
+pub use ec_core::{Architecture, Error as CoreError, Evaluate};
 
 #[cfg(feature = "evm")]
 use ec_evm::{Evm, NameOrAddress, H160};
