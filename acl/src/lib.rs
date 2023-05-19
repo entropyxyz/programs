@@ -6,7 +6,10 @@ use core::fmt::Debug;
 use codec::MaxEncodedLen;
 use codec::{Decode, Encode};
 use ec_core::{Architecture, Error as CoreError, Evaluate};
+
+#[cfg(feature = "evm")]
 use ec_evm::{Evm, NameOrAddress, H160};
+
 use scale_info::TypeInfo;
 use serde::{Deserialize, Serialize};
 
@@ -61,7 +64,9 @@ impl<A: Default> Default for Acl<A> {
 }
 
 // TODO This can likely be made generic over any architecture with GetRecipient and GetSender traits
+
 #[allow(clippy::needless_collect)]
+#[cfg(feature = "evm")]
 impl Evaluate<Evm> for Acl<[u8; 20]> {
     fn eval(self, tx: <Evm as Architecture>::TransactionRequest) -> Result<(), CoreError> {
         if tx.to.is_none() {

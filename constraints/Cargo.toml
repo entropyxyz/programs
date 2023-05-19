@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-ec-acl ={ path = "../acl", default-features = false }
+ec-acl ={ path = "../acl", default-features = false, features = ["evm"] }
 
 codec          ={ package="parity-scale-codec", version="3.0.0", default-features=false }
 scale-info = { version = '2.1.0', default-features = false, features = [

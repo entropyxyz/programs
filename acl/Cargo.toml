@@ -14,5 +14,7 @@ codec = { package = "parity-scale-codec", version = "3.0.0", default-features = 
 scale-info = { version = "2.1.0", default-features = false }
 
 [features]
-default = ["std"]
+default = ["std", "all-architectures"]
+all-architectures = ["evm"]
+evm = []
 std = ["ec-core/std", "codec/std"]
