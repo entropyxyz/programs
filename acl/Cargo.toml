@@ -7,3 +7,12 @@ edition = "2021"
 
 [dependencies]
 ec-core ={ path = "../core", default-features = false }
+ec-evm ={ path = "../evm", default-features = false }
+
+serde = { version = "1.0", default-features = false }
+codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["max-encoded-len"]}
+scale-info = { version = "2.7.0", default-features = false }
+
+[features]
+default = ["std"]
+std = ["ec-core/std", "codec/std"]

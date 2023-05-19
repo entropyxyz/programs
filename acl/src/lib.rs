@@ -1,14 +1,87 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+extern crate alloc;
+
+use alloc::vec::Vec;
+use core::fmt::Debug;
+
+use codec::MaxEncodedLen;
+use codec::{Decode, Encode};
+use scale_info::TypeInfo;
+use serde::{Deserialize, Serialize};
+use ec_core::{Architecture, Evaluate, Error as CoreError};
+use ec_evm::{Evm, NameOrAddress, H160};
+
+
+/// An access control list (Allow/Deny lists).
+#[derive(
+    Clone,
+    Debug,
+    Encode,
+    Decode,
+    PartialEq,
+    Eq,
+    scale_info::TypeInfo,
+    MaxEncodedLen,
+    Serialize,
+    Deserialize,
+)]
+pub struct Acl<Address> {
+    pub addresses: Vec<Address>,
+    pub kind: AclKind,
+    pub allow_null_recipient: bool,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+/// Represents either an allow or deny list.
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Encode,
+    Decode,
+    TypeInfo,
+    MaxEncodedLen,
+    Serialize,
+    Deserialize,
+)]
+pub enum AclKind {
+    Allow,
+    Deny,
+}
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+/// Creates an empty ACL that always evaluates to false.
+impl<A: Default> Default for Acl<A> {
+    fn default() -> Self {
+        let addresses = Vec::<A>::default();
+        Self {
+            addresses,
+            kind: AclKind::Allow,
+            allow_null_recipient: false,
+        }
+    }
+}
+
+// TODO This can likely be made generic over any architecture with GetRecipient and GetSender traits
+#[allow(clippy::needless_collect)]
+impl Evaluate<Evm> for Acl<[u8; 20]> {
+    fn eval(self, tx: <Evm as Architecture>::TransactionRequest) -> Result<(), CoreError> {
+        if tx.to.is_none() {
+            return match self.allow_null_recipient {
+                true => Ok(()),
+                false => Err(CoreError::Evaluation("Null recipients are not allowed.")),
+            };
+        }
+
+        let converted_addresses: Vec<NameOrAddress> = self
+            .addresses
+            .into_iter()
+            .map(|a| NameOrAddress::Address(H160::from(a)))
+            .collect();
+
+        match (converted_addresses.contains(&tx.to.unwrap()), self.kind) {
+            (true, AclKind::Allow) => Ok(()),
+            (false, AclKind::Deny) => Ok(()),
+            _ => Err(CoreError::Evaluation("Transaction not allowed.")),
+        }
     }
 }

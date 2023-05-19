@@ -2,7 +2,7 @@
 
 use crate::{Architecture, Error};
 
-/// Constraints must implement an evaluation trait that parses.
+/// Any constraint must implement this for each architecture.
 pub trait Evaluate<A: Architecture> {
     fn eval(self, tx: A::TransactionRequest) -> Result<(), Error>;
 }
