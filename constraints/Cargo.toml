@@ -3,33 +3,27 @@ name = "ec-constraints"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-thiserror = "1.0"
+ec-acl ={ path = "../acl", default-features = false }
 
-# parsing
-serde = { version = "1.0.147", default-features = false, features = ["derive"] }
-serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
-ec-core = { path = "../core", default-features = false }
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.31", default-features = false }
-
-# EVM
-ethers-core = { version = "0.13.0", default-features = false }
-rlp = { version = "0.5.2", default-features = false }
-hex = "0.4.3"
-primitive-types = { version = "0.11.1", default-features = false, features = [
-  "scale-info",
-  "serde_no_std",
+codec          ={ package="parity-scale-codec", version="3.0.0", default-features=false }
+scale-info = { version = '2.1.0', default-features = false, features = [
+  'derive',
 ] }
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+serde_derive = "1.0.147"
+sp-core = { package = "sp-core", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.31", default-features = false }
+sp-std = { package = "sp-std", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.31", default-features = false }
+frame-support = { package = "frame-support", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.31", default-features = false }
+node-primitives = { version = "2.0.0", default-features = false, git = 'https://github.com/paritytech/substrate.git', branch = "polkadot-v0.9.31" }
 
 [features]
 default = ["std"]
 std = [
+  "scale-info/std",
   "serde/std",
-  "serde_json/std",
-  "ec-core/std",
+  "frame-support/std",
   "sp-core/std",
-  "rlp/std",
-  "primitive-types/std",
+  "sp-std/std",
+  "ec-acl/std",
 ]

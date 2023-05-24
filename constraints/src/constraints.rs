@@ -1,36 +1,24 @@
-//! Contains the traits and implementations of each supported constraint.
+use core::fmt::Debug;
 
-use ec_core::{Acl, AclKind};
-use ethers_core::types::{NameOrAddress, H160};
+use codec::{Decode, Encode};
+use scale_info::TypeInfo;
+use serde::{Deserialize, Serialize};
 
-use crate::{Architecture, Error, Evm};
+use ec_acl::*;
 
-/// Constraints must implement an evaluation trait that parses.
-pub trait Evaluate<A: Architecture> {
-    fn eval(self, tx: A::TransactionRequest) -> Result<(), Error>;
+/// Supported architectures.
+/// DEPRECATED: This will be removed with V1 constraints removal in favor of a more generic listing of architectures
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Encode, Decode, Serialize, Deserialize, TypeInfo)]
+pub enum Arch {
+    Evm,
+    /// Not yet supported on the client, supported in Substrate storage/ACL
+    Btc,
 }
 
-// TODO This can likely be made generic over any architecture with GetRecipient and GetSender traits
-#[allow(clippy::needless_collect)]
-impl Evaluate<Evm> for Acl<[u8; 20]> {
-    fn eval(self, tx: <Evm as Architecture>::TransactionRequest) -> Result<(), Error> {
-        if tx.to.is_none() {
-            return match self.allow_null_recipient {
-                true => Ok(()),
-                false => Err(Error::Evaluation("Null recipients are not allowed.")),
-            };
-        }
-
-        let converted_addresses: Vec<NameOrAddress> = self
-            .addresses
-            .into_iter()
-            .map(|a| NameOrAddress::Address(H160::from(a)))
-            .collect();
-
-        match (converted_addresses.contains(&tx.to.unwrap()), self.kind) {
-            (true, AclKind::Allow) => Ok(()),
-            (false, AclKind::Deny) => Ok(()),
-            _ => Err(Error::Evaluation("Transaction not allowed.")),
-        }
-    }
+/// Represents a user's constraints
+/// DEPRECATED: This will be removed with V1 constraints removal
+#[derive(Default, Encode, Decode, Debug, PartialEq, Eq, Clone, TypeInfo)]
+pub struct Constraints {
+    pub evm_acl: Option<Acl<[u8; 20]>>,
+    pub btc_acl: Option<Acl<[u8; 32]>>,
 }
