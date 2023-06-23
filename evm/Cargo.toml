@@ -9,16 +9,19 @@ edition = "2021"
 ec-core = { path = "../core" }
 
 # EVM
-ethers-core = { version = "0.13.0", default-features = false }
+ethers-core = { version = "2.0.6", default-features = false }
+getrandom = { version = "0.2", default-features = false, optional = true }
 rlp = { version = "0.5.2", default-features = false }
 hex = "0.4.3"
-primitive-types = { version = "0.11.1", default-features = false, features = [
+primitive-types = { version = "0.12.1", default-features = false, features = [
   "scale-info",
   "serde_no_std",
 ] }
 serde = { version = "1.0", default-features = false }
+# ethereum = { version = "0.14.0", default-features = false, features = ["with-serde"]}
 
 
 [features]
-default = ["std"]
+default = []
+# std = ["rlp/std", "primitive-types/std", "getrandom", "getrandom/std", "ethereum/std"]
 std = ["rlp/std", "primitive-types/std"]

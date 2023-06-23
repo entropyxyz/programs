@@ -5,10 +5,10 @@ use core::fmt::Debug;
 
 use codec::MaxEncodedLen;
 use codec::{Decode, Encode};
-pub use ec_core::{Architecture, Error as CoreError, Evaluate};
+pub use ec_core::{Architecture, Error as CoreError, SatisfiableForArchitecture};
 
 #[cfg(feature = "evm")]
-use ec_evm::{Evm, NameOrAddress, H160};
+pub use ec_evm::{Evm, NameOrAddress, H160};
 
 use scale_info::TypeInfo;
 use serde::{Deserialize, Serialize};
@@ -26,6 +26,7 @@ use serde::{Deserialize, Serialize};
     Serialize,
     Deserialize,
 )]
+// TODO: Make const; Change Vec<Address> to something like <const Address, const N: usize>
 pub struct Acl<Address> {
     pub addresses: Vec<Address>,
     pub kind: AclKind,
@@ -63,16 +64,16 @@ impl<A: Default> Default for Acl<A> {
     }
 }
 
-// TODO This can likely be made generic over any architecture with GetRecipient and GetSender traits
-
+// TODO This needs to be generic over any architecture (use GetRecipient and GetSender traits)
+// TODO Move to `ec-evm` crate?
 #[allow(clippy::needless_collect)]
 #[cfg(feature = "evm")]
-impl Evaluate<Evm> for Acl<[u8; 20]> {
-    fn eval(self, tx: <Evm as Architecture>::TransactionRequest) -> Result<(), CoreError> {
+impl SatisfiableForArchitecture<Evm> for Acl<<Evm as Architecture>::AddressRaw> {
+    fn is_satisfied_by(self, tx: &<Evm as Architecture>::TransactionRequest) -> Result<(), CoreError> {
         if tx.to.is_none() {
             return match self.allow_null_recipient {
                 true => Ok(()),
-                false => Err(CoreError::Evaluation("Null recipients are not allowed.")),
+                false => Err(CoreError::Evaluation("Null recipients are not allowed.".to_string())),
             };
         }
 
@@ -82,10 +83,10 @@ impl Evaluate<Evm> for Acl<[u8; 20]> {
             .map(|a| NameOrAddress::Address(H160::from(a)))
             .collect();
 
-        match (converted_addresses.contains(&tx.to.unwrap()), self.kind) {
+        match (converted_addresses.contains(&tx.to.clone().unwrap()), self.kind) {
             (true, AclKind::Allow) => Ok(()),
             (false, AclKind::Deny) => Ok(()),
-            _ => Err(CoreError::Evaluation("Transaction not allowed.")),
+            _ => Err(CoreError::Evaluation("Transaction not allowed.".to_string())),
         }
     }
 }

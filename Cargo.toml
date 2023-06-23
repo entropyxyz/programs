@@ -1,2 +1,2 @@
 [workspace]
-members = ["constraints", "core", "acl", "evm"]
+members = ["constraints", "core", "acl", "evm", "runtime", "examples"]

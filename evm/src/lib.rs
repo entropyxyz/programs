@@ -1,6 +1,10 @@
 //! This module contains the EVM architecture and its associated types. Since it implements Architecture, constraints written around the Architecture trait can be used with EVM.
 
-use ec_core::{Architecture, Error as CoreError, GetReceiver, GetSender, Parse};
+extern crate alloc;
+
+use alloc::string::String;
+
+use ec_core::{Architecture, Error as CoreError, GetReceiver, GetSender, Parse, TryParse};
 pub use ethers_core::types::transaction::request::TransactionRequest as EvmTransactionRequest;
 pub use ethers_core::types::{NameOrAddress, H160};
 use rlp::Rlp;
@@ -44,6 +48,35 @@ impl Parse<Evm> for <Evm as Architecture>::TransactionRequest {
             CoreError::InvalidTransactionRequest(format!("Unable to parse to RLP: {}", e))
         })?;
         let rlp = Rlp::new(&bytes);
+        match Self::decode_unsigned_rlp(&rlp) {
+            Ok(tx) => match tx.to {
+                // Clients shouldn't even be able to serialize tx reqs with ENS names, but it it
+                // does somehow, err
+                Some(NameOrAddress::Name(_)) => Err(CoreError::InvalidTransactionRequest(
+                    "ENS recipients not supported. Resolve to an address first.".to_string(),
+                )),
+                _ => Ok(tx),
+            },
+            Err(e) => Err(CoreError::InvalidTransactionRequest(format!(
+                "Unable to decode string: {}",
+                e
+            ))),
+        }
+    }
+}
+
+impl TryParse<Evm> for <Evm as Architecture>::TransactionRequest {
+    /// TODO expect the hex-encoded RLP of the transaction request, so user doesn't have to hex::decode
+    fn try_parse(bytes: &[u8]) -> Result<Self, CoreError> {
+
+        let request_as_string = String::from_utf8(bytes.to_owned()).map_err(|e| {
+            CoreError::InvalidTransactionRequest(format!("Unable to parse to String: {}", e))
+        })?;
+        let into_bytes = hex::decode(request_as_string.replace("0x", "")).map_err(|e| {
+            CoreError::InvalidTransactionRequest(format!("Unable to parse to RLP: {}", e))
+        })?;
+        let rlp = Rlp::new(&into_bytes);
+
         match Self::decode_unsigned_rlp(&rlp) {
             Ok(tx) => match tx.to {
                 // Clients shouldn't even be able to serialize tx reqs with ENS names, but it it

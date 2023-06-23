@@ -3,27 +3,20 @@ name = "ec-constraints"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
-ec-acl ={ path = "../acl", default-features = false }
+# [lib]
+# crate-type = ["cdylib"]
 
-codec          ={ package="parity-scale-codec", version="3.0.0", default-features=false }
-scale-info = { version = '2.1.0', default-features = false, features = [
-  'derive',
-] }
-serde = { version = "1.0", default-features = false, features = ["derive"] }
-serde_derive = "1.0.147"
-sp-core = { package = "sp-core", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.31", default-features = false }
-sp-std = { package = "sp-std", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.31", default-features = false }
-frame-support = { package = "frame-support", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.31", default-features = false }
-node-primitives = { version = "2.0.0", default-features = false, git = 'https://github.com/paritytech/substrate.git', branch = "polkadot-v0.9.31" }
+[dependencies]
+ec-acl ={ path = "../acl", default-features = false, features = ["evm"]}
+ec-evm ={ path = "../evm", default-features = false }
+ec-core ={ path = "../core", default-features = false }
+
+[dev-dependencies]
+# ec-runtime = { path = "../runtime", default-features = false }
 
 [features]
 default = ["std"]
 std = [
-  "scale-info/std",
-  "serde/std",
-  "frame-support/std",
-  "sp-core/std",
-  "sp-std/std",
   "ec-acl/std",
+  "ec-evm/std"
 ]
