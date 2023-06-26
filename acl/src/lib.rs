@@ -69,11 +69,16 @@ impl<A: Default> Default for Acl<A> {
 #[allow(clippy::needless_collect)]
 #[cfg(feature = "evm")]
 impl SatisfiableForArchitecture<Evm> for Acl<<Evm as Architecture>::AddressRaw> {
-    fn is_satisfied_by(self, tx: &<Evm as Architecture>::TransactionRequest) -> Result<(), CoreError> {
+    fn is_satisfied_by(
+        self,
+        tx: &<Evm as Architecture>::TransactionRequest,
+    ) -> Result<(), CoreError> {
         if tx.to.is_none() {
             return match self.allow_null_recipient {
                 true => Ok(()),
-                false => Err(CoreError::Evaluation("Null recipients are not allowed.".to_string())),
+                false => Err(CoreError::Evaluation(
+                    "Null recipients are not allowed.".to_string(),
+                )),
             };
         }
 
@@ -83,10 +88,15 @@ impl SatisfiableForArchitecture<Evm> for Acl<<Evm as Architecture>::AddressRaw> 
             .map(|a| NameOrAddress::Address(H160::from(a)))
             .collect();
 
-        match (converted_addresses.contains(&tx.to.clone().unwrap()), self.kind) {
+        match (
+            converted_addresses.contains(&tx.to.clone().unwrap()),
+            self.kind,
+        ) {
             (true, AclKind::Allow) => Ok(()),
             (false, AclKind::Deny) => Ok(()),
-            _ => Err(CoreError::Evaluation("Transaction not allowed.".to_string())),
+            _ => Err(CoreError::Evaluation(
+                "Transaction not allowed.".to_string(),
+            )),
         }
     }
 }

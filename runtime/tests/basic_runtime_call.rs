@@ -1,13 +1,14 @@
 // "barebones" constraints as created by `wasm-tools component new ./barebones.wasm -o barebones_component.wasm`
 const BAREBONES_COMPONENT_WASM: &[u8] = include_bytes!("./barebones-component.wasm");
 
-
 use core::result::Result;
 
-use wasmtime::{Config, Engine, component::{Component, bindgen, Linker}, Store, Module, Func, Caller, Instance };
+use wasmtime::{
+    component::{bindgen, Component, Linker},
+    Caller, Config, Engine, Func, Instance, Module, Store,
+};
 
 bindgen!("constraint");
-
 
 #[test]
 fn test_barebones_component() {
@@ -24,7 +25,6 @@ fn test_barebones_component() {
 
     let mut store = Store::new(&engine, ());
     // let evaluate = instance.get_typed_func::<(), (Result<(), ec_core::bindgen::Error>)>(&mut store, "evaluate").unwrap();
-
 
     let rand_stuff = "asdfasdfasdfasdf".to_string();
     let initial_state = EvaluationState {
@@ -54,7 +54,6 @@ fn test_barebones_component_failure() {
     let mut store = Store::new(&engine, ());
     // let evaluate = instance.get_typed_func::<(), (Result<(), ec_core::bindgen::Error>)>(&mut store, "evaluate").unwrap();
 
-
     let rand_stuff = "asdff".to_string();
     let initial_state = EvaluationState {
         data: rand_stuff.as_bytes(),
@@ -67,11 +66,7 @@ fn test_barebones_component_failure() {
     assert!(res.unwrap().is_err());
 }
 
-
-
 // This is basically the example from wasmtime docs
-
-
 
 #[test]
 fn test_default_wasmtime_example() {
@@ -101,7 +96,9 @@ fn test_default_wasmtime_example() {
     // afterwards we can fetch exports by name, as well as asserting the
     // type signature of the function with `get_typed_func`.
     let instance = Instance::new(&mut store, &module, &[host_func.into()]).unwrap();
-    let hello = instance.get_typed_func::<(), ()>(&mut store, "hello").unwrap();
+    let hello = instance
+        .get_typed_func::<(), ()>(&mut store, "hello")
+        .unwrap();
 
     // And finally we can call the wasm!
     hello.call(&mut store, ()).unwrap();

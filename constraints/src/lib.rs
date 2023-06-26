@@ -14,6 +14,5 @@ pub mod arch {
     pub use ec_evm as evm;
 }
 
-/// Dynamic parsing allows for easily hooking transactions into 
-pub mod parsing {
-}
+/// Dynamic parsing allows for easily hooking transactions into
+pub mod parsing {}

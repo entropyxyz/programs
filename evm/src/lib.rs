@@ -68,7 +68,6 @@ impl Parse<Evm> for <Evm as Architecture>::TransactionRequest {
 impl TryParse<Evm> for <Evm as Architecture>::TransactionRequest {
     /// TODO expect the hex-encoded RLP of the transaction request, so user doesn't have to hex::decode
     fn try_parse(bytes: &[u8]) -> Result<Self, CoreError> {
-
         let request_as_string = String::from_utf8(bytes.to_owned()).map_err(|e| {
             CoreError::InvalidTransactionRequest(format!("Unable to parse to String: {}", e))
         })?;

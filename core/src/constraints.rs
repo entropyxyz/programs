@@ -1,5 +1,5 @@
 //! Contains traits that constraints should implement, including Architecture-agnostic constraints and generic constraints.
-//! 
+//!
 //! For runtime and binary size optimizations, constraint construction should be done at compile time by using `const` types, if possible. This can be done by using `const` generic parameters,
 //! or by using a `const` builder. Both methods are described nicely here: https://wapl.es/rust/2022/07/03/const-builder-pattern.html
 
@@ -28,12 +28,12 @@ pub trait Satisfiable {
 ///    kind: AclKind::Deny,
 ///    allow_null_recipient: false,
 /// };
-/// 
+///
 /// let non_blacklisted_recipient_tx = TransactionRequest {
 ///    to: Some(NameOrAddress::Address(H160::from(non_blacklisted_addr))),
 ///   ..Default::default()
 /// };
-/// 
+///
 /// let blacklisted_recipient_tx = TransactionRequest {
 ///    to: Some(NameOrAddress::Address(H160::from(blacklisted_addr_1))),
 ///   ..Default::default()
@@ -44,7 +44,7 @@ pub trait Satisfiable {
 /// // This will return an error, because the recipient is not in the ACL.
 /// no_malicious_addresses.is_satisfied_by(blacklisted_recipient_tx)?;
 /// ```
-/// 
+///
 pub trait SatisfiableForArchitecture<A: Architecture> {
     /// Indicates that the transaction request satisfies the constraint.
     fn is_satisfied_by(self, tx: &<A as Architecture>::TransactionRequest) -> Result<(), Error>;
