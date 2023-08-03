@@ -1,2 +1,18 @@
 [workspace]
-members = ["constraints", "core", "acl", "evm", "runtime", "examples"]
+members = ["constraints", "core", "acl", "evm", "runtime", "examples/*"]
+
+[workspace.dependencies]
+ec-constraints = { path = "constraints", default-features = false }
+ec-core = { path = "core", default-features = false }
+ec-acl = { path = "acl", default-features = false }
+ec-evm = { path = "evm", default-features = false }
+ec-runtime = { path = "runtime", default-features = false }
+wit-bindgen = { version = "0.7.0", default_features = false }
+
+# strip debug info since that makes up a major part of Wasm blobs, see Wasm's `twiggy`
+[profile.release.package.template-basic-transaction]
+strip = "debuginfo"
+[profile.release.package.template-barebones]
+strip = "debuginfo"
+[profile.release.package."*"]
+strip = "debuginfo"

@@ -8,7 +8,12 @@ use wasmtime::{
     Caller, Config, Engine, Func, Instance, Module, Store,
 };
 
-bindgen!("constraint");
+
+// Note, this is wasmtime's bindgen for components, not wit-bindgen (modules)
+bindgen!({
+    world: "constraint",
+    path: "../wit/application.wit"
+});
 
 #[test]
 fn test_barebones_component() {
@@ -26,9 +31,9 @@ fn test_barebones_component() {
     let mut store = Store::new(&engine, ());
     // let evaluate = instance.get_typed_func::<(), (Result<(), ec_core::bindgen::Error>)>(&mut store, "evaluate").unwrap();
 
-    let rand_stuff = "asdfasdfasdfasdf".to_string();
+    let longer_than_10 = "asdfasdfasdfasdf".to_string();
     let initial_state = EvaluationState {
-        data: rand_stuff.as_bytes(),
+        data: longer_than_10.as_bytes(),
     };
 
     let (bindings, _) = Constraint::instantiate(&mut store, &component, &linker).unwrap();
@@ -54,9 +59,9 @@ fn test_barebones_component_failure() {
     let mut store = Store::new(&engine, ());
     // let evaluate = instance.get_typed_func::<(), (Result<(), ec_core::bindgen::Error>)>(&mut store, "evaluate").unwrap();
 
-    let rand_stuff = "asdff".to_string();
+    let shorter_than_10 = "asdff".to_string();
     let initial_state = EvaluationState {
-        data: rand_stuff.as_bytes(),
+        data: shorter_than_10.as_bytes(),
     };
 
     let (bindings, _) = Constraint::instantiate(&mut store, &component, &linker).unwrap();

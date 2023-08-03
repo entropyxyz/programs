@@ -42,8 +42,9 @@ mod tests {
 
     #[test]
     fn test_evaluate() {
+        let sig_req =  "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string();
         let signature_request = EvaluationState {
-            data: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            data: sig_req.as_bytes(),
         };
 
         match Program::evaluate(signature_request) {
@@ -57,7 +58,7 @@ mod tests {
     #[test]
     fn test_start_fail() {
         let signature_request = EvaluationState {
-            data: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            data: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".as_bytes(),
         };
 
         match Program::evaluate(signature_request) {

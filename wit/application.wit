@@ -1,4 +1,4 @@
-package ec:runtime
+package entropy:core
 
 world constraint {
    // similar to `variant`, but no type payloads
