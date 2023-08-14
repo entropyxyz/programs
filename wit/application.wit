@@ -1,0 +1,16 @@
+package entropy:core
+
+world constraint {
+   // similar to `variant`, but no type payloads
+  variant error {
+    invalid-transaction-request(string),
+    evaluation(string)
+  }
+  /// Contains signature request data that is used by the constraints runtime. Passed into `wasmtime::Store` for state (or maybe `wasmtime::Linker`).
+  export evaluate: func(config: evaluation-state) -> result<_, error>
+
+  record evaluation-state {
+    /// The preimage of the user's data under constraint evaulation (eg. RLP-encoded ETH transaction request).
+    data: list<u8>
+  }
+}

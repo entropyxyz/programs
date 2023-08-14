@@ -1,75 +1,29 @@
 # Entropy Constraints
 
-Entropy is a decentralized platform for securely managing digital assets. It uses threshold cryptography to sign messages, like transaction requests, and users write constraints to define the conditions under which signature requests are valid.
+Entropy is a decentralized platform for securely managing digital assets. It uses threshold cryptography to sign messages such as transaction requests, and users write constraints to define the conditions under which signature requests are valid.
 
-This repository contains libraries, toolchains, utilities, and specifications for writing, configuring, building, and testing the Wasm-based constraints for Entropy. Constraints can be written in any language that compiles to WebAssembly, including LLVM-supported languages like Rust, AssemblyScript, Zig, C, etc. Resultingly, constraints can be reused across *all* of these languages.
+This repository contains libraries, toolchains, utilities, and specifications for writing, configuring, building, and testing the Wasm-based applications for Entropy. Constraints can be written in any language that compiles to WebAssembly, including LLVM-supported languages like Rust, AssemblyScript, Zig, C, etc. With WIT binding generation, constraints can be reused across *all* of these languages, with rich typing (not the C ABI).
 
-## Requirements
+## Build Requirements
 
-To get started, you will need the stable Rust toolchain with the `wasm32-unknown-unknown` target installed.
+Besides the latest stable Rust toolchain, you will need to install [wasm-tools](https://github.com/bytecodealliance/wasm-tools) for constructing Wasm components. You can install it by running:
 
-## Getting started
+```bash
+cargo install wasm-tools
+```
 
-To get started, clone this repository and build an example constraints package:
+## Example Constraint: `barebones`
+
+To get started, clone this repository and build the example `barebones` constraint binary:
 
 ```bash
 git clone https://github.com/entropyxy/constraints
-cd constraints/examples/acl
-cargo build --release
+cd constraints
+cargo build --release --bin barebones --target wasm32-unknown-unknown
 ```
 
-This will build a valid constraints program for the Entropy constraints runtime, which can be uploaded to the Entropy Network.
+This creates the constraint as a *Wasm Module* a `target/wasm32-unknown-unknown/release/barebones.wasm`.
 
-To write your own constraints, you can use any language that compiles to WebAssembly, such as Rust, C++, or AssemblyScript. You will need to define a function that takes a transaction request or message as input and returns a result indicating whether the constraints are satisfied.
+To convert it into a *Wasm Component*, we must use `wasm-tools component new target/wasm32-unknown-unknown/release/barebones.wasm -o runtime/tests/barebones-component.wasm`. The Using `wasmtime::bindgen` as seen in `ec-runtime/tests/basic_runtime_call.rs`, we can see that the component is callable with rich types via WIT.
 
-## Conventions
-
-Packages should use the `ec` prefix, which stands for "Entropy Constraints". For example, `ec-core` is the "Entropy Constraints Core" package, and `ec-acl` is the "Entropy Constraints Access Control List" package.
-
-<!-- 
-The function should be exported and have the following signature:
-
-Copy code
-int32_t check_constraints(uint8_t* request, size_t request_len);
-Once you have written your constraints function, you can compile it to WebAssembly using your language's WebAssembly compiler. For example, if you are using Rust, you can compile your code as follows:
-
-```sh
-rustc --target wasm32-wasi -O --crate-type=cdylib my_constraints.rs
-```
-This will compile your code to a Wasm module that can be imported into the DACP.
-
-## Usage
-To use the constraints system in the Entropy, you will need to import the basic constraints package library and any additional constraints modules that you have written. You can do this using the wasmtime runtime and the wasmtime-interface-types crate.
-
-Here's an example of how to load and call a constraints function:
-
-```rust
-use wasmtime_interface_types::{HostFunctions, WasmtimeCxt};
-use wasmtime_runtime::Instance;
-
-// Load the basic constraints package library
-let module = wasmtime_runtime::Module::from_file("basic_constraints.wasm")?;
-
-// Load the constraints module
-let module2 = wasmtime_runtime::Module::from_file("my_constraints.wasm")?;
-
-// Create an instance of the constraints module
-let instance = Instance::new(&module2, &[])?;
-
-// Define the transaction request or message as a byte array
-let request = vec![0x01, 0x02, 0x03];
-
-// Define the host functions that the constraints function can call
-let host_fns = HostFunctions::new();
-
-// Create a context for the Wasmtime runtime
-let cxt = WasmtimeCxt::new(&host_fns);
-
-// Call the constraints function
-let check_constraints = instance
-    .get_typed_func::<(i32, i32), i32, _>(&mut *cxt, "check_constraints")?;
-let result = check_constraints.call(&mut *cxt, (request.as_ptr() as i32, request.len() as i32))?;
-
-// Check the result of the constraints function
-if result == -->
-``` -->
+Check `runtime/tests/basic_runtime_call.rs` to see how you can perform assertions on the constraint based on the input data to the runtime.

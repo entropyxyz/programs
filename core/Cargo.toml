@@ -7,12 +7,16 @@ edition = "2021"
 
 [dependencies]
 thiserror = "1.0"
+getrandom = { version = "0.2", default-features = false, features = ["custom"] }
+witgen = "0.15.0"
 
 # parsing
 serde = { version = "1.0", default-features = false, features = ["derive"] }
+wit-bindgen = { version = "0.7.0", default-features = false, features = ["macros"] }
+# wasmtime-wit-bindgen = { version = "10.0.1", default-features = false }
+# wasmtime-component-macro = { version = "10.0.1", default-features = false }
+# wasmtime ={ version = "10.0.1", default-features = false, features = ["component-model"] }
 
 [features]
 default = ["std"]
-std = [
-  "serde/std",
-]
+std = ["serde/std"]

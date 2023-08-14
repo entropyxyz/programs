@@ -1,37 +1,39 @@
 //! This supports core traits and types for supporting new architectures and constraints, and interfacing with them.
 
+/// See the [`wit-bindgen` Rust guest example](https://github.com/bytecodealliance/wit-bindgen#guest-rust) for information on how to use this.
+pub mod bindgen {
+    wit_bindgen::generate!({
+        world: "constraint",
+        path: "../wit/application.wit",
+        macro_export,
+    });
+}
+
+pub use bindgen::Error;
+
+pub mod constraints;
+
 pub use architecture::*;
 pub use constraints::*;
 
-use thiserror::Error;
-
-/// Errors related to parsing and evaulating constraints.
-#[derive(Error, Debug, PartialEq)]
-pub enum Error {
-    /// Transaction request could not be parsed
-    #[error("Invalid transaction request: {0}")]
-    InvalidTransactionRequest(String),
-    /// Transaction request did not meet constraint requirements.
-    #[error("Constraint Evaluation error: {0}")]
-    Evaluation(&'static str),
-}
-
-/// Contains the traits and implementations of each supported constraint.
-mod architecture {
-    use super::Error;
+/// Each transaction-like architecture should implement these.
+pub mod architecture {
+    use super::bindgen::Error;
     use serde::{Deserialize, Serialize};
+
     /// Trait for defining important types associated with an architecture.
     pub trait Architecture: Serialize + for<'de> Deserialize<'de> {
         /// Account type for that chain(SS58, H160, etc)
-        type Address: Eq + Serialize + for<'de> Deserialize<'de>;
+        type Address: Eq + Serialize + for<'de> Deserialize<'de> + From<Self::AddressRaw>;
         /// Account type as it is stored in the database
-        type AddressRaw: Eq + Serialize + for<'de> Deserialize<'de>;
+        type AddressRaw: Eq + Serialize + for<'de> Deserialize<'de> + From<Self::Address>;
         /// Transaction request type for unsigned transactions
         type TransactionRequest: GetSender<Self>
             + GetReceiver<Self>
             + Serialize
             + for<'de> Deserialize<'de>
-            + Parse<Self>;
+            + Parse<Self>
+            + TryParse<Self>;
     }
 
     /// Trait for getting the the sender of a transaction.
@@ -44,19 +46,49 @@ mod architecture {
         fn receiver(&self) -> Option<A::Address>;
     }
 
+    /// DEPRECATED: Use `TryParse`
+    ///
     /// Trait for parsing a raw transaction request into its native transaction request struct.
     pub trait Parse<A: Architecture> {
         fn parse(raw_tx: String) -> Result<A::TransactionRequest, Error>;
     }
+
+    /// Tries to parse a raw transaction request into its native transaction request struct.
+    pub trait TryParse<A: Architecture> {
+        fn try_parse(raw_tx: &[u8]) -> Result<A::TransactionRequest, Error>;
+    }
 }
 
-/// Constraint-specific traits
-mod constraints {
-    use super::architecture::Architecture;
-    use super::Error;
+pub mod runtime {
 
-    /// Any constraint must implement this for each architecture it wants to support.
-    pub trait Evaluate<A: Architecture> {
-        fn eval(self, tx: A::TransactionRequest) -> Result<(), Error>;
+    // /// Contains signature request data that is used by the constraints runtime. Passed into `wasmtime::Store` for state (or maybe `wasmtime::Linker`).
+    // #[witgen]
+    // pub struct EvaluationState {
+    //     /// The preimage of the user's data under constraint evaulation (eg. RLP-encoded ETH transaction request).
+    //     data: Vec<u8>
+    // }
+}
+
+/// Includes items that should be imported into most scopes
+pub mod prelude {
+    // reexport getrandom custom handler (move to macro)
+    pub use getrandom::register_custom_getrandom;
+    // reexport all core traits
+    pub use super::architecture::*;
+
+    use core::num::NonZeroU32;
+    use getrandom::Error;
+
+    /// Custom `getrandom()` handler that always returns an error.
+    ///
+    /// `getrandom` is a commonly used package for sourcing randomness.This should return an error for now,
+    /// but in the future it might make sense for the validators to determinstically source randomness from
+    /// BABE (eg. at a certain block)
+    ///
+    /// From https://docs.rs/getrandom/latest/getrandom/macro.register_custom_getrandom.html
+    // TODO This should get throw into the macros
+    pub fn always_fail(_buf: &mut [u8]) -> Result<(), Error> {
+        let code = NonZeroU32::new(Error::CUSTOM_START.saturating_add(1)).unwrap();
+        Err(Error::from(code))
     }
 }
