@@ -10,7 +10,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-ec-constraints ={ workspace = true }
+ec-core ={ workspace = true }
 
 # These are used by `cargo component`
 [package.metadata.component]

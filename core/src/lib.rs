@@ -3,7 +3,7 @@
 /// See the [`wit-bindgen` Rust guest example](https://github.com/bytecodealliance/wit-bindgen#guest-rust) for information on how to use this.
 pub mod bindgen {
     wit_bindgen::generate!({
-        world: "constraint",
+        world: "program",
         path: "../wit/application.wit",
         macro_export,
     });
@@ -63,7 +63,7 @@ pub mod runtime {
 
     // /// Contains signature request data that is used by the constraints runtime. Passed into `wasmtime::Store` for state (or maybe `wasmtime::Linker`).
     // #[witgen]
-    // pub struct EvaluationState {
+    // pub struct InitialState {
     //     /// The preimage of the user's data under constraint evaulation (eg. RLP-encoded ETH transaction request).
     //     data: Vec<u8>
     // }
