@@ -17,6 +17,7 @@ mod bindgen {
 pub use bindgen::{ Program, Error as ProgramError, InitialState };
 
 /// Runtime `Error` type
+#[derive(Debug)]
 pub enum Error {
     /// Program bytecode is invalid.
     InvalidBytecode,
