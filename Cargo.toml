@@ -1,5 +1,6 @@
 [workspace]
 members = ["constraints", "core", "acl", "evm", "runtime", "examples/*"]
+resolver = "2"
 
 [workspace.dependencies]
 ec-constraints = { path = "constraints", default-features = false }
