@@ -17,9 +17,8 @@ rustup:
 .PHONY: rust
 rust:
 		export PATH="${PATH}:${HOME}/.cargo/bin" rustup default stable \
-		&& rustup update nightly \
-		&& rustup update stable \
-		&& rustup target add wasm32-unknown-unknown --toolchain nightly
+		&& rustup show \
+		&& cargo install --git https://github.com/bytecodealliance/cargo-component --locked cargo-component
 
 # This target is specifically for generating API documentation from
 # within a Vercel.com Project. It is used as the Projects `installCommand`.
