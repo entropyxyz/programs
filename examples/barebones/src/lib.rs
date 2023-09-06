@@ -39,7 +39,6 @@ export_program!(BarebonesProgram);
 #[cfg(test)]
 mod tests {
     use super::*;
-    // use super::{InitialState, BarebonesProgram, Program, ToString};
 
     #[test]
     fn test_evaluate() {
