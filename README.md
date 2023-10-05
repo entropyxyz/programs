@@ -1,18 +1,18 @@
-# Entropy Constraints
+# Entropy Programs
 
-Entropy is a decentralized platform for securely managing digital assets. It uses threshold cryptography to sign messages such as transaction requests, and users write constraints to define the conditions under which signature requests are valid.
+Entropy allows the creation of decentralized signing authorities. Signing authorities exist as WebAssembly programs that can ingest a signature request, and a valid request is signed via a threshold signature scheme from a set of at-stake validators. These requests might include cryptocurrency-based transaction requests, certificate signing requests, or other mediums for cryptographic authentication.
 
-This repository contains libraries, toolchains, utilities, and specifications for writing, configuring, building, and testing the Wasm-based applications for Entropy. Programs can be written in any language that compiles to WebAssembly, including LLVM-supported languages like Rust, AssemblyScript, Zig, C, etc. Thanks to Wasm interface types, programs can even be reused languages, with the rich typing provided by the WIT specification.
+This repository contains libraries, toolchains, utilities, and specifications for writing, configuring, building, and testing the Wasm-based applications for Entropy. In theory, programs can be written in any language that compiles to WebAssembly, which includes all LLVM-supported languages like Rust, AssemblyScript, Zig, C, etc. Thanks to the WebAssembly [Component Model](https://component-model.bytecodealliance.org), programs can even be reused languages, with the rich typing provided by the component model interfaces.
 
-## Build Requirements
+## Writing Programs
 
-Besides the latest stable Rust toolchain, you will also need [cargo component](https://github.com/bytecodealliance/cargo-component) for building Wasm components. You can install it by running:
+### Build Requirements
 
-```bash
-cargo install wasm-tools
-```
+Besides the latest stable Rust toolchain, you will also need to install:
+- [cargo component]([https://github.com/bytecodealliance/cargo-component](https://component-model.bytecodealliance.org/), a Cargo extension for building Wasm components.
+- [wasm-tools](https://github.com/bytecodealliance/wasm-tools#installation), to be used by `cargo-component`
 
-## Example Constraint: `barebones`
+## Example Program: `barebones`
 
 To get started, clone this repository and build the example `barebones` program:
 
