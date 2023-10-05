@@ -9,7 +9,7 @@ This repository contains libraries, toolchains, utilities, and specifications fo
 ### Build Requirements
 
 Besides the latest stable Rust toolchain, you will also need to install:
-- [cargo component]([https://github.com/bytecodealliance/cargo-component](https://component-model.bytecodealliance.org/), a Cargo extension for building Wasm components.
+- [cargo component](https://component-model.bytecodealliance.org/), a Cargo extension for building Wasm components.
 - [wasm-tools](https://github.com/bytecodealliance/wasm-tools#installation), to be used by `cargo-component`
 
 ## Example Program: `barebones`
