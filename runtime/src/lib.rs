@@ -73,6 +73,6 @@ impl Runtime {
         bindings
             .call_evaluate(&mut self.store, initial_state)
             .unwrap()
-            .map_err(|e| RuntimeError::Runtime(e))
+            .map_err(RuntimeError::Runtime)
     }
 }
