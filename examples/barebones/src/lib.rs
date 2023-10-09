@@ -6,9 +6,7 @@ extern crate alloc;
 
 use alloc::{string::ToString, vec};
 
-use ec_core::{
-    bindgen::Error, bindgen::*, export_program, prelude::*,
-};
+use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
@@ -47,7 +45,6 @@ mod tests {
 
         assert!(BarebonesProgram::evaluate(signature_request).is_ok());
     }
-
 
     #[test]
     fn test_should_error() {

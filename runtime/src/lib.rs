@@ -1,10 +1,10 @@
 //! Contains the Wasm runtime and related types for evaluating programs.
 
+use thiserror::Error;
 use wasmtime::{
     component::{bindgen, Component, Linker},
-    Config, Engine, Store, Result,
+    Config, Engine, Result, Store,
 };
-use thiserror::Error;
 
 /// Note, this is wasmtime's bindgen, not wit-bindgen (modules)
 mod bindgen {
@@ -15,7 +15,7 @@ mod bindgen {
         path: "../wit/application.wit"
     });
 }
-pub use bindgen::{ Program, Error as ProgramError, InitialState };
+pub use bindgen::{Error as ProgramError, InitialState, Program};
 
 /// Runtime `Error` type
 #[derive(Debug, Error)]
@@ -25,7 +25,7 @@ pub enum RuntimeError {
     InvalidBytecode,
     /// Runtime error during execution.
     #[error("Runtime error: {0}")]
-    Runtime(ProgramError)
+    Runtime(ProgramError),
 }
 
 /// Runtime allows for the execution of programs. Instantiate with `Runtime::new()`.
@@ -58,12 +58,21 @@ impl Runtime {
 
 impl Runtime {
     /// Evaluate a program with a given initial state.
-    pub fn evaluate(&mut self, program: &[u8], initial_state: &InitialState) -> Result<(), RuntimeError> {
-        let component = Component::from_binary(&self.engine, program).map_err(|_| RuntimeError::InvalidBytecode)?;
+    pub fn evaluate(
+        &mut self,
+        program: &[u8],
+        initial_state: &InitialState,
+    ) -> Result<(), RuntimeError> {
+        let component = Component::from_binary(&self.engine, program)
+            .map_err(|_| RuntimeError::InvalidBytecode)?;
 
-        let (bindings, _) = Program::instantiate(&mut self.store, &component, &self.linker).map_err(|_| RuntimeError::InvalidBytecode)?;
+        let (bindings, _) = Program::instantiate(&mut self.store, &component, &self.linker)
+            .map_err(|_| RuntimeError::InvalidBytecode)?;
 
         // TODO fix this unwrap
-        bindings.call_evaluate(&mut self.store, initial_state).unwrap().map_err(|e| RuntimeError::Runtime(e))
+        bindings
+            .call_evaluate(&mut self.store, initial_state)
+            .unwrap()
+            .map_err(|e| RuntimeError::Runtime(e))
     }
 }

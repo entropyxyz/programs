@@ -1,7 +1,8 @@
 /// Points to the `template-barebones` program binary.
-const BAREBONES_COMPONENT_WASM: &[u8] = include_bytes!("../../target/wasm32-unknown-unknown/release/template_barebones.wasm");
+const BAREBONES_COMPONENT_WASM: &[u8] =
+    include_bytes!("../../target/wasm32-unknown-unknown/release/template_barebones.wasm");
 
-use ec_runtime::{ Runtime, InitialState };
+use ec_runtime::{InitialState, Runtime};
 
 #[test]
 fn test_barebones_component() {
