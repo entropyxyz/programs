@@ -1,4 +1,3 @@
-#![no_main]
 #![no_std]
 
 extern crate alloc;
@@ -49,32 +48,25 @@ export_program!(BasicTransaction);
 #[cfg(test)]
 mod tests {
     use super::*;
+    use alloc::string::ToString;
 
     #[test]
     fn test_evaluate() {
         let signature_request = InitialState {
+            // `data` is an RLP serialized ETH transaction with the recipient set to `0x772b9a9e8aa1c9db861c6611a82d251db4fac990`
             data: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
         };
 
-        match BasicTransaction::evaluate(signature_request) {
-            Ok(_) => (),
-            Err(e) => {
-                panic!("{}", e)
-            }
-        }
+        assert!(BasicTransaction::evaluate(signature_request).is_ok());
     }
 
     #[test]
     fn test_start_fail() {
         let signature_request = InitialState {
-            data: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            // `data` is the same as previous test, but recipient address ends in `1` instead of `0`, so it should fail
+            data: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac991019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
         };
 
-        match BasicTransaction::evaluate(signature_request) {
-            Ok(_) => (),
-            Err(e) => {
-                panic!("{}", e)
-            }
-        }
+        assert!(BasicTransaction::evaluate(signature_request).is_err());
     }
 }
