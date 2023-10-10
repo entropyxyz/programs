@@ -1,14 +1,13 @@
-#![no_main]
 #![no_std]
 
 extern crate alloc;
 
 use ec_constraints::{
     constraints::acl::*,
-    core::{bindgen::*, export_program, prelude::*, SatisfiableForArchitecture, TryParse},
+    core::{bindgen::*, export_program, prelude::*, TryParse},
 };
 
-use alloc::{string::ToString, vec};
+use alloc::string::ToString;
 
 pub struct NotATransaction;
 
@@ -36,28 +35,18 @@ mod tests {
     #[test]
     fn test_evaluate() {
         let signature_request = InitialState {
-            data: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            data: b"deadbeef".to_vec(),
         };
 
-        match NotATransaction::evaluate(signature_request) {
-            Ok(_) => (),
-            Err(e) => {
-                panic!("{}", e)
-            }
-        }
+        assert!(NotATransaction::evaluate(signature_request).is_ok());
     }
 
     #[test]
-    fn test_start_fail() {
+    fn test_evaluate_fail() {
         let signature_request = InitialState {
             data: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
         };
 
-        match NotATransaction::evaluate(signature_request) {
-            Ok(_) => (),
-            Err(e) => {
-                panic!("{}", e)
-            }
-        }
+        assert!(NotATransaction::evaluate(signature_request).is_err());
     }
 }
