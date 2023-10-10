@@ -1,15 +1,12 @@
 //! This example shows how to write a contrieved and basic constraint: checking the length of the data to be signed.
 
-#![no_main]
 #![no_std]
 
 extern crate alloc;
 
 use alloc::{string::ToString, vec};
 
-use ec_core::{
-    bindgen::Error, bindgen::*, export_program, prelude::*,
-};
+use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
@@ -41,31 +38,21 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_evaluate() {
-        let sig_req =  "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string();
+    fn test_should_sign() {
         let signature_request = InitialState {
-            data: sig_req.into_bytes(),
+            data: "some_data_longer_than_10_bytes".to_string().into_bytes(),
         };
 
-        match BarebonesProgram::evaluate(signature_request) {
-            Ok(_) => (),
-            Err(e) => {
-                panic!("{}", e)
-            }
-        }
+        assert!(BarebonesProgram::evaluate(signature_request).is_ok());
     }
 
     #[test]
-    fn test_start_fail() {
+    fn test_should_error() {
+        // data being checked is under 10 bytes in length
         let signature_request = InitialState {
-            data: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            data: "under10".to_string().into_bytes(),
         };
 
-        match BarebonesProgram::evaluate(signature_request) {
-            Ok(_) => (),
-            Err(e) => {
-                panic!("{}", e)
-            }
-        }
+        assert!(BarebonesProgram::evaluate(signature_request).is_err());
     }
 }
