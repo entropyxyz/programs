@@ -13,11 +13,21 @@ fn main() {
     let out_file = File::create(dest_path).unwrap();
     let mut writer = BufWriter::new(out_file);
 
+    // First count the number of non-empty lines in the file
+    let length = {
+        let file = File::open(format!("addresses.txt")).unwrap();
+        let reader = BufReader::new(file);
+        let mut number_lines = 0;
+        for line in reader.lines() {
+            if !line.unwrap().is_empty() {
+                number_lines += 1;
+            }
+        }
+        number_lines
+    };
+
     let file = File::open(format!("addresses.txt")).unwrap();
     let reader = BufReader::new(file);
-
-    let length = 2;
-
     writer
         .write(format!("const ADDRESSES: [[u8; 20]; {}] = [", length).as_bytes())
         .unwrap();
