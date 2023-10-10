@@ -7,9 +7,9 @@ use ec_constraints::{
     core::{bindgen::*, export_program, prelude::*, SatisfiableForArchitecture, TryParse},
 };
 
-use alloc::vec;
-
 pub struct BasicTransaction;
+
+include!(concat!(env!("OUT_DIR"), "/addresses.rs"));
 
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
@@ -23,15 +23,8 @@ impl Program for BasicTransaction {
         let parsed_tx =
             <Evm as Architecture>::TransactionRequest::try_parse(state.data.as_slice())?;
 
-        // construct a whitelist ACL
-        // TODO can we just use Address instead of AddressRaw?
-        let whitelisted_address: <Evm as Architecture>::AddressRaw =
-            hex::decode("772b9a9e8aa1c9db861c6611a82d251db4fac990")
-                .unwrap()
-                .try_into()
-                .unwrap();
         let allowlisted_acl = Acl::<<Evm as Architecture>::AddressRaw> {
-            addresses: vec![whitelisted_address],
+            addresses: ADDRESSES.to_vec(),
             ..Default::default()
         };
 
