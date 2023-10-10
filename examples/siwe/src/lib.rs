@@ -16,7 +16,8 @@ pub struct Siwe;
 impl Program for Siwe {
     fn evaluate(signature_request: InitialState) -> Result<(), Error> {
         let data: vec::Vec<u8> = signature_request.data;
-        let string_message = String::from_utf8(data).unwrap();
+        let string_message =
+            String::from_utf8(data).map_err(|err| Error::Evaluation(err.to_string()))?;
         if string_message.parse::<Message>().is_err() {
             return Err(Error::Evaluation(
                 "Not a valid Sign-in with Ethereum message".to_string(),
