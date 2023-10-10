@@ -1,3 +1,4 @@
+//! This program will sign any message which does not parse as an RLP encoded EVM transaction
 #![no_std]
 
 extern crate alloc;
@@ -18,7 +19,6 @@ impl Program for NotATransaction {
     /// Passes only if the given message is not a valid EVM transaction
     // #[no_mangle]
     fn evaluate(state: InitialState) -> Result<(), CoreError> {
-        // parse the raw tx into some type
         match <Evm as Architecture>::TransactionRequest::try_parse(state.data.as_slice()) {
             Ok(_) => Err(Error::Evaluation("Parses as a transaction".to_string())),
             Err(_) => Ok(()),
