@@ -1,6 +1,6 @@
 //! This example shows how to write a contrieved and basic constraint: checking the length of the data to be signed.
 
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 

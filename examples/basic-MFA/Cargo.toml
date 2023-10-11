@@ -1,0 +1,29 @@
+[package]
+name = "template-basic-mfa"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+# This is required to compile constraints to a wasm module
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+ec-core ={ workspace = true }
+serde_json         ="1.0"
+serde              ={ version="1.0", default-features=false, features=["derive"] }
+ethers = "2.0"
+hex = { version = "0.4.3", default-features = false }
+
+[dev-dependencies]
+actix-rt = "*"
+
+# These are used by `cargo component`
+[package.metadata.component]
+package = "entropy:template-basic-mfa"
+
+[package.metadata.component.target]
+path = "../../wit"
+
+[package.metadata.component.dependencies]
