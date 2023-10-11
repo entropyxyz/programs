@@ -3,7 +3,7 @@
 
 extern crate alloc;
 
-use alloc::{string::String, string::ToString, vec};
+use alloc::{string::String, string::ToString};
 
 use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 use siwe::Message;
@@ -15,9 +15,8 @@ pub struct Siwe;
 
 impl Program for Siwe {
     fn evaluate(signature_request: InitialState) -> Result<(), Error> {
-        let data: vec::Vec<u8> = signature_request.data;
         let string_message =
-            String::from_utf8(data).map_err(|err| Error::Evaluation(err.to_string()))?;
+            String::from_utf8(signature_request.data).map_err(|err| Error::Evaluation(err.to_string()))?;
         if string_message.parse::<Message>().is_err() {
             return Err(Error::Evaluation(
                 "Not a valid Sign-in with Ethereum message".to_string(),
