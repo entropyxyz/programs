@@ -11,6 +11,9 @@ use siwe::Message;
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
 
+// The domain we allow a user to sign-in to
+const ALLOWED_DOMAIN: &str = "localhost";
+
 pub struct Siwe;
 
 impl Program for Siwe {
@@ -18,13 +21,17 @@ impl Program for Siwe {
         let data: vec::Vec<u8> = signature_request.data;
         let string_message =
             String::from_utf8(data).map_err(|err| Error::Evaluation(err.to_string()))?;
-        if string_message.parse::<Message>().is_err() {
-            return Err(Error::Evaluation(
-                "Not a valid Sign-in with Ethereum message".to_string(),
-            ));
-        };
+        let siwe_message = string_message
+            .parse::<Message>()
+            .map_err(|err| Error::Evaluation(err.to_string()))?;
 
-        Ok(())
+        if siwe_message.domain == ALLOWED_DOMAIN {
+            Ok(())
+        } else {
+            Err(Error::Evaluation(
+                "You may not sign-in to this domain".to_string(),
+            ))
+        }
     }
 }
 
@@ -56,7 +63,7 @@ Issued At: 2022-01-28T23:28:16.013Z"
     }
 
     #[test]
-    fn test_should_not_sign() {
+    fn test_bad_siwe_message() {
         let signature_request = InitialState {
             data: "localhost does not want you to sign in with your Ethereum account:
 0x6Ee9894c677EFa1c56392e5E7533DE76004C8D94
@@ -64,6 +71,26 @@ Issued At: 2022-01-28T23:28:16.013Z"
 This is a test statement.
 
 URI: https://localhost/login
+Version: 1
+Chain ID: 1
+Nonce: oNCEHm5jzQU2WvuBB
+Issued At: 2022-01-28T23:28:16.013Z"
+                .to_string()
+                .into_bytes(),
+        };
+
+        assert!(Siwe::evaluate(signature_request).is_err());
+    }
+
+    #[test]
+    fn test_bad_domain() {
+        let signature_request = InitialState {
+            data: "google.com does not want you to sign in with your Ethereum account:
+0x6Ee9894c677EFa1c56392e5E7533DE76004C8D94
+
+This is a test statement.
+
+URI: https://google.com/login
 Version: 1
 Chain ID: 1
 Nonce: oNCEHm5jzQU2WvuBB
