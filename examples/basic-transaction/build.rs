@@ -45,4 +45,5 @@ fn main() {
     writer.write("];".as_bytes()).unwrap();
 
     println!("cargo:rerun-if-changed=build.rs");
+    println!("cargo:rerun-if-changed=addresses.txt");
 }
