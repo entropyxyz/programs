@@ -1,0 +1,27 @@
+[package]
+name = "private-transaction-acl"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+# This is required to compile constraints to a wasm module
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+blake2 = "0.10.6"
+ec-constraints = { workspace = true }
+
+[build-dependencies]
+hex = "0.4.3"
+blake2 = "0.10.6"
+
+# These are used by `cargo component`
+[package.metadata.component]
+package = "entropy:template-basic-transaction"
+
+[package.metadata.component.target]
+path = "../../wit"
+
+[package.metadata.component.dependencies]
