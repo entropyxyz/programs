@@ -11,6 +11,8 @@ world program {
 
   record initial-state {
     /// The preimage of the user's data under program evaulation (eg. RLP-encoded ETH transaction request).
-    data: list<u8>
+    data: list<u8>,
+    /// The substrate account Id of the caller
+    signature-request-key: list<u8>
   }
 }
