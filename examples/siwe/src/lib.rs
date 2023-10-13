@@ -1,4 +1,8 @@
-//! Allows only valid Sign-in with Ethereum messages (EIP 4361)
+//! A template program which allows only valid Sign-in with Ethereum messages (EIP 4361)
+//! which sign-in to a given service.
+//!
+//! This could be used to share an account for a specific service whilst not allowing transactions
+//! to be signed.
 #![no_std]
 
 extern crate alloc;
@@ -11,7 +15,7 @@ use siwe::Message;
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
 
-// The domain we allow a user to sign-in to
+// The domain we allow a user to sign-in to. Change this to the desired service
 const ALLOWED_DOMAIN: &str = "localhost";
 
 pub struct Siwe;
