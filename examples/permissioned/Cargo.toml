@@ -1,0 +1,19 @@
+[package]
+name = "template-permissioned"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+ec-core ={ workspace = true }
+
+# These are used by `cargo component`
+[package.metadata.component]
+package = "entropy:template-permissioned"
+
+[package.metadata.component.target]
+path = "../../wit"
+
+[package.metadata.component.dependencies]
