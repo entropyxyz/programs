@@ -19,7 +19,7 @@ blake2 = "0.10.6"
 
 # These are used by `cargo component`
 [package.metadata.component]
-package = "entropy:template-basic-transaction"
+package = "entropy:private-transaction-acl"
 
 [package.metadata.component.target]
 path = "../../wit"
