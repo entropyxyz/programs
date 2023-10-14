@@ -17,7 +17,7 @@ Besides the latest stable Rust toolchain, you will also need to install:
 To get started, clone this repository and build the example `barebones` program:
 
 ```bash
-git clone https://github.com/entropyxy/constraints
+git clone https://github.com/entropyxyz/constraints
 cd constraints
 cargo component build --release -p template-barebones --target wasm32-unknown-unknown
 ```
