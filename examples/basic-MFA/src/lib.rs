@@ -4,7 +4,7 @@
 
 extern crate alloc;
 
-use alloc::{string::ToString, vec};
+use alloc::{string::{ToString, String}, vec};
 
 use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 use ethers::prelude::*;
@@ -49,8 +49,6 @@ export_program!(BasicMFAProgram);
 // write a test that calls evaluate and passes it the proper parameters
 #[cfg(test)]
 mod tests {
-    use ethers::abi::AbiEncode;
-
     use super::*;
     #[actix_rt::test]
     async fn test_should_sign() {
