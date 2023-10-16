@@ -1,4 +1,4 @@
-//! This example shows how to write a contrieved and basic constraint: checking the length of the data to be signed.
+//! This example shows how to write a contrieved and basic constraint: An MFA where a signature from a different key is requiered.
 
 #![cfg_attr(not(test), no_std)]
 
@@ -22,6 +22,8 @@ pub struct MFATransaction {
     pub signatory: String,
 }
 
+/// The list of addresses that are allowed to sign.
+/// In the example below as long as one of them sign the message is valid
 const SIGNATORIES: [&str; 2] = [
     "0x63f9725f107358c9115bc9d86c72dd5823e9b1e6",
     "0x4838b106fce9647bdf1e7877bf73ce8b0bad5f97",
@@ -31,8 +33,10 @@ impl Program for BasicMFAProgram {
     /// This is the only function required by the program runtime. `signature_request` is an MFATransaction request
     fn evaluate(signature_request: InitialState) -> Result<(), Error> {
         let data: MFATransaction = serde_json::from_slice(&signature_request.data).map_err(|e| Error::Evaluation(e.to_string()))?;
+        // To reduce an O(n) verify operation find the position of the signatory 
         let index_of_signtory = SIGNATORIES.iter().position(|&r| r == data.signatory).ok_or(Error::Evaluation("Signatory not valid".to_string()))?;
         let signatory: Address = SIGNATORIES[index_of_signtory].parse().map_err(|_| Error::Evaluation("Signatory not valid Conversion".to_string()))?;
+        // verify the signature
         data.signature
             .verify(data.message, signatory)
             .map_err(|e| Error::Evaluation(e.to_string()))?;
