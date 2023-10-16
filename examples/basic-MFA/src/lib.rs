@@ -1,5 +1,5 @@
 //! This example shows how to write a contrieved and basic constraint: An MFA where a signature from a different key is requiered.
-
+//! This is just an example do not use in prod!
 #![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
@@ -40,6 +40,7 @@ impl Program for BasicMFAProgram {
         data.signature
             .verify(data.message, signatory)
             .map_err(|e| Error::Evaluation(e.to_string()))?;
+        // Entropy will sign the whole signature_request including the sig, needs to have a way to sign only the message
         Ok(())
     }
 }
