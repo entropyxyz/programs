@@ -16,8 +16,8 @@ pub trait Satisfiable {
 ///
 /// For example, a constraint that checks that the recipient is not a blacklisted address would implement this trait for EVM, and would be similar to this:
 /// ```
-/// use ec_constraints::constraints::acl::*;
-/// use ec_constraints::arch::evm::*;
+/// use ec_acl::*;
+/// use ec_evm::*;
 ///
 /// let non_blacklisted_addr: [u8; 20] = [1u8; 20];
 /// let blacklisted_addr_1: [u8; 20] = [2u8; 20];
@@ -29,20 +29,21 @@ pub trait Satisfiable {
 ///    allow_null_recipient: false,
 /// };
 ///
-/// let non_blacklisted_recipient_tx = TransactionRequest {
+/// let non_blacklisted_recipient_tx = EvmTransactionRequest {
 ///    to: Some(NameOrAddress::Address(H160::from(non_blacklisted_addr))),
 ///   ..Default::default()
 /// };
 ///
-/// let blacklisted_recipient_tx = TransactionRequest {
+/// let blacklisted_recipient_tx = EvmTransactionRequest {
 ///    to: Some(NameOrAddress::Address(H160::from(blacklisted_addr_1))),
 ///   ..Default::default()
 /// };
 ///
 /// // This will be allowed, since the recipient is not in the blacklisted ACL.
-/// no_malicious_addresses.is_satisfied_by(non_blacklisted_recipient_tx)?;
+/// no_malicious_addresses.clone().is_satisfied_by(&non_blacklisted_recipient_tx)?;
 /// // This will return an error, because the recipient is not in the ACL.
-/// no_malicious_addresses.is_satisfied_by(blacklisted_recipient_tx)?;
+/// assert!(no_malicious_addresses.is_satisfied_by(&blacklisted_recipient_tx).is_err());
+/// Ok::<(), CoreError>(())
 /// ```
 ///
 pub trait SatisfiableForArchitecture<A: Architecture> {
