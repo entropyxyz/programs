@@ -1,9 +1,7 @@
 [package]
-name = "private-transaction-acl"
+name = "example-private-acl"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 # This is required to compile constraints to a wasm module
 [lib]
@@ -19,7 +17,7 @@ blake2 = "0.10.6"
 
 # These are used by `cargo component`
 [package.metadata.component]
-package = "entropy:private-transaction-acl"
+package = "entropy:example-private-acl"
 
 [package.metadata.component.target]
 path = "../../wit"
