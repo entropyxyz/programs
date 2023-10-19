@@ -1,0 +1,21 @@
+[package]
+name = "template-siwe"
+version = "0.1.0"
+edition = "2021"
+
+# This is required to compile constraints to a wasm module
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+ec-core = { workspace = true }
+siwe = "0.6.0"
+
+# These are used by `cargo component`
+[package.metadata.component]
+package = "entropy:template-siwe"
+
+[package.metadata.component.target]
+path = "../../wit"
+
+[package.metadata.component.dependencies]
