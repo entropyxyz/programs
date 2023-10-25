@@ -17,7 +17,7 @@ impl Program for BarebonesProgram {
     /// This is the only function required by the program runtime. `signature_request` is the preimage of the curve element to be
     /// signed, eg. RLP-serialized Ethereum transaction request, raw x86_64 executable, etc.
     fn evaluate(signature_request: InitialState) -> Result<(), Error> {
-        let data: vec::Vec<u8> = signature_request.data;
+        let data: vec::Vec<u8> = signature_request.preimage;
 
         // our constraint just checks that the length of the signature request is greater than 10
         if data.len() < 10 {

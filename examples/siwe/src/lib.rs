@@ -22,7 +22,7 @@ pub struct Siwe;
 
 impl Program for Siwe {
     fn evaluate(signature_request: InitialState) -> Result<(), Error> {
-        let string_message = String::from_utf8(signature_request.data)
+        let string_message = String::from_utf8(signature_request.preimage)
             .map_err(|err| Error::Evaluation(err.to_string()))?;
         let siwe_message = string_message
             .parse::<Message>()

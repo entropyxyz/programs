@@ -21,7 +21,7 @@ impl Program for BasicTransaction {
     fn evaluate(state: InitialState) -> Result<(), CoreError> {
         // parse the raw tx into some type
         let parsed_tx =
-            <Evm as Architecture>::TransactionRequest::try_parse(state.data.as_slice())?;
+            <Evm as Architecture>::TransactionRequest::try_parse(state.preimage.as_slice())?;
 
         // construct a whitelist ACL
         // TODO can we just use Address instead of AddressRaw?
