@@ -13,6 +13,6 @@ world program {
     /// Preimage of the user's data under program evaulation (eg. RLP-encoded ETH transaction request).
     preimage: list<u8>,
     /// Auxiliary data required for program evaluation, that won't be signed (eg. zero-knowledge proof, third party signature)
-    extra: list<u8>
+    extra: option<list<u8>>
   }
 }

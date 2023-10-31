@@ -54,7 +54,8 @@ mod tests {
     fn test_evaluate() {
         let signature_request = InitialState {
             // `data` is an RLP serialized ETH transaction with the recipient set to `0x772b9a9e8aa1c9db861c6611a82d251db4fac990`
-            data: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            preimage: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            extra: None
         };
 
         assert!(BasicTransaction::evaluate(signature_request).is_ok());
@@ -64,7 +65,8 @@ mod tests {
     fn test_start_fail() {
         let signature_request = InitialState {
             // `data` is the same as previous test, but recipient address ends in `1` instead of `0`, so it should fail
-            data: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac991019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            preimage: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac991019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            extra: None
         };
 
         assert!(BasicTransaction::evaluate(signature_request).is_err());
