@@ -14,28 +14,18 @@ use risc0_zkvm::Receipt;
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
 
-pub mod zkvm_verification {
-    use super::*;
-    use serde::{Deserialize, Serialize};
-
-    #[derive(Debug, Serialize, Deserialize)]
-    pub struct VerificationData {
-        pub image_id: [u32; 8],
-        pub receipt: Receipt,
-    }
-}
-use zkvm_verification::*;
-
 pub struct ZkVmVerificationProgram;
 
 impl Program for ZkVmVerificationProgram {
     fn evaluate(signature_request: InitialState) -> Result<(), Error> {
-        let VerificationData { receipt, image_id } = bincode::deserialize(&signature_request.data)
-            .map_err(|_| {
-                Error::InvalidTransactionRequest(
-                    "Could not parse data into VerificationData".to_string(),
-                )
-            })?;
+        let image_id: [u32; 8] = bincode::deserialize(&signature_request.preimage)
+            .map_err(|_| Error::InvalidTransactionRequest("Could not parse image_id".to_string()))?;
+
+        let receipt: Receipt = match signature_request.extra {
+            Some(serialized_receipt) => bincode::deserialize(&serialized_receipt)
+                .map_err(|_| Error::InvalidTransactionRequest("Could not parse receipt".to_string()))?,
+            None => return Err(Error::InvalidTransactionRequest("No receipt provided".to_string())),
+        };
 
         receipt
             .verify(image_id)
@@ -51,7 +41,6 @@ export_program!(ZkVmVerificationProgram);
 #[cfg(test)]
 mod tests {
     use super::*;
-    use zkvm_verification::VerificationData;
 
     use std::fs::{create_dir_all, File};
     use std::io::{Read, Write};
@@ -86,9 +75,9 @@ mod tests {
 
     #[test]
     fn test_should_pass_valid_receipt_and_image_pair() {
-        let test_verification_data = bincode::serialize(&get_test_verification_data()).unwrap();
         let signature_request = InitialState {
-            data: test_verification_data,
+            preimage: bincode::serialize(&read_test_image_id()).unwrap(),
+            extra: Some(bincode::serialize(&read_test_receipt()).unwrap())
         };
 
         assert!(ZkVmVerificationProgram::evaluate(signature_request).is_ok());
@@ -96,10 +85,9 @@ mod tests {
 
     #[test]
     fn test_should_error_with_incorrect_image_id_for_receipt_image_pair() {
-        let erronous_test_verification_data =
-            bincode::serialize(&get_erronous_test_verification_data()).unwrap();
         let signature_request = InitialState {
-            data: erronous_test_verification_data,
+            preimage: bincode::serialize(&read_erronous_test_image_id()).unwrap(),
+            extra: Some(bincode::serialize(&read_test_receipt()).unwrap())
         };
 
         assert!(ZkVmVerificationProgram::evaluate(signature_request).is_err());
@@ -138,22 +126,6 @@ mod tests {
         // Read zkvm_wrong_image_id.bin from disk
         pub fn read_erronous_test_image_id() -> [u32; 8] {
             read_struct_from_file("zkvm_wrong_image_id.bin")
-        }
-
-        /// Gets the test verification data for use in tests
-        pub fn get_test_verification_data() -> VerificationData {
-            VerificationData {
-                image_id: read_test_image_id(),
-                receipt: read_test_receipt(),
-            }
-        }
-
-        // Gets the erronous test verification data for use in tests
-        pub fn get_erronous_test_verification_data() -> VerificationData {
-            VerificationData {
-                image_id: read_erronous_test_image_id(),
-                receipt: read_test_receipt(),
-            }
         }
 
         pub fn read_json_data() -> String {
