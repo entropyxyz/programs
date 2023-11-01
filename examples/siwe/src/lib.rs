@@ -43,8 +43,6 @@ export_program!(Siwe);
 // write a test that calls evaluate and passes it the proper parameters
 #[cfg(test)]
 mod tests {
-    use alloc::vec;
-
     use super::*;
 
     #[test]
