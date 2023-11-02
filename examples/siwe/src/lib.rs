@@ -60,7 +60,7 @@ Nonce: oNCEHm5jzQU2WvuBB
 Issued At: 2022-01-28T23:28:16.013Z"
                 .to_string()
                 .into_bytes(),
-            extra: None
+            extra: None,
         };
 
         assert!(Siwe::evaluate(signature_request).is_ok());
@@ -81,7 +81,7 @@ Nonce: oNCEHm5jzQU2WvuBB
 Issued At: 2022-01-28T23:28:16.013Z"
                 .to_string()
                 .into_bytes(),
-            extra: None
+            extra: None,
         };
 
         assert!(Siwe::evaluate(signature_request).is_err());
@@ -102,7 +102,7 @@ Nonce: oNCEHm5jzQU2WvuBB
 Issued At: 2022-01-28T23:28:16.013Z"
                 .to_string()
                 .into_bytes(),
-            extra: None
+            extra: None,
         };
 
         assert!(Siwe::evaluate(signature_request).is_err());

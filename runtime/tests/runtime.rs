@@ -12,7 +12,7 @@ fn test_barebones_component() {
     let longer_than_10 = "asdfasdfasdfasdf".to_string();
     let initial_state = InitialState {
         preimage: longer_than_10.into_bytes(),
-        extra: None
+        extra: None,
     };
 
     let res = runtime.evaluate(BAREBONES_COMPONENT_WASM, &initial_state);
@@ -27,7 +27,7 @@ fn test_barebones_component_fails_with_data_length_less_than_10() {
     let shorter_than_10 = "asdf".to_string();
     let initial_state = InitialState {
         preimage: shorter_than_10.into_bytes(),
-        extra: None
+        extra: None,
     };
 
     let res = runtime.evaluate(BAREBONES_COMPONENT_WASM, &initial_state);

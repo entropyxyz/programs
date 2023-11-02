@@ -18,13 +18,22 @@ pub struct ZkVmVerificationProgram;
 
 impl Program for ZkVmVerificationProgram {
     fn evaluate(signature_request: InitialState) -> Result<(), Error> {
-        let image_id: [u32; 8] = bincode::deserialize(&signature_request.preimage)
-            .map_err(|_| Error::InvalidTransactionRequest("Could not parse image_id".to_string()))?;
+        let image_id: [u32; 8] =
+            bincode::deserialize(&signature_request.preimage).map_err(|_| {
+                Error::InvalidTransactionRequest("Could not parse image_id".to_string())
+            })?;
 
         let receipt: Receipt = match signature_request.extra {
-            Some(serialized_receipt) => bincode::deserialize(&serialized_receipt)
-                .map_err(|_| Error::InvalidTransactionRequest("Could not parse receipt".to_string()))?,
-            None => return Err(Error::InvalidTransactionRequest("No receipt provided".to_string())),
+            Some(serialized_receipt) => {
+                bincode::deserialize(&serialized_receipt).map_err(|_| {
+                    Error::InvalidTransactionRequest("Could not parse receipt".to_string())
+                })?
+            }
+            None => {
+                return Err(Error::InvalidTransactionRequest(
+                    "No receipt provided".to_string(),
+                ))
+            }
         };
 
         receipt
@@ -77,7 +86,7 @@ mod tests {
     fn test_should_pass_valid_receipt_and_image_pair() {
         let signature_request = InitialState {
             preimage: bincode::serialize(&read_test_image_id()).unwrap(),
-            extra: Some(bincode::serialize(&read_test_receipt()).unwrap())
+            extra: Some(bincode::serialize(&read_test_receipt()).unwrap()),
         };
 
         assert!(ZkVmVerificationProgram::evaluate(signature_request).is_ok());
@@ -87,7 +96,7 @@ mod tests {
     fn test_should_error_with_incorrect_image_id_for_receipt_image_pair() {
         let signature_request = InitialState {
             preimage: bincode::serialize(&read_erronous_test_image_id()).unwrap(),
-            extra: Some(bincode::serialize(&read_test_receipt()).unwrap())
+            extra: Some(bincode::serialize(&read_test_receipt()).unwrap()),
         };
 
         assert!(ZkVmVerificationProgram::evaluate(signature_request).is_err());
