@@ -41,7 +41,7 @@ mod tests {
     fn test_should_sign() {
         let signature_request = InitialState {
             preimage: "some_data_longer_than_10_bytes".to_string().into_bytes(),
-            extra: None
+            extra: None,
         };
 
         assert!(BarebonesProgram::evaluate(signature_request).is_ok());
@@ -52,7 +52,7 @@ mod tests {
         // data being checked is under 10 bytes in length
         let signature_request = InitialState {
             preimage: "under10".to_string().into_bytes(),
-            extra: None
+            extra: None,
         };
 
         assert!(BarebonesProgram::evaluate(signature_request).is_err());
