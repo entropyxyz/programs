@@ -15,7 +15,7 @@ mod bindgen {
         path: "../wit/application.wit"
     });
 }
-pub use bindgen::{Error as ProgramError, SignatureRequest, Program};
+pub use bindgen::{Error as ProgramError, Program, SignatureRequest};
 
 /// Runtime `Error` type
 #[derive(Debug, Error)]

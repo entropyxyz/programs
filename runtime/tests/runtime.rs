@@ -2,7 +2,7 @@
 const BAREBONES_COMPONENT_WASM: &[u8] =
     include_bytes!("../../target/wasm32-unknown-unknown/release/template_barebones.wasm");
 
-use ec_runtime::{SignatureRequest, Runtime};
+use ec_runtime::{Runtime, SignatureRequest};
 
 #[test]
 fn test_barebones_component() {

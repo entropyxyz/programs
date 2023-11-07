@@ -18,12 +18,10 @@ pub struct ZkVmVerificationProgram;
 
 impl Program for ZkVmVerificationProgram {
     fn evaluate(signature_request: SignatureRequest) -> Result<(), Error> {
-        let image_id: [u32; 8] =
-            bincode::deserialize(&signature_request.message).map_err(|_| {
-                Error::InvalidSignatureRequest("Could not parse image_id".to_string())
-            })?;
+        let image_id: [u32; 8] = bincode::deserialize(&signature_request.message)
+            .map_err(|_| Error::InvalidSignatureRequest("Could not parse image_id".to_string()))?;
 
-        let receipt: Receipt = match signature_request.auxilary_data{
+        let receipt: Receipt = match signature_request.auxilary_data {
             Some(serialized_receipt) => {
                 bincode::deserialize(&serialized_receipt).map_err(|_| {
                     Error::InvalidSignatureRequest("Could not parse receipt".to_string())

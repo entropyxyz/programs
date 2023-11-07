@@ -17,7 +17,10 @@ impl Program for BarebonesWithExtra {
     /// This is the only function required by the program runtime. `signature_request` includes the message to be
     /// signed, eg. RLP-serialized Ethereum transaction request, raw x86_64 executable, etc.
     fn evaluate(signature_request: SignatureRequest) -> Result<(), Error> {
-        let SignatureRequest { message, auxilary_data } = signature_request;
+        let SignatureRequest {
+            message,
+            auxilary_data,
+        } = signature_request;
 
         // our constraint just checks that the length of the signature request is greater than 10
         if message.len() < 10 {
