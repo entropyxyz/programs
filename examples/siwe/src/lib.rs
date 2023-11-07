@@ -21,8 +21,8 @@ const ALLOWED_DOMAIN: &str = "localhost";
 pub struct Siwe;
 
 impl Program for Siwe {
-    fn evaluate(signature_request: InitialState) -> Result<(), Error> {
-        let string_message = String::from_utf8(signature_request.preimage)
+    fn evaluate(signature_request: SignatureRequest) -> Result<(), Error> {
+        let string_message = String::from_utf8(signature_request.message)
             .map_err(|err| Error::Evaluation(err.to_string()))?;
         let siwe_message = string_message
             .parse::<Message>()
@@ -47,8 +47,8 @@ mod tests {
 
     #[test]
     fn test_should_sign() {
-        let signature_request = InitialState {
-            preimage: "localhost wants you to sign in with your Ethereum account:
+        let signature_request = SignatureRequest {
+            message: "localhost wants you to sign in with your Ethereum account:
 0x6Ee9894c677EFa1c56392e5E7533DE76004C8D94
 
 This is a test statement.
@@ -60,7 +60,7 @@ Nonce: oNCEHm5jzQU2WvuBB
 Issued At: 2022-01-28T23:28:16.013Z"
                 .to_string()
                 .into_bytes(),
-            extra: None,
+            auxilary_data: None,
         };
 
         assert!(Siwe::evaluate(signature_request).is_ok());
@@ -68,8 +68,8 @@ Issued At: 2022-01-28T23:28:16.013Z"
 
     #[test]
     fn test_bad_siwe_message() {
-        let signature_request = InitialState {
-            preimage: "localhost does not want you to sign in with your Ethereum account:
+        let signature_request = SignatureRequest {
+            message: "localhost does not want you to sign in with your Ethereum account:
 0x6Ee9894c677EFa1c56392e5E7533DE76004C8D94
 
 This is a test statement.
@@ -81,7 +81,7 @@ Nonce: oNCEHm5jzQU2WvuBB
 Issued At: 2022-01-28T23:28:16.013Z"
                 .to_string()
                 .into_bytes(),
-            extra: None,
+            auxilary_data: None,
         };
 
         assert!(Siwe::evaluate(signature_request).is_err());
@@ -89,8 +89,8 @@ Issued At: 2022-01-28T23:28:16.013Z"
 
     #[test]
     fn test_bad_domain() {
-        let signature_request = InitialState {
-            preimage: "google.com does not want you to sign in with your Ethereum account:
+        let signature_request = SignatureRequest {
+            message: "google.com does not want you to sign in with your Ethereum account:
 0x6Ee9894c677EFa1c56392e5E7533DE76004C8D94
 
 This is a test statement.
@@ -102,7 +102,7 @@ Nonce: oNCEHm5jzQU2WvuBB
 Issued At: 2022-01-28T23:28:16.013Z"
                 .to_string()
                 .into_bytes(),
-            extra: None,
+            auxilary_data: None,
         };
 
         assert!(Siwe::evaluate(signature_request).is_err());

@@ -10,7 +10,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-ec-core ={ workspace = true }
+ec-core = { workspace = true }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 bincode = "1.3.3"
 # json-example = { path = "json" }

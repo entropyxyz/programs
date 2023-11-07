@@ -14,15 +14,15 @@ register_custom_getrandom!(always_fail);
 pub struct BarebonesProgram;
 
 impl Program for BarebonesProgram {
-    /// This is the only function required by the program runtime. `signature_request` is the preimage of the curve element to be
+    /// This is the only function required by the program runtime. `message` is the preimage of the curve element to be
     /// signed, eg. RLP-serialized Ethereum transaction request, raw x86_64 executable, etc.
-    fn evaluate(signature_request: InitialState) -> Result<(), Error> {
-        let data: vec::Vec<u8> = signature_request.preimage;
+    fn evaluate(signature_request: SignatureRequest) -> Result<(), Error> {
+        let message: vec::Vec<u8> = signature_request.message;
 
-        // our constraint just checks that the length of the signature request is greater than 10
-        if data.len() < 10 {
+        // our constraint just checks that the length of the message is greater than 10
+        if message.len() < 10 {
             return Err(Error::Evaluation(
-                "Length of data is too short.".to_string(),
+                "Length of message is too short.".to_string(),
             ));
         }
 
@@ -39,9 +39,9 @@ mod tests {
 
     #[test]
     fn test_should_sign() {
-        let signature_request = InitialState {
-            preimage: "some_data_longer_than_10_bytes".to_string().into_bytes(),
-            extra: None,
+        let signature_request = SignatureRequest {
+            message: "some_data_longer_than_10_bytes".to_string().into_bytes(),
+            auxilary_data: None,
         };
 
         assert!(BarebonesProgram::evaluate(signature_request).is_ok());
@@ -50,9 +50,9 @@ mod tests {
     #[test]
     fn test_should_error() {
         // data being checked is under 10 bytes in length
-        let signature_request = InitialState {
-            preimage: "under10".to_string().into_bytes(),
-            extra: None,
+        let signature_request = SignatureRequest {
+            message: "under10".to_string().into_bytes(),
+            auxilary_data: None,
         };
 
         assert!(BarebonesProgram::evaluate(signature_request).is_err());

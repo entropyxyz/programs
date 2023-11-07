@@ -17,8 +17,8 @@ wit-bindgen = { version = "0.7.0" }
 # wasmtime ={ version = "10.0.1", default-features = false, features = ["component-model"] }
 
 [dev-dependencies]
-ec-acl ={ path = "../acl", default-features = false, features = ["evm"]}
-ec-evm ={ path = "../evm", default-features = false }
+ec-acl = { path = "../acl", default-features = false, features = ["evm"] }
+ec-evm = { path = "../evm", default-features = false }
 
 [features]
 default = ["std"]

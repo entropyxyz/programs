@@ -59,16 +59,6 @@ pub mod architecture {
     }
 }
 
-pub mod runtime {
-
-    // /// Contains signature request data that is used by the constraints runtime. Passed into `wasmtime::Store` for state (or maybe `wasmtime::Linker`).
-    // #[witgen]
-    // pub struct InitialState {
-    //     /// The preimage of the user's data under constraint evaulation (eg. RLP-encoded ETH transaction request).
-    //     data: Vec<u8>
-    // }
-}
-
 /// Includes items that should be imported into most scopes
 pub mod prelude {
     // reexport getrandom custom handler (move to macro)

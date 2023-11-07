@@ -1,5 +1,5 @@
 [package]
-name = "example-barebones-with-extra"
+name = "example-barebones-with-auxilary"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,11 +10,11 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-ec-core ={ workspace = true }
+ec-core = { workspace = true }
 
 # These are used by `cargo component`
 [package.metadata.component]
-package = "entropy:example-barebones-with-extra"
+package = "entropy:example-barebones-with-auxilary"
 
 [package.metadata.component.target]
 path = "../../wit"
