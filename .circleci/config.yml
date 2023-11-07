@@ -9,4 +9,4 @@ jobs:
       - run: cargo --version
       - run:
           name: Run Check
-          command: "cargo check"
+          command: "cargo install cargo-risczero && cargo risczero install && cargo check"
