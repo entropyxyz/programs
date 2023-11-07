@@ -18,10 +18,10 @@ impl Program for BasicTransaction {
     /// This is the function that the constraints engine will runtime esecute. signature_request is the preimage of the curve element to be
     /// signed, eg. RLP-serialized Ethereum transaction request, raw x86_64 executable, etc.
     // #[no_mangle]
-    fn evaluate(state: InitialState) -> Result<(), CoreError> {
+    fn evaluate(state: SignatureRequest) -> Result<(), CoreError> {
         // parse the raw tx into some type
         let parsed_tx =
-            <Evm as Architecture>::TransactionRequest::try_parse(state.preimage.as_slice())?;
+            <Evm as Architecture>::TransactionRequest::try_parse(state.message.as_slice())?;
 
         // construct a whitelist ACL
         // TODO can we just use Address instead of AddressRaw?
@@ -52,10 +52,10 @@ mod tests {
 
     #[test]
     fn test_evaluate() {
-        let signature_request = InitialState {
+        let signature_request = SignatureRequest {
             // `data` is an RLP serialized ETH transaction with the recipient set to `0x772b9a9e8aa1c9db861c6611a82d251db4fac990`
-            preimage: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
-            extra: None
+            message: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            auxilary_data: None
         };
 
         assert!(BasicTransaction::evaluate(signature_request).is_ok());
@@ -63,10 +63,10 @@ mod tests {
 
     #[test]
     fn test_start_fail() {
-        let signature_request = InitialState {
+        let signature_request = SignatureRequest {
             // `data` is the same as previous test, but recipient address ends in `1` instead of `0`, so it should fail
-            preimage: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac991019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
-            extra: None
+            message: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac991019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            auxilary_data: None
         };
 
         assert!(BasicTransaction::evaluate(signature_request).is_err());

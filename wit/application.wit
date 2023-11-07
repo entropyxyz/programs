@@ -3,16 +3,17 @@ package entropy:core
 world program {
    // similar to `variant`, but no type payloads
   variant error {
-    invalid-transaction-request(string),
+    /// The signature request is invalid (ie. the `initial-state` )
+    invalid-signature-request(string),
     evaluation(string)
   }
   /// Contains signature request data that is used by the runtime. Passed into `wasmtime::Store` for state (or maybe `wasmtime::Linker`).
-  export evaluate: func(config: initial-state) -> result<_, error>
+  export evaluate: func(signature-request: signature-request) -> result<_, error>
 
-  record initial-state {
-    /// Preimage of the user's data under program evaulation (eg. RLP-encoded ETH transaction request).
-    preimage: list<u8>,
-    /// Auxiliary data required for program evaluation, that won't be signed (eg. zero-knowledge proof, third party signature)
-    extra: option<list<u8>>
+  record signature-request {
+    /// Preimage of the user's data that will be signed (eg. RLP-encoded ETH transaction request).
+    message: list<u8>,
+    /// Auxiliary data optionally required for program evaluation; this won't be signed (eg. zero-knowledge proof, third party signature)
+    auxilary-data: option<list<u8>>
   }
 }

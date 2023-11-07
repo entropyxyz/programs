@@ -15,7 +15,7 @@ mod bindgen {
         path: "../wit/application.wit"
     });
 }
-pub use bindgen::{Error as ProgramError, InitialState, Program};
+pub use bindgen::{Error as ProgramError, SignatureRequest, Program};
 
 /// Runtime `Error` type
 #[derive(Debug, Error)]
@@ -61,7 +61,7 @@ impl Runtime {
     pub fn evaluate(
         &mut self,
         program: &[u8],
-        initial_state: &InitialState,
+        signature_request: &SignatureRequest,
     ) -> Result<(), RuntimeError> {
         let component = Component::from_binary(&self.engine, program)
             .map_err(|_| RuntimeError::InvalidBytecode)?;
@@ -71,7 +71,7 @@ impl Runtime {
 
         // TODO fix this unwrap
         bindings
-            .call_evaluate(&mut self.store, initial_state)
+            .call_evaluate(&mut self.store, signature_request)
             .unwrap()
             .map_err(RuntimeError::Runtime)
     }
