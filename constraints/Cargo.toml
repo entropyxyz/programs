@@ -7,16 +7,13 @@ edition = "2021"
 # crate-type = ["cdylib"]
 
 [dependencies]
-ec-acl ={ path = "../acl", default-features = false, features = ["evm"]}
-ec-evm ={ path = "../evm", default-features = false }
-ec-core ={ path = "../core", default-features = false }
+ec-acl = { path = "../acl", default-features = false, features = ["evm"] }
+ec-evm = { path = "../evm", default-features = false }
+ec-core = { path = "../core", default-features = false }
 
 [dev-dependencies]
 # ec-runtime = { path = "../runtime", default-features = false }
 
 [features]
 default = ["std"]
-std = [
-  "ec-acl/std",
-  "ec-evm/std"
-]
+std = ["ec-acl/std", "ec-evm/std"]

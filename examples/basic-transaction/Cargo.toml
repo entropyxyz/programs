@@ -10,7 +10,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-ec-constraints ={ workspace = true }
+ec-constraints = { workspace = true }
 # TODO move hex parsing into the ec-evm crate
 hex = { version = "0.4.3", default-features = false }
 
