@@ -66,6 +66,10 @@ impl Runtime {
         program: &[u8],
         signature_request: &SignatureRequest,
     ) -> Result<(), RuntimeError> {
+        if program.len() == 0 {
+            return Err(RuntimeError::EmptyBytecode);
+        }
+
         let component = Component::from_binary(&self.engine, program)
             .map_err(|_| RuntimeError::InvalidBytecode)?;
 
