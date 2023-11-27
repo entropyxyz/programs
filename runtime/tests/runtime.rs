@@ -33,3 +33,16 @@ fn test_barebones_component_fails_with_data_length_less_than_10() {
     let res = runtime.evaluate(BAREBONES_COMPONENT_WASM, &signature_request);
     assert!(res.is_err());
 }
+
+#[test]
+fn test_empty_bytecode_fails() {
+    let mut runtime = Runtime::new();
+
+    let signature_request = SignatureRequest {
+        message: vec![],
+        auxilary_data: None,
+    };
+
+    let res = runtime.evaluate(&[], &signature_request);
+    assert_eq!(res.unwrap_err().to_string(), "Bytecode length is zero");
+}

@@ -20,7 +20,10 @@ pub use bindgen::{Error as ProgramError, Program, SignatureRequest};
 /// Runtime `Error` type
 #[derive(Debug, Error)]
 pub enum RuntimeError {
-    /// Program bytecode is invalid.
+    /// Program bytecode is of zero length (core-side runtime error; Programs should probably not return this)
+    #[error("Bytecode length is zero")]
+    EmptyBytecode,
+    /// Program bytecode is not a valid WebAssembly component.
     #[error("Invalid bytecode")]
     InvalidBytecode,
     /// Runtime error during execution.
@@ -63,6 +66,10 @@ impl Runtime {
         program: &[u8],
         signature_request: &SignatureRequest,
     ) -> Result<(), RuntimeError> {
+        if program.len() == 0 {
+            return Err(RuntimeError::EmptyBytecode);
+        }
+
         let component = Component::from_binary(&self.engine, program)
             .map_err(|_| RuntimeError::InvalidBytecode)?;
 
