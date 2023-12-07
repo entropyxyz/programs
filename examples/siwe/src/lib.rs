@@ -7,7 +7,7 @@
 
 extern crate alloc;
 
-use alloc::{string::String, string::ToString};
+use alloc::{string::{String, ToString}, vec::Vec};
 
 use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 use siwe::Message;
@@ -35,6 +35,11 @@ impl Program for Siwe {
                 "You may not sign-in to this domain".to_string(),
             ))
         }
+    }
+
+    /// Since we don't use a custom hash function, we can just return `None` here.
+    fn custom_hash(_data: Vec<u8>) -> Option<Vec<u8>> {
+        None
     }
 }
 

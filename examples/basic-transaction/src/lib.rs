@@ -7,7 +7,7 @@ use ec_constraints::{
     core::{bindgen::*, export_program, prelude::*, SatisfiableForArchitecture, TryParse},
 };
 
-use alloc::vec;
+use alloc::{vec, vec::Vec};
 
 pub struct BasicTransaction;
 
@@ -39,6 +39,11 @@ impl Program for BasicTransaction {
         allowlisted_acl.is_satisfied_by(&parsed_tx)?;
 
         Ok(())
+    }
+
+    /// Since we don't use a custom hash function, we can just return `None` here.
+    fn custom_hash(_data: Vec<u8>) -> Option<Vec<u8>> {
+        None
     }
 }
 
