@@ -61,14 +61,10 @@ fn test_custom_hash() {
     expected_hash.copy_from_slice(&expected_hash_as_vec);
 
     let actual_hash = runtime
-        .custom_hash(CUSTOM_HASH_COMPONENT_WASM, &SignatureRequest {
-            message,
-            auxilary_data: None,
-        })
+        .custom_hash(CUSTOM_HASH_COMPONENT_WASM, message.as_slice())
         .unwrap();
 
     assert_eq!(actual_hash, expected_hash);
-    assert!(actual_hash.len() == 32);
 }
 
 #[test]
@@ -80,10 +76,7 @@ fn test_custom_hash_errors_when_returning_none() {
     let res = runtime.custom_hash(
         // Remember, barebones component doesn't define a custom hash function
         BAREBONES_COMPONENT_WASM,
-        &SignatureRequest {
-            message,
-            auxilary_data: None,
-        },
+        message.as_slice(),
     );
     assert!(res.is_err());
     assert_eq!(
