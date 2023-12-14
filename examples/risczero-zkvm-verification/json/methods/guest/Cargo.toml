@@ -1,6 +1,9 @@
 [package]
 name = "search_json"
 version = "0.12.0"
+authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
+homepage = "https://entropy.xyz/"
+repository = "https://github.com/entropyxyz/constraints"
 edition = "2021"
 
 [workspace]

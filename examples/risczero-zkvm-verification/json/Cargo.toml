@@ -1,6 +1,9 @@
 [package]
 name = "json-example"
 version = "0.1.0"
+authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
+homepage = "https://entropy.xyz/"
+repository = "https://github.com/entropyxyz/constraints"
 edition = "2021"
 
 [dependencies]
