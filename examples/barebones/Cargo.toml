@@ -3,6 +3,7 @@ name = "template-barebones"
 version = "0.1.0"
 authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
 homepage = "https://entropy.xyz/"
+license = "Unlicense"
 repository = "https://github.com/entropyxyz/constraints"
 edition = "2021"
 
