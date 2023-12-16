@@ -1,0 +1,25 @@
+[package]
+name = "example-private-acl"
+version = "0.1.0"
+edition = "2021"
+
+# This is required to compile constraints to a wasm module
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+blake2 = "0.10.6"
+ec-constraints = { workspace = true }
+
+[build-dependencies]
+hex = "0.4.3"
+blake2 = "0.10.6"
+
+# These are used by `cargo component`
+[package.metadata.component]
+package = "entropy:example-private-acl"
+
+[package.metadata.component.target]
+path = "../../wit"
+
+[package.metadata.component.dependencies]
