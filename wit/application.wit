@@ -9,6 +9,9 @@ world program {
   }
   /// Contains signature request data that is used by the runtime. Passed into `wasmtime::Store` for state (or maybe `wasmtime::Linker`).
   export evaluate: func(signature-request: signature-request) -> result<_, error>
+  
+  /// Programs that use custom hash functions can a custom 32-byte curve point to be signed.
+  export custom-hash: func(data: list<u8>) -> option<list<u8>>
 
   record signature-request {
     /// Preimage of the user's data that will be signed (eg. RLP-encoded ETH transaction request).

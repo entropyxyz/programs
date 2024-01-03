@@ -1,0 +1,23 @@
+[package]
+name = "example-custom-hash"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+# This is required to compile constraints to a wasm module
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+blake3 = "1.5.0"
+ec-core = { workspace = true }
+
+# These are used by `cargo component`
+[package.metadata.component]
+package = "entropy:example-custom-hash"
+
+[package.metadata.component.target]
+path = "../../wit"
+
+[package.metadata.component.dependencies]

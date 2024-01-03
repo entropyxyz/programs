@@ -1,8 +1,11 @@
 /// Points to the `template-barebones` program binary.
 const BAREBONES_COMPONENT_WASM: &[u8] =
     include_bytes!("../../target/wasm32-unknown-unknown/release/template_barebones.wasm");
+const CUSTOM_HASH_COMPONENT_WASM: &[u8] =
+    include_bytes!("../../target/wasm32-unknown-unknown/release/example_custom_hash.wasm");
 
 use ec_runtime::{Runtime, SignatureRequest};
+use blake3;
 
 #[test]
 fn test_barebones_component() {
@@ -46,3 +49,40 @@ fn test_empty_bytecode_fails() {
     let res = runtime.evaluate(&[], &signature_request);
     assert_eq!(res.unwrap_err().to_string(), "Bytecode length is zero");
 }
+
+#[test]
+fn test_custom_hash() {
+    let mut runtime = Runtime::new();
+
+    let message = "some_data_to_be_hashed".to_string().into_bytes();
+
+    let mut expected_hash = [0u8; 32];
+    let expected_hash_as_vec = blake3::hash(&message).as_bytes().to_vec();
+    expected_hash.copy_from_slice(&expected_hash_as_vec);
+
+    let actual_hash = runtime
+        .custom_hash(CUSTOM_HASH_COMPONENT_WASM, message.as_slice())
+        .unwrap();
+
+    assert_eq!(actual_hash, expected_hash);
+}
+
+#[test]
+fn test_custom_hash_errors_when_returning_none() {
+    let mut runtime = Runtime::new();
+
+    let message = "some_data_to_be_hashed".to_string().into_bytes();
+
+    let res = runtime.custom_hash(
+        // Remember, barebones component doesn't define a custom hash function
+        BAREBONES_COMPONENT_WASM,
+        message.as_slice(),
+    );
+    assert!(res.is_err());
+    assert_eq!(
+        res.unwrap_err().to_string(),
+        "Runtime error: Error::InvalidSignatureRequest(\"`custom-hash` returns `None`. Implement the hash function in your program, or select a predefined `hash` in your signature request.\")"
+    );
+}
+
+// TODO add test for custom hash returning a vec of length != 32

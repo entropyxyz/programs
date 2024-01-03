@@ -4,7 +4,7 @@
 
 extern crate alloc;
 
-use alloc::{string::ToString, vec};
+use alloc::{string::ToString, vec::Vec};
 
 use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 
@@ -17,7 +17,7 @@ impl Program for BarebonesProgram {
     /// This is the only function required by the program runtime. `message` is the preimage of the curve element to be
     /// signed, eg. RLP-serialized Ethereum transaction request, raw x86_64 executable, etc.
     fn evaluate(signature_request: SignatureRequest) -> Result<(), Error> {
-        let message: vec::Vec<u8> = signature_request.message;
+        let message: Vec<u8> = signature_request.message;
 
         // our constraint just checks that the length of the message is greater than 10
         if message.len() < 10 {
@@ -27,6 +27,11 @@ impl Program for BarebonesProgram {
         }
 
         Ok(())
+    }
+
+    /// Since we don't use a custom hash function, we can just return `None` here.
+    fn custom_hash(_data: Vec<u8>) -> Option<Vec<u8>> {
+        None
     }
 }
 
