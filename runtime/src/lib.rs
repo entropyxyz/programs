@@ -44,7 +44,8 @@ impl Default for Runtime {
         config.wasm_component_model(true).consume_fuel(true);
         let engine = Engine::new(&config).unwrap();
         let linker = Linker::new(&engine);
-        let store = Store::new(&engine, ());
+        let mut store = Store::new(&engine, ());
+        store.add_fuel(100).unwrap();
         Self {
             engine,
             linker,
