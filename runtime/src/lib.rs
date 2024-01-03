@@ -3,7 +3,7 @@
 use thiserror::Error;
 use wasmtime::{
     component::{bindgen, Component, Linker},
-    Config, Engine, Result, Store,
+    Config as WasmtimeConfig, Engine, Result, Store,
 };
 
 /// Note, this is wasmtime's bindgen, not wit-bindgen (modules)
@@ -31,6 +31,20 @@ pub enum RuntimeError {
     Runtime(ProgramError),
 }
 
+/// Config is for runtime parameters (eg instructions per program, additional runtime interfaces, etc).
+pub struct Config {
+    /// Max number of instructions that will execute before the runtime returns an error.
+    pub max_instructions_per_program: u64,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            max_instructions_per_program: 10_000,
+        }
+    }
+}
+
 /// Runtime allows for the execution of programs. Instantiate with `Runtime::new()`.
 pub struct Runtime {
     engine: Engine,
@@ -40,23 +54,25 @@ pub struct Runtime {
 
 impl Default for Runtime {
     fn default() -> Self {
-        let mut config = Config::new();
-        config.wasm_component_model(true).consume_fuel(true);
-        let engine = Engine::new(&config).unwrap();
+        Self::new(Config::default())
+    }
+}
+
+impl Runtime {
+    pub fn new(config: Config) -> Self {
+        let mut wasmtime_config = WasmtimeConfig::new();
+        wasmtime_config.wasm_component_model(true).consume_fuel(true);
+
+        let engine = Engine::new(&wasmtime_config).unwrap();
         let linker = Linker::new(&engine);
         let mut store = Store::new(&engine, ());
-        store.add_fuel(10_000).unwrap();
+
+        store.add_fuel(config.max_instructions_per_program).unwrap();
         Self {
             engine,
             linker,
             store,
         }
-    }
-}
-
-impl Runtime {
-    pub fn new() -> Self {
-        Self::default()
     }
 }
 
