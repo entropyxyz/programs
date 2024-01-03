@@ -45,7 +45,7 @@ impl Default for Runtime {
         let engine = Engine::new(&config).unwrap();
         let linker = Linker::new(&engine);
         let mut store = Store::new(&engine, ());
-        store.add_fuel(10000).unwrap();
+        store.add_fuel(10_000).unwrap();
         Self {
             engine,
             linker,
