@@ -41,7 +41,7 @@ pub struct Runtime {
 impl Default for Runtime {
     fn default() -> Self {
         let mut config = Config::new();
-        config.wasm_component_model(true);
+        config.wasm_component_model(true).consume_fuel(true);
         let engine = Engine::new(&config).unwrap();
         let linker = Linker::new(&engine);
         let store = Store::new(&engine, ());
