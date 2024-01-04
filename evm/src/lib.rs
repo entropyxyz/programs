@@ -1,3 +1,4 @@
+
 //! This module contains the EVM architecture and its associated types. Since it implements Architecture, constraints written around the Architecture trait can be used with EVM.
 
 extern crate alloc;

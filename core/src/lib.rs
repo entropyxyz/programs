@@ -1,3 +1,4 @@
+pub mod parsing {}
 //! This supports core traits and types for supporting new architectures and constraints, and interfacing with them.
 
 /// See the [`wit-bindgen` Rust guest example](https://github.com/bytecodealliance/wit-bindgen#guest-rust) for information on how to use this.
@@ -81,4 +82,3 @@ pub mod prelude {
         let code = NonZeroU32::new(Error::CUSTOM_START.saturating_add(1)).unwrap();
         Err(Error::from(code))
     }
-}

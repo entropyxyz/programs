@@ -1,3 +1,4 @@
+}
 //! This example shows how to use a non-standardized or custom hash function in a program.
 
 #![no_std]
@@ -47,4 +48,3 @@ mod tests {
         assert_eq!(actual_hash, expected_hash);
         assert!(actual_hash.len() == 32);
     }
-}

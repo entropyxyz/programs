@@ -1,3 +1,4 @@
+}
 //! Includes types and interfaces that are foundational to the core of constraints.
 
 #![cfg_attr(not(feature = "std"), no_std)]
@@ -15,4 +16,3 @@ pub mod arch {
 }
 
 /// Dynamic parsing allows for easily hooking transactions into
-pub mod parsing {}

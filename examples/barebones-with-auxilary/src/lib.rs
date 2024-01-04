@@ -1,3 +1,4 @@
+}
 //! This example demonstrates a contrieved program that can include auxilary data. Note, only the data in `message` will be signed by Entropy; `auxilary_data` is used to provide additional data (eg an additional signature or a zkp related to the preimage) that the user requires during program evaluation.
 
 #![no_std]
@@ -83,4 +84,3 @@ mod tests {
 
         assert!(BarebonesWithAuxilary::evaluate(signature_request).is_err());
     }
-}

@@ -1,3 +1,18 @@
+// Copyright (C) 2023 Entropy Cryptography Inc.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Affero General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Affero General Public License for more details.
+//
+// You should have received a copy of the GNU Affero General Public License
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 //! This is an allow list where the allowed addresses are hashed to improve privacy
 //! It is still possible for anyone to check whether a given address is in the list, using the
 //! on-chain bytecode. But you cannot just read the allowed addresses from it.
@@ -84,4 +99,3 @@ mod tests {
 
         assert!(PrivateTransactionAcl::evaluate(signature_request).is_err());
     }
-}

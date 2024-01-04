@@ -1,3 +1,4 @@
+}
 /// Points to the `template-barebones` program binary.
 const BAREBONES_COMPONENT_WASM: &[u8] =
     include_bytes!("../../target/wasm32-unknown-unknown/release/template_barebones.wasm");
@@ -85,4 +86,3 @@ fn test_custom_hash_errors_when_returning_none() {
     );
 }
 
-// TODO add test for custom hash returning a vec of length != 32

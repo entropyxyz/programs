@@ -1,3 +1,4 @@
+}
 //! Contains traits that constraints should implement, including Architecture-agnostic constraints and generic constraints.
 //!
 //! For runtime and binary size optimizations, constraint construction should be done at compile time by using `const` types, if possible. This can be done by using `const` generic parameters,
@@ -49,4 +50,3 @@ pub trait Satisfiable {
 pub trait SatisfiableForArchitecture<A: Architecture> {
     /// Indicates that the transaction request satisfies the constraint.
     fn is_satisfied_by(self, tx: &<A as Architecture>::TransactionRequest) -> Result<(), Error>;
-}
