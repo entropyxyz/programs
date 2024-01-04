@@ -1,0 +1,24 @@
+//! This example shows how to write a contrieved and basic constraint: checking the length of the data to be signed.
+
+#![no_std]
+
+extern crate alloc;
+
+use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
+
+// TODO confirm this isn't an issue for audit
+register_custom_getrandom!(always_fail);
+
+pub struct InfiniteLoop;
+
+impl Program for InfiniteLoop {
+    /// This is the only function required by the program runtime. `message` is the preimage of the curve element to be
+    /// signed, eg. RLP-serialized Ethereum transaction request, raw x86_64 executable, etc.
+    fn evaluate(_signature_request: SignatureRequest) -> Result<(), Error> {
+        loop {};
+        #[allow(unreachable_code)]
+        Ok(())
+    }
+}
+
+export_program!(InfiniteLoop);

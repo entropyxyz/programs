@@ -1,0 +1,26 @@
+[package]
+name = "infinite-loop"
+version = "0.1.0"
+authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
+homepage = "https://entropy.xyz/"
+license = "Unlicense"
+repository = "https://github.com/entropyxyz/constraints"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+# This is required to compile constraints to a wasm module
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+ec-core = { workspace = true }
+
+# These are used by `cargo component`
+[package.metadata.component]
+package = "entropy:template-barebones"
+
+[package.metadata.component.target]
+path = "../../wit"
+
+[package.metadata.component.dependencies]
