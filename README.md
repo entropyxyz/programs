@@ -32,3 +32,15 @@ cargo component build --release -p template-barebones --target wasm32-unknown-un
 This creates the program as a Wasm component at `target/wasm32-unknown-unknown/release/template_barebones.wasm`.
 
 Since this program is used in tests for the program runtime (`ec-runtime`), you can see the program get used by running `cargo test -p ec-runtime`.
+
+## Licensing
+
+For the most part, the code in this repository is licensed under [AGPL-3.0](./LICENSE).
+
+There are some exceptions however:
+
+- The original code in the `examples/risc0-zkvm-verification` crate comes from RISC Zero's [`risc0`](https://github.com/risc0/risc0) project, which is licensed under
+  `Apache License 2.0`.
+
+Modifications made by Entropy to these crates are licensed under `AGPL-3.0`.
+
