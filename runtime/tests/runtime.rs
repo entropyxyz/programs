@@ -69,7 +69,7 @@ fn test_infinite_loop() {
 
 #[test]
 fn test_custom_hash() {
-    let mut runtime = Runtime::new();
+    let mut runtime = Runtime::default();
 
     let message = "some_data_to_be_hashed".to_string().into_bytes();
 
@@ -86,7 +86,7 @@ fn test_custom_hash() {
 
 #[test]
 fn test_custom_hash_errors_when_returning_none() {
-    let mut runtime = Runtime::new();
+    let mut runtime = Runtime::default();
 
     let message = "some_data_to_be_hashed".to_string().into_bytes();
 
