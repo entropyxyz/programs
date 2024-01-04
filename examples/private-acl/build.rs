@@ -1,3 +1,4 @@
+}
 //! This reads a text file of hex-encoded addresses, one per line,
 //! hashes them, and puts them in the constant ADDRESSES
 use blake2::{Blake2s256, Digest};

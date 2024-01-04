@@ -1,3 +1,4 @@
+}
 extern crate alloc;
 
 use alloc::vec::Vec;
@@ -99,4 +100,3 @@ impl SatisfiableForArchitecture<Evm> for Acl<<Evm as Architecture>::AddressRaw> 
             )),
         }
     }
-}

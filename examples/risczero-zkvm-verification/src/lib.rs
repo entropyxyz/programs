@@ -1,3 +1,4 @@
+// TODO add test for custom hash returning a vec of length != 32
 //! This example shows how to write a contrieved and basic constraint: checking the length of the data to be signed.
 
 #![cfg_attr(not(test), no_std)]
@@ -167,4 +168,3 @@ mod tests {
             wrong_commitment
         }
     }
-}

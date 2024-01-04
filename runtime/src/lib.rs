@@ -1,3 +1,4 @@
+}
 //! Contains the Wasm runtime and related types for evaluating programs.
 
 use thiserror::Error;
@@ -103,4 +104,3 @@ impl Runtime {
         hash.copy_from_slice(&hash_as_vec);
         Ok(hash)
     }
-}
