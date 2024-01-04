@@ -4,7 +4,7 @@
 
 extern crate alloc;
 
-use alloc::string::ToString;
+use alloc::{string::ToString, vec::Vec};
 
 use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 
@@ -35,6 +35,11 @@ impl Program for BarebonesWithAuxilary {
         ))?;
 
         Ok(())
+    }
+
+    /// Since we don't use a custom hash function, we can just return `None` here.
+    fn custom_hash(_data: Vec<u8>) -> Option<Vec<u8>> {
+        None
     }
 }
 

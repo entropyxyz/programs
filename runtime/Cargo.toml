@@ -15,4 +15,5 @@ ec-core = { path = "../core" }
 thiserror = "1.0.47"
 
 [dev-dependencies]
+blake3 = "1.5.0"
 # anyhow = "1.0.71"

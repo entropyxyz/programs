@@ -94,14 +94,35 @@ impl Runtime {
 
         let component = Component::from_binary(&self.engine, program)
             .map_err(|_| RuntimeError::InvalidBytecode)?;
-
         let (bindings, _) = Program::instantiate(&mut self.store, &component, &self.linker)
             .map_err(|_| RuntimeError::InvalidBytecode)?;
 
-        // TODO fix this unwrap
         bindings
             .call_evaluate(&mut self.store, signature_request)
             .map_err(|e| RuntimeError::Bindings(e.to_string()))?
             .map_err(RuntimeError::Runtime)
+    }
+
+    /// Compute the `custom-hash` of a `message` from the program.
+    pub fn custom_hash(&mut self, program: &[u8], message: &[u8]) -> Result<[u8; 32], RuntimeError> {
+        if program.len() == 0 {
+            return Err(RuntimeError::EmptyBytecode);
+        }
+
+        let component = Component::from_binary(&self.engine, program)
+            .map_err(|_| RuntimeError::InvalidBytecode)?;
+        let (bindings, _) = Program::instantiate(&mut self.store, &component, &self.linker)
+            .map_err(|_| RuntimeError::InvalidBytecode)?;
+
+        let hash_as_vec = bindings
+            .call_custom_hash(&mut self.store, message)
+            .unwrap().ok_or(RuntimeError::Runtime(ProgramError::InvalidSignatureRequest("`custom-hash` returns `None`. Implement the hash function in your program, or select a predefined `hash` in your signature request.".to_string())))?;
+        if hash_as_vec.len() != 32 {
+            return Err(RuntimeError::Runtime(ProgramError::InvalidSignatureRequest(format!("`custom-hash` must returns a Vec<u8> of length 32, not {}.", hash_as_vec.len()))));
+        }
+
+        let mut hash = [0u8; 32];
+        hash.copy_from_slice(&hash_as_vec);
+        Ok(hash)
     }
 }

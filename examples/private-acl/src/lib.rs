@@ -6,6 +6,7 @@
 extern crate alloc;
 
 use alloc::string::ToString;
+use alloc::vec::Vec;
 use blake2::{Blake2s256, Digest};
 use ec_constraints::{
     arch::evm::NameOrAddress,
@@ -23,10 +24,10 @@ register_custom_getrandom!(always_fail);
 impl Program for PrivateTransactionAcl {
     /// Allow any address given in the pre-defined list (addresses.txt)
     // #[no_mangle]
-    fn evaluate(state: InitialState) -> Result<(), CoreError> {
+    fn evaluate(signature_request: SignatureRequest) -> Result<(), CoreError> {
         // parse the raw tx into some type
         let parsed_tx =
-            <Evm as Architecture>::TransactionRequest::try_parse(state.data.as_slice())?;
+            <Evm as Architecture>::TransactionRequest::try_parse(signature_request.message.as_slice())?;
 
         let name_or_address: NameOrAddress = parsed_tx.to.ok_or(Error::Evaluation(
             "No recipient given in transaction".to_string(),
@@ -48,6 +49,10 @@ impl Program for PrivateTransactionAcl {
             }
         }
     }
+
+    fn custom_hash(_data: Vec<u8>) -> Option<Vec<u8>> {
+        None
+    }
 }
 
 export_program!(PrivateTransactionAcl);
@@ -60,9 +65,10 @@ mod tests {
 
     #[test]
     fn test_evaluate() {
-        let signature_request = InitialState {
+        let signature_request = SignatureRequest {
             // `data` is an RLP serialized ETH transaction with the recipient set to `0x772b9a9e8aa1c9db861c6611a82d251db4fac990`
-            data: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            message: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            auxilary_data: None,
         };
 
         assert!(PrivateTransactionAcl::evaluate(signature_request).is_ok());
@@ -70,9 +76,10 @@ mod tests {
 
     #[test]
     fn test_start_fail() {
-        let signature_request = InitialState {
+        let signature_request = SignatureRequest {
             // `data` is the same as previous test, but recipient address ends in `1` instead of `0`, so it should fail
-            data: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac991019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            message: "0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac991019243726561746564204f6e20456e74726f7079018080".to_string().into_bytes(),
+            auxilary_data: None,
         };
 
         assert!(PrivateTransactionAcl::evaluate(signature_request).is_err());
