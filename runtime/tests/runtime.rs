@@ -2,6 +2,10 @@
 const BAREBONES_COMPONENT_WASM: &[u8] =
     include_bytes!("../../target/wasm32-unknown-unknown/release/template_barebones.wasm");
 
+/// Points to the `infinite-loop` program binary.
+const INFINITE_LOOP_WASM: &[u8] =
+    include_bytes!("../../target/wasm32-unknown-unknown/release/infinite_loop.wasm");
+
 use ec_runtime::{Runtime, SignatureRequest};
 
 #[test]
@@ -45,4 +49,17 @@ fn test_empty_bytecode_fails() {
 
     let res = runtime.evaluate(&[], &signature_request);
     assert_eq!(res.unwrap_err().to_string(), "Bytecode length is zero");
+}
+
+#[test]
+fn test_infinite_loop() {
+    let mut runtime = Runtime::default();
+
+    let signature_request = SignatureRequest {
+        message: vec![],
+        auxilary_data: None,
+    };
+
+    let res = runtime.evaluate(INFINITE_LOOP_WASM, &signature_request);
+    assert_eq!(res.unwrap_err().to_string(), "Runtime error: error while executing at wasm backtrace:\n    0:  0x18a - <unknown>!evaluate");
 }
