@@ -29,6 +29,9 @@ pub enum RuntimeError {
     /// Runtime error during execution.
     #[error("Runtime error: {0}")]
     Runtime(ProgramError),
+    /// Runtime error during execution.
+    #[error("Runtime error: {0}")]
+    Bindings(String),
 }
 
 /// Config is for runtime parameters (eg instructions per program, additional runtime interfaces, etc).
@@ -61,7 +64,9 @@ impl Default for Runtime {
 impl Runtime {
     pub fn new(config: Config) -> Self {
         let mut wasmtime_config = WasmtimeConfig::new();
-        wasmtime_config.wasm_component_model(true).consume_fuel(true);
+        wasmtime_config
+            .wasm_component_model(true)
+            .consume_fuel(true);
 
         let engine = Engine::new(&wasmtime_config).unwrap();
         let linker = Linker::new(&engine);
@@ -96,7 +101,7 @@ impl Runtime {
         // TODO fix this unwrap
         bindings
             .call_evaluate(&mut self.store, signature_request)
-            .unwrap()
+            .map_err(|e| RuntimeError::Bindings(e.to_string()))?
             .map_err(RuntimeError::Runtime)
     }
 }

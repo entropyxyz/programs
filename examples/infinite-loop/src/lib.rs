@@ -15,7 +15,7 @@ impl Program for InfiniteLoop {
     /// This is the only function required by the program runtime. `message` is the preimage of the curve element to be
     /// signed, eg. RLP-serialized Ethereum transaction request, raw x86_64 executable, etc.
     fn evaluate(_signature_request: SignatureRequest) -> Result<(), Error> {
-        loop {};
+        loop {}
         #[allow(unreachable_code)]
         Ok(())
     }
