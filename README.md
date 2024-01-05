@@ -19,19 +19,27 @@ cargo install cargo-component --version 0.2.0 &&
 cargo install wasm-tools
 ```
 
-## Example Program: `barebones`
+## Example Program: `template-barebones`
 
-To get started, clone this repository and build the example `barebones` program:
+An example of a barebones program is at [`examples/barebones/src/lib.rs`](./examples/barebones/src/lib.rs). This example does a simple check on the length of the message to be signed.
+
+You can compile the program by running:
 
 ```bash
-git clone https://github.com/entropyxyz/constraints
-cd constraints
 cargo component build --release -p template-barebones --target wasm32-unknown-unknown
 ```
 
-This creates the program as a Wasm component at `target/wasm32-unknown-unknown/release/template_barebones.wasm`.
+This builds the program as a Wasm component at `target/wasm32-unknown-unknown/release/template_barebones.wasm`.
 
-Since this program is used in tests for the program runtime (`ec-runtime`), you can see the program get used by running `cargo test -p ec-runtime`.
+## Running Tests
+
+Before running the runtime tests, you need to build the `template-barebones` and `infinite-loop` components. To do this, execute:
+
+```bash
+cargo component build --release -p template-barebones -p infinite-loop --target wasm32-unknown-unknown`
+```
+
+This will create the components in `target/wasm32-unknown-unknown/release/`.
 
 ## Licensing
 
@@ -43,4 +51,3 @@ There are some exceptions however:
   `Apache License 2.0`.
 
 Modifications made by Entropy to these crates are licensed under `AGPL-3.0`.
-
