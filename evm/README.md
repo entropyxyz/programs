@@ -1,3 +1,3 @@
-# `ec-evm`
+# `entropy-programs-evm`
 
-Provides the EVM `Architecture`, adding EVM support to generic constraints (not specific to Ethereum Mainnet).
+Provides the EVM `Architecture`, adding EVM support to generic programs (not specific to Ethereum Mainnet).

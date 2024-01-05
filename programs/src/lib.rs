@@ -1,12 +1,12 @@
-//! Includes types and interfaces that are foundational to the core of constraints.
+//! Includes types and interfaces that are foundational to the core of programs.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
 extern crate alloc;
 
 pub use ec_core as core;
-/// All architecture-agnostic constraints should be re-exported from this module
-pub mod constraints {
+/// All architecture-agnostic programs should be re-exported from this module
+pub mod programs {
     pub use ec_acl as acl;
 }
 /// All architectures that implement the `ec_core::Architecture` trait should be re-exported from here.

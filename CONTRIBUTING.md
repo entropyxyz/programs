@@ -4,4 +4,4 @@ Thanks for contributing to the project! Please consider the following in PRs.
 
 ## Conventions
 
-Packages should use the `ec` prefix, which stands for "Entropy Constraints". For example, `ec-core` is the "Entropy Constraints Core" package, and `ec-acl` is the "Entropy Constraints Access Control List" package.
+Packages should use the `entropy-programs` prefix, which stands for "Entropy Programs". For example, `entropy-programs-core` is the "Entropy Programs Core" package, and `entropy-programs-acl` is the "Entropy Programs Access Control List" package.

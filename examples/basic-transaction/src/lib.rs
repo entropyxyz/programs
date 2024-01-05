@@ -2,9 +2,9 @@
 
 extern crate alloc;
 
-use ec_constraints::{
-    constraints::acl::*,
+use entropy_programs::{
     core::{bindgen::*, export_program, prelude::*, SatisfiableForArchitecture, TryParse},
+    programs::acl::*,
 };
 
 use alloc::{vec, vec::Vec};
@@ -15,7 +15,7 @@ pub struct BasicTransaction;
 register_custom_getrandom!(always_fail);
 
 impl Program for BasicTransaction {
-    /// This is the function that the constraints engine will runtime esecute. signature_request is the preimage of the curve element to be
+    /// This is the function that the programs engine will runtime esecute. signature_request is the preimage of the curve element to be
     /// signed, eg. RLP-serialized Ethereum transaction request, raw x86_64 executable, etc.
     // #[no_mangle]
     fn evaluate(state: SignatureRequest) -> Result<(), CoreError> {

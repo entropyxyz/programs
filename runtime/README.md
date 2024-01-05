@@ -1,6 +1,6 @@
-# `ec-runtime`
+# `entropy-programs-runtime`
 
-This contains the Wasm runtime for evaluaing, testing, and simulating constraints as *Wasm Components*.
+This contains the Wasm runtime for evaluaing, testing, and simulating programs as *Wasm Components*.
 
 ## Running Tests
 

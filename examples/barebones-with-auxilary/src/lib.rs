@@ -6,7 +6,7 @@ extern crate alloc;
 
 use alloc::{string::ToString, vec::Vec};
 
-use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
+use entropy_programs_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
@@ -22,7 +22,7 @@ impl Program for BarebonesWithAuxilary {
             auxilary_data,
         } = signature_request;
 
-        // our constraint just checks that the length of the signature request is greater than 10
+        // our program just checks that the length of the signature request is greater than 10
         if message.len() < 10 {
             return Err(Error::Evaluation(
                 "Length of message is too short.".to_string(),

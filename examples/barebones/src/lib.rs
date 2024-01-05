@@ -1,4 +1,4 @@
-//! This example shows how to write a contrieved and basic constraint: checking the length of the data to be signed.
+//! This example shows how to write a contrieved and basic program: checking the length of the data to be signed.
 
 #![no_std]
 
@@ -6,7 +6,7 @@ extern crate alloc;
 
 use alloc::{string::ToString, vec::Vec};
 
-use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
+use entropy_programs_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
@@ -19,7 +19,7 @@ impl Program for BarebonesProgram {
     fn evaluate(signature_request: SignatureRequest) -> Result<(), Error> {
         let message: Vec<u8> = signature_request.message;
 
-        // our constraint just checks that the length of the message is greater than 10
+        // our program just checks that the length of the message is greater than 10
         if message.len() < 10 {
             return Err(Error::Evaluation(
                 "Length of message is too short.".to_string(),

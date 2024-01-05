@@ -24,14 +24,14 @@ cargo install wasm-tools
 To get started, clone this repository and build the example `barebones` program:
 
 ```bash
-git clone https://github.com/entropyxyz/constraints
-cd constraints
+git clone https://github.com/entropyxyz/programs
+cd programs
 cargo component build --release -p template-barebones --target wasm32-unknown-unknown
 ```
 
 This creates the program as a Wasm component at `target/wasm32-unknown-unknown/release/template_barebones.wasm`.
 
-Since this program is used in tests for the program runtime (`ec-runtime`), you can see the program get used by running `cargo test -p ec-runtime`.
+Since this program is used in tests for the program runtime (`entropy-programs-runtime`), you can see the program get used by running `cargo test -p entropy-programs-runtime`.
 
 ## Licensing
 

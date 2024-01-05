@@ -1,10 +1,12 @@
-//! This module contains the EVM architecture and its associated types. Since it implements Architecture, constraints written around the Architecture trait can be used with EVM.
+//! This module contains the EVM architecture and its associated types. Since it implements Architecture, programs written around the Architecture trait can be used with EVM.
 
 extern crate alloc;
 
 use alloc::string::String;
 
-use ec_core::{Architecture, Error as CoreError, GetReceiver, GetSender, Parse, TryParse};
+use entropy_programs_core::{
+    Architecture, Error as CoreError, GetReceiver, GetSender, Parse, TryParse,
+};
 pub use ethers_core::types::transaction::request::TransactionRequest as EvmTransactionRequest;
 pub use ethers_core::types::{NameOrAddress, H160};
 use rlp::Rlp;
