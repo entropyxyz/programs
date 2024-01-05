@@ -3,7 +3,7 @@
 use thiserror::Error;
 use wasmtime::{
     component::{bindgen, Component, Linker},
-    Config, Engine, Result, Store,
+    Config as WasmtimeConfig, Engine, Result, Store,
 };
 
 /// Note, this is wasmtime's bindgen, not wit-bindgen (modules)
@@ -26,9 +26,26 @@ pub enum RuntimeError {
     /// Program bytecode is not a valid WebAssembly component.
     #[error("Invalid bytecode")]
     InvalidBytecode,
-    /// Runtime error during execution.
+    /// Program error during execution.
     #[error("Runtime error: {0}")]
     Runtime(ProgramError),
+    /// Program exceeded fuel limits. Execute fewer instructions.
+    #[error("Out of fuel")]
+    OutOfFuel,
+}
+
+/// Config is for runtime parameters (eg instructions per program, additional runtime interfaces, etc).
+pub struct Config {
+    /// Max number of instructions the runtime will execute before returning an error.
+    pub fuel: u64,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            fuel: 10_000,
+        }
+    }
 }
 
 /// Runtime allows for the execution of programs. Instantiate with `Runtime::new()`.
@@ -40,22 +57,27 @@ pub struct Runtime {
 
 impl Default for Runtime {
     fn default() -> Self {
-        let mut config = Config::new();
-        config.wasm_component_model(true);
-        let engine = Engine::new(&config).unwrap();
+        Self::new(Config::default())
+    }
+}
+
+impl Runtime {
+    pub fn new(config: Config) -> Self {
+        let mut wasmtime_config = WasmtimeConfig::new();
+        wasmtime_config
+            .wasm_component_model(true)
+            .consume_fuel(true);
+
+        let engine = Engine::new(&wasmtime_config).unwrap();
         let linker = Linker::new(&engine);
-        let store = Store::new(&engine, ());
+        let mut store = Store::new(&engine, ());
+
+        store.add_fuel(config.fuel).unwrap();
         Self {
             engine,
             linker,
             store,
         }
-    }
-}
-
-impl Runtime {
-    pub fn new() -> Self {
-        Self::default()
     }
 }
 
@@ -77,7 +99,7 @@ impl Runtime {
 
         bindings
             .call_evaluate(&mut self.store, signature_request)
-            .unwrap()
+            .map_err(|_| RuntimeError::OutOfFuel)?
             .map_err(RuntimeError::Runtime)
     }
 
