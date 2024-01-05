@@ -26,24 +26,24 @@ pub enum RuntimeError {
     /// Program bytecode is not a valid WebAssembly component.
     #[error("Invalid bytecode")]
     InvalidBytecode,
-    /// Runtime error during execution.
+    /// Program error during execution.
     #[error("Runtime error: {0}")]
     Runtime(ProgramError),
-    /// Runtime error during execution.
-    #[error("Runtime error: {0}")]
-    Bindings(String),
+    /// Program exceeded fuel limits. Execute fewer instructions.
+    #[error("Out of fuel")]
+    OutOfFuel,
 }
 
 /// Config is for runtime parameters (eg instructions per program, additional runtime interfaces, etc).
 pub struct Config {
-    /// Max number of instructions that will execute before the runtime returns an error.
-    pub max_instructions_per_program: u64,
+    /// Max number of instructions the runtime will execute before returning an error.
+    pub fuel: u64,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Self {
-            max_instructions_per_program: 10_000,
+            fuel: 10_000,
         }
     }
 }
@@ -72,7 +72,7 @@ impl Runtime {
         let linker = Linker::new(&engine);
         let mut store = Store::new(&engine, ());
 
-        store.add_fuel(config.max_instructions_per_program).unwrap();
+        store.add_fuel(config.fuel).unwrap();
         Self {
             engine,
             linker,
@@ -99,7 +99,7 @@ impl Runtime {
 
         bindings
             .call_evaluate(&mut self.store, signature_request)
-            .map_err(|e| RuntimeError::Bindings(e.to_string()))?
+            .map_err(|_| RuntimeError::OutOfFuel)?
             .map_err(RuntimeError::Runtime)
     }
 

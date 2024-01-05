@@ -64,7 +64,7 @@ fn test_infinite_loop() {
     };
 
     let res = runtime.evaluate(INFINITE_LOOP_WASM, &signature_request);
-    assert_eq!(res.unwrap_err().to_string(), "Runtime error: error while executing at wasm backtrace:\n    0:  0x18a - <unknown>!evaluate");
+    assert_eq!(res.unwrap_err().to_string(), "Out of fuel");
 }
 
 #[test]
