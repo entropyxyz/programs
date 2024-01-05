@@ -4,8 +4,8 @@ const BAREBONES_COMPONENT_WASM: &[u8] =
 const CUSTOM_HASH_COMPONENT_WASM: &[u8] =
     include_bytes!("../../target/wasm32-unknown-unknown/release/example_custom_hash.wasm");
 
-use ec_runtime::{Runtime, SignatureRequest};
 use blake3;
+use entropy_programs_runtime::{Runtime, SignatureRequest};
 
 #[test]
 fn test_barebones_component() {

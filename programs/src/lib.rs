@@ -4,14 +4,14 @@
 
 extern crate alloc;
 
-pub use ec_core as core;
+pub use entropy_programs_core as core;
 /// All architecture-agnostic programs should be re-exported from this module
 pub mod programs {
-    pub use ec_acl as acl;
+    pub use entropy_programs_acl as acl;
 }
 /// All architectures that implement the `ec_core::Architecture` trait should be re-exported from here.
 pub mod arch {
-    pub use ec_evm as evm;
+    pub use entropy_programs_evm as evm;
 }
 
 /// Dynamic parsing allows for easily hooking transactions into
