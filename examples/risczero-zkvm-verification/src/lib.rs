@@ -1,4 +1,4 @@
-//! This example shows how to write a contrieved and basic constraint: checking the length of the data to be signed.
+//! This example shows how to write a contrieved and basic program: checking the length of the data to be signed.
 
 #![cfg_attr(not(test), no_std)]
 
@@ -6,7 +6,7 @@ extern crate alloc;
 
 use alloc::{string::ToString, vec::Vec};
 
-use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
+use entropy_programs_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 
 use bincode;
 use risc0_zkvm::Receipt;

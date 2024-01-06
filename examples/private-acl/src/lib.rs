@@ -8,10 +8,10 @@ extern crate alloc;
 use alloc::string::ToString;
 use alloc::vec::Vec;
 use blake2::{Blake2s256, Digest};
-use ec_constraints::{
+use entropy_programs::{
     arch::evm::NameOrAddress,
-    constraints::acl::*,
     core::{bindgen::*, export_program, prelude::*, TryParse},
+    programs::acl::*,
 };
 
 pub struct PrivateTransactionAcl;
@@ -26,8 +26,9 @@ impl Program for PrivateTransactionAcl {
     // #[no_mangle]
     fn evaluate(signature_request: SignatureRequest) -> Result<(), CoreError> {
         // parse the raw tx into some type
-        let parsed_tx =
-            <Evm as Architecture>::TransactionRequest::try_parse(signature_request.message.as_slice())?;
+        let parsed_tx = <Evm as Architecture>::TransactionRequest::try_parse(
+            signature_request.message.as_slice(),
+        )?;
 
         let name_or_address: NameOrAddress = parsed_tx.to.ok_or(Error::Evaluation(
             "No recipient given in transaction".to_string(),
