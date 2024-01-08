@@ -19,7 +19,7 @@ rust:
 		export PATH="${PATH}:${HOME}/.cargo/bin" rustup default stable \
 		&& rustup show \
 		&& cargo install --git https://github.com/bytecodealliance/cargo-component --locked cargo-component \
-		&& cargo install cargo-risczero
+		&& cargo install cargo-risczero \
 		&& cargo risczero install
 
 # This target is specifically for generating API documentation from
