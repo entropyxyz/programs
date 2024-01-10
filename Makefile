@@ -18,9 +18,7 @@ rustup:
 rust:
 		export PATH="${PATH}:${HOME}/.cargo/bin" rustup default stable \
 		&& rustup show \
-		&& cargo install --git https://github.com/bytecodealliance/cargo-component --locked cargo-component \
-		&& cargo install cargo-risczero \
-		&& cargo risczero install
+		&& cargo install --git https://github.com/bytecodealliance/cargo-component --locked cargo-component
 
 # This target is specifically for generating API documentation from
 # within a Vercel.com Project. It is used as the Projects `installCommand`.
@@ -35,4 +33,4 @@ vercel-install-api-docs :: vercel-rustup rust
 # The Vercel Project's `buildCommand` is defined here.
 vercel-build-api-docs ::
 		export PATH="${PATH}:${HOME}/.cargo/bin" \
-			&& cargo doc --release --no-deps
+			&& cargo doc --workspace --exclude example-risc0 --release --no-deps
