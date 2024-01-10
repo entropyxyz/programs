@@ -19,7 +19,7 @@ rust:
 		export PATH="${PATH}:${HOME}/.cargo/bin" rustup default stable \
 		&& rustup show \
 		&& cargo install --git https://github.com/bytecodealliance/cargo-component --locked cargo-component \
-		apt update -y && apt-get install -y libssl-dev openssl pkg-config \
+		&& apt update -y && apt-get install -y libssl-dev openssl pkg-config \
 		&& cargo install cargo-risczero \
 		&& cargo risczero install
 
