@@ -3,13 +3,13 @@ name = "example-private-acl"
 version = "0.1.0"
 edition = "2021"
 
-# This is required to compile constraints to a wasm module
+# This is required to compile programs to a wasm module
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
 blake2 = "0.10.6"
-ec-constraints = { workspace = true }
+entropy-programs = { workspace = true }
 
 [build-dependencies]
 hex = "0.4.3"

@@ -7,9 +7,12 @@
 
 extern crate alloc;
 
-use alloc::{string::{String, ToString}, vec::Vec};
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
 
-use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
+use entropy_programs_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 use siwe::Message;
 
 // TODO confirm this isn't an issue for audit

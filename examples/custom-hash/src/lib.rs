@@ -6,7 +6,7 @@ extern crate alloc;
 
 use alloc::{string::ToString, vec::Vec};
 
-use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
+use entropy_programs_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 
 use blake3;
 
@@ -18,7 +18,9 @@ pub struct CustomHashExample;
 impl Program for CustomHashExample {
     fn evaluate(signature_request: SignatureRequest) -> Result<(), Error> {
         if signature_request.message.len() < 1 {
-            return Err(Error::Evaluation("You need to give me SOME data to sign!".to_string()));
+            return Err(Error::Evaluation(
+                "You need to give me SOME data to sign!".to_string(),
+            ));
         }
         // By immediately returning Ok, we sign any data that is passed to us.
         Ok(())

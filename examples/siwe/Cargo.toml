@@ -4,15 +4,15 @@ version = "0.1.0"
 authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
 homepage = "https://entropy.xyz/"
 license = "Unlicense"
-repository = "https://github.com/entropyxyz/constraints"
+repository = "https://github.com/entropyxyz/programs"
 edition = "2021"
 
-# This is required to compile constraints to a wasm module
+# This is required to compile programs to a wasm module
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-ec-core = { workspace = true }
+entropy-programs-core = { workspace = true }
 siwe = "0.6.0"
 
 # These are used by `cargo component`

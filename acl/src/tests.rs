@@ -1,6 +1,6 @@
 #![cfg(test)]
 
-use ec_core::{Acl, AclKind};
+use entropy_programs_core::{Acl, AclKind};
 use ethers_core::types::{NameOrAddress, TransactionRequest, H160};
 
 use crate::Evaluate;
@@ -59,11 +59,21 @@ fn test_acl_functions_properly() {
     };
 
     // should only block whitelisted and null recipient txs
-    assert!(denylisted_acl.clone().is_satisfied_by(to_address_2_tx.clone()).is_ok());
-    assert!(denylisted_acl.clone().is_satisfied_by(to_address_3_tx.clone()).is_ok());
+    assert!(denylisted_acl
+        .clone()
+        .is_satisfied_by(to_address_2_tx.clone())
+        .is_ok());
+    assert!(denylisted_acl
+        .clone()
+        .is_satisfied_by(to_address_3_tx.clone())
+        .is_ok());
 
-    assert!(denylisted_acl.is_satisfied_by(to_address_1_tx.clone()).is_err());
-    assert!(allowlisted_acl.is_satisfied_by(to_null_recipient_tx.clone()).is_err());
+    assert!(denylisted_acl
+        .is_satisfied_by(to_address_1_tx.clone())
+        .is_err());
+    assert!(allowlisted_acl
+        .is_satisfied_by(to_null_recipient_tx.clone())
+        .is_err());
 
     let allowlisted_acl_with_null_recipient = Acl::<[u8; 20]> {
         addresses: vec![evm_address_1],

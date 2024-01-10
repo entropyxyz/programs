@@ -3,13 +3,16 @@ const BAREBONES_COMPONENT_WASM: &[u8] =
     include_bytes!("../../target/wasm32-unknown-unknown/release/template_barebones.wasm");
 const CUSTOM_HASH_COMPONENT_WASM: &[u8] =
     include_bytes!("../../target/wasm32-unknown-unknown/release/example_custom_hash.wasm");
+/// Points to the `infinite-loop` program binary.
+const INFINITE_LOOP_WASM: &[u8] =
+    include_bytes!("../../target/wasm32-unknown-unknown/release/infinite_loop.wasm");
 
-use ec_runtime::{Runtime, SignatureRequest};
 use blake3;
+use entropy_programs_runtime::{Runtime, SignatureRequest};
 
 #[test]
 fn test_barebones_component() {
-    let mut runtime = Runtime::new();
+    let mut runtime = Runtime::default();
 
     // The barebones example simply validates that the length of the data to be signed is greater than 10.
     let longer_than_10 = "asdfasdfasdfasdf".to_string();
@@ -24,7 +27,7 @@ fn test_barebones_component() {
 
 #[test]
 fn test_barebones_component_fails_with_data_length_less_than_10() {
-    let mut runtime = Runtime::new();
+    let mut runtime = Runtime::default();
 
     // Since the barebones example verifies that the length of the data to be signed is greater than 10, this should fail.
     let shorter_than_10 = "asdf".to_string();
@@ -39,7 +42,7 @@ fn test_barebones_component_fails_with_data_length_less_than_10() {
 
 #[test]
 fn test_empty_bytecode_fails() {
-    let mut runtime = Runtime::new();
+    let mut runtime = Runtime::default();
 
     let signature_request = SignatureRequest {
         message: vec![],
@@ -51,8 +54,21 @@ fn test_empty_bytecode_fails() {
 }
 
 #[test]
+fn test_infinite_loop() {
+    let mut runtime = Runtime::default();
+
+    let signature_request = SignatureRequest {
+        message: vec![],
+        auxilary_data: None,
+    };
+
+    let res = runtime.evaluate(INFINITE_LOOP_WASM, &signature_request);
+    assert_eq!(res.unwrap_err().to_string(), "Out of fuel");
+}
+
+#[test]
 fn test_custom_hash() {
-    let mut runtime = Runtime::new();
+    let mut runtime = Runtime::default();
 
     let message = "some_data_to_be_hashed".to_string().into_bytes();
 
@@ -69,7 +85,7 @@ fn test_custom_hash() {
 
 #[test]
 fn test_custom_hash_errors_when_returning_none() {
-    let mut runtime = Runtime::new();
+    let mut runtime = Runtime::default();
 
     let message = "some_data_to_be_hashed".to_string().into_bytes();
 
