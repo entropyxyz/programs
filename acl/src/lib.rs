@@ -27,6 +27,7 @@ use serde::{Deserialize, Serialize};
     Deserialize,
 )]
 // TODO: Make const; Change Vec<Address> to something like <const Address, const N: usize>
+// TODO: Add an AclConfig struct where `addresses` can be a generic string for any architecture, with TryFrom<AclConfig> implemented for all Acl<A> where A: TryFrom<String>
 pub struct Acl<Address> {
     pub addresses: Vec<Address>,
     pub kind: AclKind,
