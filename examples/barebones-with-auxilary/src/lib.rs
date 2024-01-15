@@ -16,7 +16,7 @@ pub struct BarebonesWithAuxilary;
 impl Program for BarebonesWithAuxilary {
     /// This is the only function required by the program runtime. `signature_request` includes the message to be
     /// signed, eg. RLP-serialized Ethereum transaction request, raw x86_64 executable, etc.
-    fn evaluate(signature_request: SignatureRequest) -> Result<(), Error> {
+    fn evaluate(signature_request: SignatureRequest, _config: Option<Vec<u8>>) -> Result<(), Error> {
         let SignatureRequest {
             message,
             auxilary_data,
@@ -57,7 +57,7 @@ mod tests {
             auxilary_data: Some(vec![0x00]),
         };
 
-        assert!(BarebonesWithAuxilary::evaluate(signature_request).is_ok());
+        assert!(BarebonesWithAuxilary::evaluate(signature_request, None).is_ok());
     }
 
     /// Note, the program is written s.t. if `message` is less than 10 bytes, the program will error.
@@ -69,7 +69,7 @@ mod tests {
             auxilary_data: Some(vec![0x00]),
         };
 
-        assert!(BarebonesWithAuxilary::evaluate(signature_request).is_err());
+        assert!(BarebonesWithAuxilary::evaluate(signature_request, None).is_err());
     }
 
     /// Note, the program is written s.t. if `auxilary_data` is `None`, the program will error.
@@ -81,6 +81,6 @@ mod tests {
             auxilary_data: None,
         };
 
-        assert!(BarebonesWithAuxilary::evaluate(signature_request).is_err());
+        assert!(BarebonesWithAuxilary::evaluate(signature_request, None).is_err());
     }
 }

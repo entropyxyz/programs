@@ -87,6 +87,7 @@ impl Runtime {
         &mut self,
         program: &[u8],
         signature_request: &SignatureRequest,
+        config: Option<&[u8]>
     ) -> Result<(), RuntimeError> {
         if program.len() == 0 {
             return Err(RuntimeError::EmptyBytecode);
@@ -98,7 +99,7 @@ impl Runtime {
             .map_err(|_| RuntimeError::InvalidBytecode)?;
 
         bindings
-            .call_evaluate(&mut self.store, signature_request)
+            .call_evaluate(&mut self.store, signature_request, config)
             .map_err(|_| RuntimeError::OutOfFuel)?
             .map_err(RuntimeError::Runtime)
     }

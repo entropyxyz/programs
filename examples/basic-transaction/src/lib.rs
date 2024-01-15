@@ -18,10 +18,10 @@ impl Program for BasicTransaction {
     /// This is the function that the programs engine will runtime esecute. signature_request is the preimage of the curve element to be
     /// signed, eg. RLP-serialized Ethereum transaction request, raw x86_64 executable, etc.
     // #[no_mangle]
-    fn evaluate(state: SignatureRequest) -> Result<(), CoreError> {
+    fn evaluate(signature_request: SignatureRequest, _config: Option<Vec<u8>>) -> Result<(), CoreError> {
         // parse the raw tx into some type
         let parsed_tx =
-            <Evm as Architecture>::TransactionRequest::try_parse(state.message.as_slice())?;
+            <Evm as Architecture>::TransactionRequest::try_parse(signature_request.message.as_slice())?;
 
         // construct a whitelist ACL
         // TODO can we just use Address instead of AddressRaw?
@@ -63,7 +63,7 @@ mod tests {
             auxilary_data: None
         };
 
-        assert!(BasicTransaction::evaluate(signature_request).is_ok());
+        assert!(BasicTransaction::evaluate(signature_request, None).is_ok());
     }
 
     #[test]
@@ -74,6 +74,6 @@ mod tests {
             auxilary_data: None
         };
 
-        assert!(BasicTransaction::evaluate(signature_request).is_err());
+        assert!(BasicTransaction::evaluate(signature_request, None).is_err());
     }
 }
