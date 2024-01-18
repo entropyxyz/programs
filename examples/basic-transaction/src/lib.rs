@@ -31,7 +31,7 @@ impl Program for BasicTransaction {
         let parsed_tx =
             <Evm as Architecture>::TransactionRequest::try_parse(signature_request.message.as_slice())?;
 
-        // construct a whitelist ACL from the config
+        // construct a allowlist ACL from the config
         let typed_config = serde_json::from_slice::<BasicTransactionConfig>(
                 config.ok_or(CoreError::Evaluation("No config provided.".to_string()))?.as_slice()
             ).map_err(|e| CoreError::Evaluation(format!("Failed to parse config: {}", e)))?;
@@ -67,8 +67,8 @@ export_program!(BasicTransaction);
 mod tests {
     use super::*;
 
-    const EVM_TX_WITH_WHITELISTED_RECIPIENT: &[u8] = b"0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080";
-    const EVM_TX_WITH_NONWHITELISTED_RECIPIENT: &[u8] = b"0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac991019243726561746564204f6e20456e74726f7079018080";
+    const EVM_TX_WITH_ALLOWLISTED_RECIPIENT: &[u8] = b"0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac990019243726561746564204f6e20456e74726f7079018080";
+    const EVM_TX_WITH_NONALLOWLISTED_RECIPIENT: &[u8] = b"0xef01808094772b9a9e8aa1c9db861c6611a82d251db4fac991019243726561746564204f6e20456e74726f7079018080";
     const CONFIG: &[u8] = r#"
         {
             "allowlisted_addresses": [
@@ -81,7 +81,7 @@ mod tests {
     fn test_evaluate() {
         let signature_request = SignatureRequest {
             // `data` is an RLP serialized ETH transaction with the recipient set to `0x772b9a9e8aa1c9db861c6611a82d251db4fac990`
-            message: EVM_TX_WITH_WHITELISTED_RECIPIENT.to_vec(),
+            message: EVM_TX_WITH_ALLOWLISTED_RECIPIENT.to_vec(),
             auxilary_data: None
         };
 
@@ -92,7 +92,7 @@ mod tests {
     fn test_start_fail() {
         let signature_request = SignatureRequest {
             // `data` is the same as previous test, but recipient address ends in `1` instead of `0`, so it should fail
-            message: EVM_TX_WITH_NONWHITELISTED_RECIPIENT.to_vec(),
+            message: EVM_TX_WITH_NONALLOWLISTED_RECIPIENT.to_vec(),
             auxilary_data: None
         };
 

@@ -58,7 +58,7 @@ fn test_acl_functions_properly() {
         ..Default::default()
     };
 
-    // should only block whitelisted and null recipient txs
+    // should only block allowlisted and null recipient txs
     assert!(denylisted_acl
         .clone()
         .is_satisfied_by(to_address_2_tx.clone())
@@ -105,7 +105,7 @@ fn test_acl_functions_properly() {
         allow_null_recipient: true,
     };
 
-    // should only block whitelisted
+    // should only block allowlisted
     assert!(denylisted_acl_with_null_recipient
         .clone()
         .is_satisfied_by(to_address_2_tx.clone())
