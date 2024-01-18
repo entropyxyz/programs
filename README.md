@@ -20,7 +20,7 @@ cargo install cargo-component --version 0.2.0 &&
 cargo install wasm-tools
 ```
 
-## Example Program: `template-barebones`
+## A Barebones Program: [`template-barebones`](./examples/barebones/src/lib.rs)
 
 An example of a barebones program is at [`examples/barebones/src/lib.rs`](./examples/barebones/src/lib.rs). This example does a simple check on the length of the message to be signed.
 
@@ -31,6 +31,16 @@ cargo component build --release -p template-barebones --target wasm32-unknown-un
 ```
 
 This builds the program as a Wasm component at `target/wasm32-unknown-unknown/release/template_barebones.wasm`.
+
+## Example Custody Program with Config: [`example-basic-transaction`](./examples/basic-transaction/src/lib.rs)
+
+This example validates that an an EVM transaction request recipient exists on a list of allowlisted addresses. It also uses a configuration, which allows the user to modify the allowlisted addresses without having to recompile the program (i.e. update the allowlist from the browser).
+
+You can compile the program by running:
+
+```bash
+cargo component build --release -p example-basic-transaction --target wasm32-unknown-unknown
+```
 
 ## Running Tests
 

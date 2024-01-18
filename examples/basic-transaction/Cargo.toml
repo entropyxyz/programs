@@ -15,6 +15,8 @@ crate-type = ["cdylib"]
 entropy-programs = { workspace = true }
 # TODO move hex parsing into the entropy-programs-evm crate
 hex = { version = "0.4.3", default-features = false }
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
+serde_json = { version = "1.0", default-features = false, features = ["alloc"]}
 
 # These are used by `cargo component`
 [package.metadata.component]

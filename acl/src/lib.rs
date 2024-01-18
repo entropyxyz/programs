@@ -26,7 +26,6 @@ use serde::{Deserialize, Serialize};
     Serialize,
     Deserialize,
 )]
-// TODO: Make const; Change Vec<Address> to something like <const Address, const N: usize>
 pub struct Acl<Address> {
     pub addresses: Vec<Address>,
     pub kind: AclKind,
