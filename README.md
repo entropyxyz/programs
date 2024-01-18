@@ -34,7 +34,7 @@ This builds the program as a Wasm component at `target/wasm32-unknown-unknown/re
 
 ## Example Custody Program with Config: [`example-basic-transaction`](./examples/basic-transaction/src/lib.rs)
 
-This example validates that an an EVM transaction request recipient exists on a list of whitelistd addresses. It also uses a configuration, which allows the user to modify the whitelisted addresses without having to recompile the program (i.e. update the whitelist from the browser).
+This example validates that an an EVM transaction request recipient exists on a list of whitelisted addresses. It also uses a configuration which allows the user to modify the whitelisted addresses without having to recompile the program (i.e. update the whitelist from the browser).
 
 You can compile the program by running:
 
