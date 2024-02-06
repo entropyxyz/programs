@@ -9,5 +9,4 @@ RUN cargo install wasm-tools
 RUN cargo component build --release -p $PACKAGE --target wasm32-unknown-unknown
 
 FROM scratch AS binary
-COPY --from=base /usr/src/programs/target/wasm32-unknown-unknown/release /
-# TODO this copies all files, should really be only $PACKAGE.wasm - but there is an issue with snake case vs kebab case
+COPY --from=base /usr/src/programs/target/wasm32-unknown-unknown/release/*.wasm /
