@@ -1,11 +1,10 @@
-FROM rust:1.67 AS base
+# This is for building the example programs in this repo.
+FROM pegpegpeg/build-entropy-programs:latest AS base
 ARG PACKAGE=template-barebones
 
 WORKDIR /usr/src/programs
 COPY . .
 
-RUN cargo install cargo-component --version 0.2.0
-RUN cargo install wasm-tools
 RUN cargo component build --release -p $PACKAGE --target wasm32-unknown-unknown
 
 FROM scratch AS binary
