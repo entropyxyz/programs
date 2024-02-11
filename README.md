@@ -74,10 +74,10 @@ This will compile your program and put the `.wasm` binary file in `./binary-dir`
 
 ## Running Tests
 
-Before running the runtime tests, you need to build the `template-barebones` and `infinite-loop` components. To do this, execute:
+Before running the runtime tests, you need to build the `template-barebones`, `infinite-loop` and `example-custom-hash` components. To do this, execute:
 
 ```bash
-cargo component build --release -p template-barebones -p infinite-loop --target wasm32-unknown-unknown`
+cargo component build --release -p template-barebones -p infinite-loop -p example-custom-hash --target wasm32-unknown-unknown`
 ```
 
 This will create the components in `target/wasm32-unknown-unknown/release/`.
