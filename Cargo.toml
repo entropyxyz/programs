@@ -1,5 +1,6 @@
 [workspace]
 members = ["programs", "core", "acl", "evm", "runtime", "examples/*"]
+exclude = ["examples/basic-template"]
 resolver = "2"
 
 [workspace.dependencies]
