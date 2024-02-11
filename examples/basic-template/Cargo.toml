@@ -1,0 +1,19 @@
+[package]
+name = "{{project-name}}"
+version = "0.1.0"
+authors = ["{{authors}}"]
+license = "Unlicense"
+edition = "2021"
+
+# This is required to compile programs to a wasm module
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+entropy-programs-core={ git="https://github.com/entropyxyz/programs.git", tag="v0.8.0" }
+
+# These are used by `cargo component`
+[package.metadata.component]
+package = "entropy:{{project-name}}"
+
+[package.metadata.component.dependencies]
