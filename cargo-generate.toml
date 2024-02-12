@@ -1,2 +1,2 @@
 [template]
-sub_templates = ["examples/basic-template"]
+sub_templates = ["templates/basic-template"]
