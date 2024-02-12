@@ -24,7 +24,7 @@ Alternatively you can build them using the included Dockerfile:
 ```bash
 docker build --build-arg PACKAGE=<example name> --output=example-binary .
 ```
-This will build the specified example and put comiled `.wasm` in the director `./example-binary`.
+This will build the specified example and put compiled `.wasm` in the director `./example-binary`.
 
 ### A Barebones Program: [`template-barebones`](./examples/barebones/src/lib.rs)
 
@@ -64,9 +64,15 @@ cargo generate entropyxyz/programs --name my-program
 
 You template program is now in the `./my-program` directory and ready to be edited. You can run tests as you would a normal rust project with `cargo test`.
 
-If you want to make your program publicly available and open source, it is recommended to build it with the Dockerfile included in the template. This makes it possible for others to verify that the source code does correspond to the on-chain binary.
+You can compile your program with `cargo component`:
 
+```bash
+cargo component build --release --target wasm32-unknown-unknown
 ```
+
+If you want to make your program publicly available and open source, and make it possible for others to verify that the source code corresponds to the on-chain binary, you can build it with the Dockerfile included in the template: 
+
+```bash
 docker build --output=binary-dir .
 ```
 

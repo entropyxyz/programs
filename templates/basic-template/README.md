@@ -22,7 +22,8 @@ The `.wasm` binary can be found in `./target/wasm32-unknown-unknown/release`
 
 ## Building with docker
 
-If you want to make your program publicly available and open source, it is recommended to build it with the Dockerfile included in the template. This makes it possible for others to verify that the source code does correspond to the on-chain binary.
+If you want to make your program publicly available and open source, and make it possible for others to verify that the source code corresponds to the on-chain binary, you can build it with the included Dockerfile: 
+
 
 ```
 docker build --output=binary-dir .
