@@ -22,7 +22,7 @@ package = "entropy:{{project-name}}"
 [package.metadata.entropy-program]
 
 # The docker image used to build this program
-docker-image = "pegpegpeg/build-entropy-programs:latest"
+docker-image = "peg997/build-entropy-programs:version0.1"
 
 # Configuration interface
 # configuration-interface = ""
