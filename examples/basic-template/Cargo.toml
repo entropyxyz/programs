@@ -17,3 +17,12 @@ entropy-programs-core={ git="https://github.com/entropyxyz/programs.git", tag="v
 package = "entropy:{{project-name}}"
 
 [package.metadata.component.dependencies]
+
+# Metadata related to an Entropy program
+[package.metadata.entropy-program]
+
+# The docker image used to build this program
+docker-image = "pegpegpeg/build-entropy-programs:latest"
+
+# Configuration interface
+# configuration-interface = ""
