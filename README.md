@@ -22,7 +22,7 @@ cargo install wasm-tools
 
 Alternatively you can build them using the included Dockerfile:
 ```bash
-docker build --build-arg PACKAGE=<example name> --output=example-binary --target=binary .
+docker build --build-arg PACKAGE=<example name> --output=example-binary .
 ```
 This will build the specified example and put comiled `.wasm` in the director `./example-binary`.
 
@@ -67,7 +67,7 @@ You template program is now in the `./my-program` directory and ready to be edit
 If you want to make your program publicly available and open source, it is recommended to build it with the Dockerfile included in the template. This makes it possible for others to verify that the source code does correspond to the on-chain binary.
 
 ```
-docker build --output=binary-dir --target=binary .
+docker build --output=binary-dir .
 ```
 
 This will compile your program and put the `.wasm` binary file in `./binary-dir`. 
