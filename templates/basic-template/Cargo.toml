@@ -12,6 +12,10 @@ crate-type = ["cdylib"]
 [dependencies]
 entropy-programs-core={ git="https://github.com/entropyxyz/programs.git", tag="v0.8.0" }
 
+# strip debug info since that makes up a major part of Wasm blobs, see Wasm's `twiggy`
+[profile.release]
+strip = "debuginfo"
+
 # These are used by `cargo component`
 [package.metadata.component]
 package = "entropy:{{project-name}}"
