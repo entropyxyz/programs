@@ -4,7 +4,7 @@ Entropy allows the creation of decentralized signing authorities. Signing author
 
 This repository contains libraries, toolchains, utilities, and specifications for writing, configuring, building, and testing the Wasm-based applications for Entropy. In theory, programs can be written in any language that compiles to WebAssembly, which includes all LLVM-supported languages like Rust, AssemblyScript, Zig, C, etc. Thanks to the WebAssembly [Component Model](https://component-model.bytecodealliance.org), programs can even be reused languages, with the rich typing provided by the component model interfaces.
 
-## Writing Programs
+## Example Programs
 
 ### Build Requirements
 
@@ -20,7 +20,13 @@ cargo install cargo-component --version 0.2.0 &&
 cargo install wasm-tools
 ```
 
-## A Barebones Program: [`template-barebones`](./examples/barebones/src/lib.rs)
+Alternatively you can build them using the included Dockerfile:
+```bash
+docker build --build-arg PACKAGE=<example name> --output=example-binary .
+```
+This will build the specified example and put compiled `.wasm` in the director `./example-binary`.
+
+### A Barebones Program: [`template-barebones`](./examples/barebones/src/lib.rs)
 
 An example of a barebones program is at [`examples/barebones/src/lib.rs`](./examples/barebones/src/lib.rs). This example does a simple check on the length of the message to be signed.
 
@@ -32,7 +38,7 @@ cargo component build --release -p template-barebones --target wasm32-unknown-un
 
 This builds the program as a Wasm component at `target/wasm32-unknown-unknown/release/template_barebones.wasm`.
 
-## Example Custody Program with Config: [`example-basic-transaction`](./examples/basic-transaction/src/lib.rs)
+### Example Custody Program with Config: [`example-basic-transaction`](./examples/basic-transaction/src/lib.rs)
 
 This example validates that an an EVM transaction request recipient exists on a list of allowlisted addresses. It also uses a configuration, which allows the user to modify the allowlisted addresses without having to recompile the program (i.e. update the allowlist from the browser).
 
@@ -42,12 +48,42 @@ You can compile the program by running:
 cargo component build --release -p example-basic-transaction --target wasm32-unknown-unknown
 ```
 
-## Running Tests
+## Writing your own programs
 
-Before running the runtime tests, you need to build the `template-barebones` and `infinite-loop` components. To do this, execute:
+You can get started with a template program using cargo-generate.
+
+Install cargo-generate:
 
 ```bash
-cargo component build --release -p template-barebones -p infinite-loop --target wasm32-unknown-unknown`
+cargo install cargo-generate
+```
+
+```bash
+cargo generate entropyxyz/programs --name my-program
+```
+
+You template program is now in the `./my-program` directory and ready to be edited. You can run tests as you would a normal rust project with `cargo test`.
+
+You can compile your program with `cargo component`:
+
+```bash
+cargo component build --release --target wasm32-unknown-unknown
+```
+
+If you want to make your program publicly available and open source, and make it possible for others to verify that the source code corresponds to the on-chain binary, you can build it with the Dockerfile included in the template: 
+
+```bash
+docker build --output=binary-dir .
+```
+
+This will compile your program and put the `.wasm` binary file in `./binary-dir`. 
+
+## Running Tests
+
+Before running the runtime tests, you need to build the `template-barebones`, `infinite-loop` and `example-custom-hash` components. To do this, execute:
+
+```bash
+cargo component build --release -p template-barebones -p infinite-loop -p example-custom-hash --target wasm32-unknown-unknown`
 ```
 
 This will create the components in `target/wasm32-unknown-unknown/release/`.
