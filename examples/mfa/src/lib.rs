@@ -4,9 +4,9 @@
 
 extern crate alloc;
 
-use alloc::{string::{ToString, String}, vec};
+use alloc::{string::{ToString, String}, vec, vec::Vec};
 
-use ec_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
+use entropy_programs_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 use ethers::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -31,8 +31,8 @@ const SIGNATORIES: [&str; 2] = [
 
 impl Program for BasicMFAProgram {
     /// This is the only function required by the program runtime. `signature_request` is an MFATransaction request
-    fn evaluate(signature_request: InitialState) -> Result<(), Error> {
-        let data: MFATransaction = serde_json::from_slice(&signature_request.data).map_err(|e| Error::Evaluation(e.to_string()))?;
+    fn evaluate(signature_request: SignatureRequest, _config: Option<Vec<u8>>) -> Result<(), Error> {
+        let data: MFATransaction = serde_json::from_slice(&signature_request.message).map_err(|e| Error::Evaluation(e.to_string()))?;
         // To reduce an O(n) verify operation find the position of the signatory 
         let index_of_signtory = SIGNATORIES.iter().position(|&r| r == data.signatory).ok_or(Error::Evaluation("Signatory not valid".to_string()))?;
         let signatory: Address = SIGNATORIES[index_of_signtory].parse().map_err(|_| Error::Evaluation("Signatory not valid Conversion".to_string()))?;
@@ -42,6 +42,11 @@ impl Program for BasicMFAProgram {
             .map_err(|e| Error::Evaluation(e.to_string()))?;
         // Entropy will sign the whole signature_request including the sig, needs to have a way to sign only the message
         Ok(())
+    }
+
+    /// Since we don't use a custom hash function, we can just return `None` here.
+    fn custom_hash(_data: Vec<u8>) -> Option<Vec<u8>> {
+        None
     }
 }
 
@@ -63,11 +68,12 @@ mod tests {
             signature: signature,
             signatory: format!("0x{}", hex::encode(wallet.address()))
         };
-        let signature_request = InitialState {
-            data: serde_json::to_vec(&mfa_transaction).unwrap(),
+        let signature_request = SignatureRequest {
+            message: serde_json::to_vec(&mfa_transaction).unwrap(),
+            auxilary_data: None
         };
 
-        assert!(BasicMFAProgram::evaluate(signature_request).is_ok());
+        assert!(BasicMFAProgram::evaluate(signature_request, None).is_ok());
     }
 
     #[actix_rt::test]
@@ -82,10 +88,11 @@ mod tests {
             signature: signature,
             signatory: format!("0x{}", hex::encode(wallet.address()))
         };
-        let signature_request = InitialState {
-            data: serde_json::to_vec(&mfa_transaction).unwrap(),
+        let signature_request = SignatureRequest {
+            message: serde_json::to_vec(&mfa_transaction).unwrap(),
+            auxilary_data: None
         };
 
-        assert!(BasicMFAProgram::evaluate(signature_request).is_err());
+        assert!(BasicMFAProgram::evaluate(signature_request, None).is_err());
     }
 }
