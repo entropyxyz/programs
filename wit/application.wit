@@ -4,8 +4,18 @@ world program {
    // similar to `variant`, but no type payloads
   variant error {
     /// The signature request is invalid (ie. the `initial-state` )
-    invalid-signature-request(string),
+    invalid-signature-request(signature-request-error),
+    /// The signature request does not satisfy the requirements of the program.
     evaluation(string)
+  }
+  
+  variant signature-request-error {
+    /// Message cannot be parsed into the expected format.
+    unparsable-message,
+    /// Configuration cannot be parsed into the expected format.
+    unparsable-config,
+    /// Auxiliary data cannot be parsed into the expected format.
+    unparsable-aux-data
   }
   /// Evaluates the program given the user's signature request and the program's configuration.
   export evaluate: func(signature-request: signature-request, config: option<list<u8>>) -> result<_, error>
