@@ -1,0 +1,24 @@
+[package]
+name = "example-barebones-with-auxilary"
+version = "0.1.0"
+authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
+homepage = "https://entropy.xyz/"
+license = "Unlicense"
+repository = "https://github.com/entropyxyz/programs"
+edition = "2021"
+
+# This is required to compile programs to a wasm module
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+entropy-programs-core = { workspace = true }
+
+# These are used by `cargo component`
+[package.metadata.component]
+package = "entropy:example-barebones-with-auxilary"
+
+[package.metadata.component.target]
+path = "../../wit"
+
+[package.metadata.component.dependencies]

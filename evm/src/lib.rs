@@ -1,10 +1,12 @@
-//! This module contains the EVM architecture and its associated types. Since it implements Architecture, constraints written around the Architecture trait can be used with EVM.
+//! This module contains the EVM architecture and its associated types. Since it implements Architecture, programs written around the Architecture trait can be used with EVM.
 
 extern crate alloc;
 
 use alloc::string::String;
 
-use ec_core::{Architecture, Error as CoreError, GetReceiver, GetSender, Parse, TryParse};
+use entropy_programs_core::{
+    Architecture, Error as CoreError, GetReceiver, GetSender, Parse, TryParse,
+};
 pub use ethers_core::types::transaction::request::TransactionRequest as EvmTransactionRequest;
 pub use ethers_core::types::{NameOrAddress, H160};
 use rlp::Rlp;
@@ -45,19 +47,19 @@ impl Parse<Evm> for <Evm as Architecture>::TransactionRequest {
         hex_rlp_raw_tx: String,
     ) -> Result<<Evm as Architecture>::TransactionRequest, CoreError> {
         let bytes = hex::decode(hex_rlp_raw_tx.replace("0x", "")).map_err(|e| {
-            CoreError::InvalidTransactionRequest(format!("Unable to parse to RLP: {}", e))
+            CoreError::InvalidSignatureRequest(format!("Unable to parse to RLP: {}", e))
         })?;
         let rlp = Rlp::new(&bytes);
         match Self::decode_unsigned_rlp(&rlp) {
             Ok(tx) => match tx.to {
                 // Clients shouldn't even be able to serialize tx reqs with ENS names, but it it
                 // does somehow, err
-                Some(NameOrAddress::Name(_)) => Err(CoreError::InvalidTransactionRequest(
+                Some(NameOrAddress::Name(_)) => Err(CoreError::InvalidSignatureRequest(
                     "ENS recipients not supported. Resolve to an address first.".to_string(),
                 )),
                 _ => Ok(tx),
             },
-            Err(e) => Err(CoreError::InvalidTransactionRequest(format!(
+            Err(e) => Err(CoreError::InvalidSignatureRequest(format!(
                 "Unable to decode string: {}",
                 e
             ))),
@@ -69,10 +71,10 @@ impl TryParse<Evm> for <Evm as Architecture>::TransactionRequest {
     /// TODO expect the hex-encoded RLP of the transaction request, so user doesn't have to hex::decode
     fn try_parse(bytes: &[u8]) -> Result<Self, CoreError> {
         let request_as_string = String::from_utf8(bytes.to_owned()).map_err(|e| {
-            CoreError::InvalidTransactionRequest(format!("Unable to parse to String: {}", e))
+            CoreError::InvalidSignatureRequest(format!("Unable to parse to String: {}", e))
         })?;
         let into_bytes = hex::decode(request_as_string.replace("0x", "")).map_err(|e| {
-            CoreError::InvalidTransactionRequest(format!("Unable to parse to RLP: {}", e))
+            CoreError::InvalidSignatureRequest(format!("Unable to parse to RLP: {}", e))
         })?;
         let rlp = Rlp::new(&into_bytes);
 
@@ -80,12 +82,12 @@ impl TryParse<Evm> for <Evm as Architecture>::TransactionRequest {
             Ok(tx) => match tx.to {
                 // Clients shouldn't even be able to serialize tx reqs with ENS names, but it it
                 // does somehow, err
-                Some(NameOrAddress::Name(_)) => Err(CoreError::InvalidTransactionRequest(
+                Some(NameOrAddress::Name(_)) => Err(CoreError::InvalidSignatureRequest(
                     "ENS recipients not supported. Resolve to an address first.".to_string(),
                 )),
                 _ => Ok(tx),
             },
-            Err(e) => Err(CoreError::InvalidTransactionRequest(format!(
+            Err(e) => Err(CoreError::InvalidSignatureRequest(format!(
                 "Unable to decode string: {}",
                 e
             ))),

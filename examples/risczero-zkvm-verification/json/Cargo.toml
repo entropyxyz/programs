@@ -1,0 +1,19 @@
+[package]
+name = "json-example"
+version = "0.1.0"
+authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
+homepage = "https://entropy.xyz/"
+license = "Apache-2.0"
+repository = "https://github.com/entropyxyz/constraints"
+edition = "2021"
+
+[dependencies]
+json-core = { path = "core" }
+json-methods = { path = "methods" }
+risc0-zkvm = { git = "https://github.com/risc0/risc0", tag = "v0.18.0", default-features = false }
+serde = "1.0"
+
+[features]
+cuda = ["risc0-zkvm/cuda"]
+default = []
+metal = ["risc0-zkvm/metal"]

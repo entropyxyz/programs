@@ -1,0 +1,23 @@
+[package]
+name = "entropy-programs"
+version = "0.1.0"
+authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
+homepage = "https://entropy.xyz/"
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/entropyxyz/programs"
+edition = "2021"
+
+# [lib]
+# crate-type = ["cdylib"]
+
+[dependencies]
+entropy-programs-acl = { path = "../acl", default-features = false, features = ["evm"] }
+entropy-programs-evm = { path = "../evm", default-features = false }
+entropy-programs-core = { path = "../core", default-features = false }
+
+[dev-dependencies]
+# entropy-programs-runtime = { path = "../runtime", default-features = false }
+
+[features]
+default = ["std"]
+std = ["entropy-programs-acl/std", "entropy-programs-evm/std"]

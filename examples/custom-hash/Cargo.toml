@@ -1,0 +1,21 @@
+[package]
+name = "example-custom-hash"
+version = "0.1.0"
+edition = "2021"
+
+# This is required to compile programs to a wasm module
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+blake3 = "1.5.0"
+entropy-programs-core = { workspace = true }
+
+# These are used by `cargo component`
+[package.metadata.component]
+package = "entropy:example-custom-hash"
+
+[package.metadata.component.target]
+path = "../../wit"
+
+[package.metadata.component.dependencies]

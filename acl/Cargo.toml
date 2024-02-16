@@ -1,19 +1,23 @@
 [package]
-name = "ec-acl"
+name = "entropy-programs-acl"
 version = "0.1.0"
+authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
+homepage = "https://entropy.xyz/"
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/entropyxyz/programs"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-ec-core ={ path = "../core", default-features = false }
-ec-evm ={ path = "../evm", default-features = false, optional = true }
+entropy-programs-core = { path = "../core", default-features = false }
+entropy-programs-evm = { path = "../evm", default-features = false, optional = true }
 
 serde = { version = "1.0", default-features = false }
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["max-encoded-len"]}
+codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = [
+  "max-encoded-len",
+] }
 scale-info = { version = "2.1.0", default-features = false }
 
 [features]
 default = ["std"]
-evm = ["dep:ec-evm"]
-std = ["ec-core/std", "codec/std", "evm"]
+evm = ["dep:entropy-programs-evm"]
+std = ["entropy-programs-core/std", "codec/std", "evm"]

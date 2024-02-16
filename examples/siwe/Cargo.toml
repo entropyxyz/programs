@@ -1,0 +1,25 @@
+[package]
+name = "template-siwe"
+version = "0.1.0"
+authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
+homepage = "https://entropy.xyz/"
+license = "Unlicense"
+repository = "https://github.com/entropyxyz/programs"
+edition = "2021"
+
+# This is required to compile programs to a wasm module
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+entropy-programs-core = { workspace = true }
+siwe = "0.6.0"
+
+# These are used by `cargo component`
+[package.metadata.component]
+package = "entropy:template-siwe"
+
+[package.metadata.component.target]
+path = "../../wit"
+
+[package.metadata.component.dependencies]

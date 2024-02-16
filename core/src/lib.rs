@@ -1,4 +1,4 @@
-//! This supports core traits and types for supporting new architectures and constraints, and interfacing with them.
+//! This supports core traits and types for supporting new architectures and programs, and interfacing with them.
 
 /// See the [`wit-bindgen` Rust guest example](https://github.com/bytecodealliance/wit-bindgen#guest-rust) for information on how to use this.
 pub mod bindgen {
@@ -11,10 +11,10 @@ pub mod bindgen {
 
 pub use bindgen::Error;
 
-pub mod constraints;
+pub mod programs;
 
 pub use architecture::*;
-pub use constraints::*;
+pub use programs::*;
 
 /// Each transaction-like architecture should implement these.
 pub mod architecture {
@@ -57,16 +57,6 @@ pub mod architecture {
     pub trait TryParse<A: Architecture> {
         fn try_parse(raw_tx: &[u8]) -> Result<A::TransactionRequest, Error>;
     }
-}
-
-pub mod runtime {
-
-    // /// Contains signature request data that is used by the constraints runtime. Passed into `wasmtime::Store` for state (or maybe `wasmtime::Linker`).
-    // #[witgen]
-    // pub struct InitialState {
-    //     /// The preimage of the user's data under constraint evaulation (eg. RLP-encoded ETH transaction request).
-    //     data: Vec<u8>
-    // }
 }
 
 /// Includes items that should be imported into most scopes

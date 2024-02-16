@@ -5,10 +5,10 @@ use core::fmt::Debug;
 
 use codec::MaxEncodedLen;
 use codec::{Decode, Encode};
-pub use ec_core::{Architecture, Error as CoreError, SatisfiableForArchitecture};
+pub use entropy_programs_core::{Architecture, Error as CoreError, SatisfiableForArchitecture};
 
 #[cfg(feature = "evm")]
-pub use ec_evm::{Evm, NameOrAddress, H160};
+pub use entropy_programs_evm::{Evm, NameOrAddress, H160};
 
 use scale_info::TypeInfo;
 use serde::{Deserialize, Serialize};
@@ -26,7 +26,6 @@ use serde::{Deserialize, Serialize};
     Serialize,
     Deserialize,
 )]
-// TODO: Make const; Change Vec<Address> to something like <const Address, const N: usize>
 pub struct Acl<Address> {
     pub addresses: Vec<Address>,
     pub kind: AclKind,
@@ -65,7 +64,7 @@ impl<A: Default> Default for Acl<A> {
 }
 
 // TODO This needs to be generic over any architecture (use GetRecipient and GetSender traits)
-// TODO Move to `ec-evm` crate?
+// TODO Move to `entropy-programs-evm` crate?
 #[allow(clippy::needless_collect)]
 #[cfg(feature = "evm")]
 impl SatisfiableForArchitecture<Evm> for Acl<<Evm as Architecture>::AddressRaw> {
