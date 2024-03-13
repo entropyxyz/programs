@@ -7,7 +7,7 @@ extern crate alloc;
 use alloc::{string::{ToString, String}, vec, vec::Vec};
 
 use entropy_programs_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
-use ethers::prelude::*;
+// use ethers::prelude::*;
 use serde::{Deserialize, Serialize};
 
 // TODO confirm this isn't an issue for audit
