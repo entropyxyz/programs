@@ -1,8 +1,8 @@
-#![no_std]
+#![cfg_attr(not(test), no_std)]
 
 extern crate alloc;
 
-use alloc::{borrow::ToOwned, format, string::{String, ToString}, vec::Vec};
+use alloc::{format, string::{String, ToString}, vec::Vec};
 
 use entropy_programs_core::{bindgen::*, export_program, prelude::*};
 
@@ -17,7 +17,7 @@ register_custom_getrandom!(always_fail);
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct DeviceKeyProxyConfig {
-    // base64-encoded device keys
+    // base64-encoded public device keys
     pub device_keys: Vec<String>,
 }
 
@@ -65,29 +65,72 @@ impl Program for DeviceKeyProxy {
 
 export_program!(DeviceKeyProxy);
 
-// write a test that calls evaluate and passes it the proper parameters
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    use k256::ecdsa::{SigningKey, Signature, signature::Signer};
+    use rand_core::OsRng;
+
     #[test]
-    fn test_should_sign() {
-        let signature_request = SignatureRequest {
-            message: "some_data_longer_than_10_bytes".to_string().into_bytes(),
-            auxilary_data: None,
+    fn test_ok_for_only_device_key_signatures() {
+        let (device_keys, non_device_keys) = key_generation();
+
+        let config = DeviceKeyProxyConfig {
+            device_keys: device_keys.iter().map(|key| {
+                let public_key = VerifyingKey::from(key);
+                let encoded_key = BASE64_STANDARD.encode(public_key.to_encoded_point(true).as_bytes());
+                encoded_key
+            }).collect(),
+        };
+        let config_bytes = serde_json::to_vec(&config).unwrap();
+
+        let message = "this is some message that we want to sign if its from a valid device key";
+        let device_key_signature: Signature = device_keys[0].try_sign(message.as_bytes()).unwrap();
+        let non_device_key_signature: Signature = non_device_keys[0].try_sign(message.as_bytes()).unwrap();
+
+        let request_from_device_key = SignatureRequest {
+            message: message.to_string().into_bytes(),
+            auxilary_data: Some(BASE64_STANDARD.encode(device_key_signature.to_bytes()).into_bytes()),
+        };
+        let request_from_non_device_key = SignatureRequest {
+            message: message.to_string().into_bytes(),
+            auxilary_data: Some(BASE64_STANDARD.encode(non_device_key_signature.to_bytes()).into_bytes()),
         };
 
-        assert!(DeviceKeyProxy::evaluate(signature_request, None).is_ok());
+        assert!(DeviceKeyProxy::evaluate(request_from_device_key, Some(config_bytes.clone())).is_ok());
+        assert!(DeviceKeyProxy::evaluate(request_from_non_device_key, Some(config_bytes)).is_err());
     }
 
     #[test]
-    fn test_should_error() {
-        // data being checked is under 10 bytes in length
-        let signature_request = SignatureRequest {
-            message: "under10".to_string().into_bytes(),
+    fn test_fails_with_empty_aux_data() {
+        let (device_keys, _)= key_generation();
+
+        let config = DeviceKeyProxyConfig {
+            device_keys: device_keys.iter().map(|key| {
+                let public_key = VerifyingKey::from(key);
+                let encoded_key = BASE64_STANDARD.encode(public_key.to_encoded_point(true).as_bytes());
+                encoded_key
+            }).collect(),
+        };
+        let config_bytes = serde_json::to_vec(&config).unwrap();
+
+        let message = "this is some message that we want to sign if its from a valid device key";
+        let _device_key_signature: Signature = device_keys[0].try_sign(message.as_bytes()).unwrap();
+
+        let request_from_device_key = SignatureRequest {
+            message: message.to_string().into_bytes(),
             auxilary_data: None,
         };
 
-        assert!(DeviceKeyProxy::evaluate(signature_request, None).is_err());
+        assert!(DeviceKeyProxy::evaluate(request_from_device_key, Some(config_bytes)).is_err());
+    }
+
+    fn key_generation() -> (Vec<SigningKey>, Vec<SigningKey>) {
+        let keys: Vec<SigningKey> = (0..5)
+            .map(|_| SigningKey::random(&mut OsRng))
+            .collect();
+        let (device_keys, non_device_keys) = keys.split_at(3);
+        (device_keys.to_vec(), non_device_keys.to_vec())
     }
 }

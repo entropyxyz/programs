@@ -17,8 +17,11 @@ crate-type = ["cdylib"]
 entropy-programs-core = { workspace = true }
 serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"]}
-k256 = { version = "0.13.3", default-features = false, features = ["ecdsa"] }
+k256 = { version = "0.13.3", default-features = false, features = ["ecdsa", "ecdsa-core"] }
 base64 = { version = "0.22.0", default-features = false, features = ["alloc"] }
+
+[dev-dependencies]
+rand_core = { version = "0.6.4", features = ["getrandom"] }
 
 # These are used by `cargo component`
 [package.metadata.component]
