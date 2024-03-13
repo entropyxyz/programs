@@ -1,0 +1,30 @@
+[package]
+name = "device-key-proxy"
+version = "0.1.0"
+authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
+homepage = "https://entropy.xyz/"
+license = "Unlicense"
+repository = "https://github.com/entropyxyz/programs"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+# This is required to compile programs to a wasm module
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+entropy-programs-core = { workspace = true }
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
+serde_json = { version = "1.0", default-features = false, features = ["alloc"]}
+k256 = { version = "0.13.3", default-features = false, features = ["ecdsa"] }
+base64 = { version = "0.22.0", default-features = false, features = ["alloc"] }
+
+# These are used by `cargo component`
+[package.metadata.component]
+package = "entropy:device-key-proxy"
+
+[package.metadata.component.target]
+path = "../../wit"
+
+[package.metadata.component.dependencies]
