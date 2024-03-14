@@ -6,7 +6,6 @@ use alloc::{format, string::{String, ToString}, vec::Vec};
 
 use entropy_programs_core::{bindgen::*, export_program, prelude::*};
 
-use serde_json;
 use serde::{Serialize, Deserialize};
 use k256::ecdsa::{VerifyingKey, Signature};
 use base64::{prelude::BASE64_STANDARD, Engine};
@@ -17,7 +16,7 @@ register_custom_getrandom!(always_fail);
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct DeviceKeyProxyConfig {
-    // base64-encoded public device keys
+    /// base64-encoded compressed point (33-byte) ECDSA public keys, (eg. "A572dqoue5OywY/48dtytQimL9WO0dpSObaFbAxoEWW9")
     pub device_keys: Vec<String>,
 }
 
@@ -80,6 +79,7 @@ mod tests {
             device_keys: device_keys.iter().map(|key| {
                 let public_key = VerifyingKey::from(key);
                 let encoded_key = BASE64_STANDARD.encode(public_key.to_encoded_point(true).as_bytes());
+                println!("{}", encoded_key);
                 encoded_key
             }).collect(),
         };
