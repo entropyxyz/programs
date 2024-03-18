@@ -4,43 +4,49 @@ extern crate alloc;
 
 use alloc::{format, string::{String, ToString}, vec::Vec};
 
-use entropy_programs_core::{bindgen::*, export_program, prelude::*};
+use entropy_programs_core::{bindgen::*, export_program, prelude::*, Error};
 
 use serde::{Serialize, Deserialize};
-use k256::ecdsa::{VerifyingKey, Signature};
 use base64::{prelude::BASE64_STANDARD, Engine};
-use k256::ecdsa::signature::Verifier;
+use k256::ecdsa::{signature::Verifier, VerifyingKey as EcdsaPublicKey, Signature as EcdsaSignature};
+use schnorrkel::{PublicKey as Sr25519PublicKey, Signature as Sr25519Signature};
 
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
 
+/// JSON-deserializable struct that will be used to derive the program-JSON interface.
+/// Note how this uses JSON-native types only.
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
-pub struct DeviceKeyProxyConfig {
+pub struct DeviceKeyProxyConfigJson {
     /// base64-encoded compressed point (33-byte) ECDSA public keys, (eg. "A572dqoue5OywY/48dtytQimL9WO0dpSObaFbAxoEWW9")
-    pub device_keys: Vec<String>,
+    pub ecdsa_public_keys: Option<Vec<String>>,
+}
+
+/// Used by the program to verify signatures
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct DeviceKeyProxyConfig {
+    pub ecdsa_public_keys: Vec<EcdsaPublicKey>,
 }
 
 pub struct DeviceKeyProxy;
 
 impl Program for DeviceKeyProxy {
     fn evaluate(signature_request: SignatureRequest, raw_config: Option<Vec<u8>>) -> Result<(), Error> {
-        let config = serde_json::from_slice::<DeviceKeyProxyConfig>(
-                raw_config.ok_or(Error::Evaluation("No config provided.".to_string()))?.as_slice()
-            ).map_err(|e| Error::Evaluation(format!("Failed to parse config: {}", e)))?;
+        let config: DeviceKeyProxyConfigJson = Self::parse_config(raw_config).unwrap();
         
-        let public_keys = config.device_keys.iter().map(|encoded_key| {
-            let key = BASE64_STANDARD.decode(encoded_key.as_bytes()).map_err(|_| {
+        let public_keys = config.ecdsa_public_keys.unwrap().iter().map(|encoded_key| {
+            let key = BASE64_STANDARD.decode(encoded_key).map_err(|_| {
                 Error::InvalidSignatureRequest("Could not parse base64 public key".to_string())
             }).unwrap();
-            VerifyingKey::from_sec1_bytes(key.as_slice()).unwrap()
-        }).collect::<Vec<VerifyingKey>>();
+            EcdsaPublicKey::from_sec1_bytes(key.as_slice()).unwrap()
+        }).collect::<Vec<EcdsaPublicKey>>();
         
-        let signature: Signature = match signature_request.auxilary_data {
+        let signature: EcdsaSignature = match signature_request.auxilary_data {
             Some(base64_sig) => {
                 let decoded_signature = BASE64_STANDARD.decode(base64_sig).map_err(|_| {
                     Error::InvalidSignatureRequest("Could not parse base64 signature".to_string())
                 })?;
-                Signature::try_from(decoded_signature.as_slice()).map_err(|_| {
+                EcdsaSignature::try_from(decoded_signature.as_slice()).map_err(|_| {
                     Error::InvalidSignatureRequest("Could not parse base64 input to ecdsa signature".to_string())
                 })?
             }
@@ -62,32 +68,42 @@ impl Program for DeviceKeyProxy {
     }
 }
 
+impl DeviceKeyProxy {
+    fn parse_config(config: Option<Vec<u8>>) -> Result<DeviceKeyProxyConfigJson, Error> {
+        let config = serde_json::from_slice::<DeviceKeyProxyConfigJson>(
+            config.ok_or(Error::Evaluation("No config provided.".to_string()))?.as_slice()
+        ).map_err(|e| Error::Evaluation(format!("Failed to parse config: {}", e)))?;
+
+        Ok(config)
+    }
+}
+
 export_program!(DeviceKeyProxy);
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    use k256::ecdsa::{SigningKey, Signature, signature::Signer};
+    use k256::ecdsa::{SigningKey, Signature as EcdsaSignature, signature::Signer};
     use rand_core::OsRng;
 
     #[test]
     fn test_ok_for_only_device_key_signatures() {
         let (device_keys, non_device_keys) = key_generation();
 
-        let config = DeviceKeyProxyConfig {
-            device_keys: device_keys.iter().map(|key| {
-                let public_key = VerifyingKey::from(key);
+        let config = DeviceKeyProxyConfigJson {
+            ecdsa_public_keys: Some(device_keys.iter().map(|key| {
+                let public_key = EcdsaPublicKey::from(key);
                 let encoded_key = BASE64_STANDARD.encode(public_key.to_encoded_point(true).as_bytes());
                 println!("{}", encoded_key);
                 encoded_key
-            }).collect(),
+            }).collect()),
         };
         let config_bytes = serde_json::to_vec(&config).unwrap();
 
         let message = "this is some message that we want to sign if its from a valid device key";
-        let device_key_signature: Signature = device_keys[0].try_sign(message.as_bytes()).unwrap();
-        let non_device_key_signature: Signature = non_device_keys[0].try_sign(message.as_bytes()).unwrap();
+        let device_key_signature: EcdsaSignature = device_keys[0].try_sign(message.as_bytes()).unwrap();
+        let non_device_key_signature: EcdsaSignature = non_device_keys[0].try_sign(message.as_bytes()).unwrap();
 
         let request_from_device_key = SignatureRequest {
             message: message.to_string().into_bytes(),
@@ -106,17 +122,17 @@ mod tests {
     fn test_fails_with_empty_aux_data() {
         let (device_keys, _)= key_generation();
 
-        let config = DeviceKeyProxyConfig {
-            device_keys: device_keys.iter().map(|key| {
-                let public_key = VerifyingKey::from(key);
+        let config = DeviceKeyProxyConfigJson {
+            ecdsa_public_keys: Some(device_keys.iter().map(|key| {
+                let public_key = EcdsaPublicKey::from(key);
                 let encoded_key = BASE64_STANDARD.encode(public_key.to_encoded_point(true).as_bytes());
                 encoded_key
-            }).collect(),
+            }).collect()),
         };
         let config_bytes = serde_json::to_vec(&config).unwrap();
 
         let message = "this is some message that we want to sign if its from a valid device key";
-        let _device_key_signature: Signature = device_keys[0].try_sign(message.as_bytes()).unwrap();
+        let _device_key_signature: EcdsaSignature = device_keys[0].try_sign(message.as_bytes()).unwrap();
 
         let request_from_device_key = SignatureRequest {
             message: message.to_string().into_bytes(),
