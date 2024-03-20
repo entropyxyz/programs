@@ -20,6 +20,7 @@ serde_json = { version = "1.0", default-features = false, features = ["alloc"]}
 base64 = { version = "0.22.0", default-features = false, features = ["alloc"] }
 k256 = { version = "0.13.3", default-features = false, features = ["ecdsa", "ecdsa-core"] }
 schnorrkel = { version = "0.11.4", default-features = false }
+ed25519-dalek = { version = "2.1.1", default-features = false, features = ["rand_core"]}
 
 [dev-dependencies]
 rand_core = { version = "0.6.4", features = ["getrandom"] }

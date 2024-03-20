@@ -9,6 +9,7 @@ use entropy_programs_core::{bindgen::*, export_program, prelude::*, Error};
 use serde::{Serialize, Deserialize};
 use base64::{prelude::BASE64_STANDARD, Engine};
 use k256::ecdsa::{signature::Verifier, VerifyingKey as EcdsaPublicKey, Signature as EcdsaSignature};
+use ed25519_dalek::{VerifyingKey as Ed25519PublicKey, Signature as Ed25519Signature};
 use schnorrkel::{PublicKey as Sr25519PublicKey, Signature as Sr25519Signature, signing_context};
 
 // TODO confirm this isn't an issue for audit
@@ -21,6 +22,7 @@ pub struct ConfigJson {
     /// base64-encoded compressed point (33-byte) ECDSA public keys, (eg. "A572dqoue5OywY/48dtytQimL9WO0dpSObaFbAxoEWW9")
     pub ecdsa_public_keys: Option<Vec<String>>,
     pub sr25519_public_keys: Option<Vec<String>>,
+    pub ed25519_public_keys: Option<Vec<String>>,
 }
 
 /// Used by the program to verify signatures
@@ -28,6 +30,7 @@ pub struct ConfigJson {
 pub struct Config {
     pub ecdsa_public_keys: Vec<EcdsaPublicKey>,
     pub sr25519_public_keys: Vec<Sr25519PublicKey>,
+    pub ed25519_public_keys: Vec<Ed25519PublicKey>,
 }
 
 /// JSON representation of the auxiliary data
@@ -57,6 +60,16 @@ trait Keysystem {
 struct Ecdsa {
     pub_key: EcdsaPublicKey,
     signature: EcdsaSignature,
+}
+
+struct Sr25519 {
+    pub_key: Sr25519PublicKey,
+    signature: Sr25519Signature,
+}
+
+struct Ed25519 {
+    pub_key: Ed25519PublicKey,
+    signature: Ed25519Signature,
 }
 
 impl Keysystem for Ecdsa {
@@ -89,10 +102,47 @@ impl Keysystem for Ecdsa {
 
     fn confirm_in_config(&self, config: &Config) -> Result<(), Error> {
         if !config.ecdsa_public_keys.contains(&self.pub_key) {
-            return Err(Error::InvalidSignatureRequest("Public key not in config".to_string()));
+            return Err(Error::InvalidSignatureRequest("ECDSA Public key not in config".to_string()));
         }
         Ok(())
     }
+}
+
+impl Keysystem for Ed25519 {
+    type PublicKey = Ed25519PublicKey;
+    type Signature = Ed25519Signature;
+
+    fn verify_signature(&self, message: &[u8]) -> Result<(), Error> {
+        self.pub_key.verify(message, &self.signature).map_err(|_| Error::InvalidSignatureRequest("Unable to verify ed25519 signature".to_string()))
+    }
+
+    fn pub_key_from_base64(public_key: &[u8]) -> Result<Self::PublicKey, Error> where Self: Sized {
+        let pub_key = Ed25519PublicKey::try_from(BASE64_STANDARD.decode(public_key).unwrap().as_slice()).map_err(|_| Error::InvalidSignatureRequest("Invalid ed25519 public key".to_string()))?;
+        Ok(pub_key)
+    }
+
+    fn from_base64(pub_key_encoded: &[u8], signature_encoded: &[u8]) -> Result<Self, Error> {
+        let pub_key = Ed25519::pub_key_from_base64(pub_key_encoded)?;
+        let signature = Ed25519Signature::try_from(BASE64_STANDARD.decode(signature_encoded).unwrap().as_slice()).unwrap();
+        Ok(Ed25519 {
+            pub_key,
+            signature
+        })
+    }
+
+    fn to_base64(&self) -> (String, String) {
+        let pub_key_encoded = BASE64_STANDARD.encode(self.pub_key.to_bytes());
+        let signature_encoded = BASE64_STANDARD.encode(self.signature.to_bytes());
+        (pub_key_encoded, signature_encoded)
+    }
+
+    fn confirm_in_config(&self, config: &Config) -> Result<(), Error> {
+        if !config.ed25519_public_keys.contains(&self.pub_key) {
+            return Err(Error::InvalidSignatureRequest("Ed25519 Public key not in config".to_string()));
+        }
+        Ok(())
+    }
+
 }
 
 // struct VerificationParameters<K: Keysystem> {
@@ -106,10 +156,7 @@ impl Keysystem for Ecdsa {
 //     }
 // }
 
-struct Sr25519 {
-    pub_key: Sr25519PublicKey,
-    signature: Sr25519Signature,
-}
+
 /// Everything needed to verify a message against a signature/pubkey pair
 // pub struct VerificationParameters<K: Keysystem> {
 //     pub_key: K::PublicKey,
@@ -158,7 +205,6 @@ impl Keysystem for Sr25519 {
             pub_key,
             signature
         })
-
     }
 
     fn pub_key_from_base64(pub_key_encoded: &[u8]) -> Result<Self::PublicKey, Error> {
@@ -174,7 +220,7 @@ impl Keysystem for Sr25519 {
 
     fn confirm_in_config(&self, config: &Config) -> Result<(), Error> {
         if !config.sr25519_public_keys.contains(&self.pub_key) {
-            return Err(Error::InvalidSignatureRequest("Public key not in config".to_string()));
+            return Err(Error::InvalidSignatureRequest("Sr25519 Public key not in config".to_string()));
         }
         Ok(())
     }
@@ -203,6 +249,11 @@ impl Program for DeviceKeyProxy {
             }
             "sr25519" => {
                 let verification_parameters = Sr25519::from_base64(aux_data_json.public_key.as_bytes(), aux_data_json.signature.as_bytes())?;
+                verification_parameters.confirm_in_config(&config)?;
+                verification_parameters.verify_signature(signature_request.message.as_slice())?;
+            }
+            "ed25519" => {
+                let verification_parameters = Ed25519::from_base64(aux_data_json.public_key.as_bytes(), aux_data_json.signature.as_bytes())?;
                 verification_parameters.confirm_in_config(&config)?;
                 verification_parameters.verify_signature(signature_request.message.as_slice())?;
             }
@@ -267,10 +318,15 @@ impl From<Config> for ConfigJson {
             let encoded_key = BASE64_STANDARD.encode(key);
             encoded_key
         }).collect();
+        let ed25519_public_keys = config.ed25519_public_keys.iter().map(|key| {
+            let encoded_key = BASE64_STANDARD.encode(key.as_bytes());
+            encoded_key
+        }).collect();
 
         ConfigJson {
             ecdsa_public_keys: Some(ecdsa_public_keys),
             sr25519_public_keys: Some(sr25519_public_keys),
+            ed25519_public_keys: Some(ed25519_public_keys),
         }
     }
 }
@@ -311,11 +367,13 @@ mod tests {
 
     use k256::ecdsa::{SigningKey as EcdsaKeypair, Signature as EcdsaSignature, signature::Signer};
     use schnorrkel::{Keypair as Sr25519Keypair, Signature as Sr25519Signature};
+    use ed25519_dalek::{SigningKey as Ed25519Keypair, Signature as Ed25519Signature};
     use rand_core::OsRng;
 
     struct TestKeys {
         ecdsa_keys: Vec<EcdsaKeypair>,
-        sr25519_keys: Vec<Sr25519Keypair>
+        sr25519_keys: Vec<Sr25519Keypair>,
+        ed25519_keys: Vec<Ed25519Keypair>,
     }
 
     #[test]
@@ -326,6 +384,8 @@ mod tests {
         let config = Config {
             ecdsa_public_keys: device_keys.ecdsa_keys.iter().map(|key| EcdsaPublicKey::from(key)).collect(),
             sr25519_public_keys: device_keys.sr25519_keys.iter().map(|key| key.public).collect(),
+            ed25519_public_keys: device_keys.ed25519_keys.iter().map(|key| key.verifying_key()).collect(),
+
         };
         let json_config = ConfigJson::from(config.clone());
         dbg!(json_config.clone());
@@ -373,6 +433,7 @@ mod tests {
                 encoded_key
             }).collect()),
             sr25519_public_keys: None,
+            ed25519_public_keys: None,
         };
         let config_bytes = serde_json::to_vec(&config).unwrap();
 
@@ -395,10 +456,14 @@ mod tests {
         let sr25519_keys: Vec<Sr25519Keypair> = (0..3)
             .map(|_| Sr25519Keypair::generate_with(&mut OsRng))
             .collect();
+        let ed25519_keys: Vec<Ed25519Keypair> = (0..3)
+            .map(|_| Ed25519Keypair::generate(&mut OsRng))
+            .collect();
 
         TestKeys {
             ecdsa_keys,
-            sr25519_keys 
+            sr25519_keys,
+            ed25519_keys
         }
     }
 }
