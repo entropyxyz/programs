@@ -362,29 +362,30 @@ mod tests {
         assert!(DeviceKeyProxy::evaluate(request_from_non_device_key, Some(config_bytes)).is_err());
     }
 
-    // #[test]
-    // fn test_fails_with_empty_aux_data() {
-    //     let (device_keys, _)= generate_test_keys();
+    #[test]
+    fn test_fails_with_empty_aux_data() {
+        let device_keys = generate_test_keys();
 
-    //     let config = ConfigJson {
-    //         ecdsa_public_keys: Some(device_keys.iter().map(|key| {
-    //             let public_key = EcdsaPublicKey::from(key);
-    //             let encoded_key = BASE64_STANDARD.encode(public_key.to_encoded_point(true).as_bytes());
-    //             encoded_key
-    //         }).collect()),
-    //     };
-    //     let config_bytes = serde_json::to_vec(&config).unwrap();
+        let config = ConfigJson {
+            ecdsa_public_keys: Some(device_keys.ecdsa_keys.iter().map(|key| {
+                let public_key = EcdsaPublicKey::from(key);
+                let encoded_key = BASE64_STANDARD.encode(public_key.to_encoded_point(true).as_bytes());
+                encoded_key
+            }).collect()),
+            sr25519_public_keys: None,
+        };
+        let config_bytes = serde_json::to_vec(&config).unwrap();
 
-    //     let message = "this is some message that we want to sign if its from a valid device key";
-    //     let _device_key_signature: EcdsaSignature = device_keys[0].try_sign(message.as_bytes()).unwrap();
+        let message = "this is some message that we want to sign if its from a valid device key";
+        let _device_key_signature: EcdsaSignature = device_keys.ecdsa_keys[0].try_sign(message.as_bytes()).unwrap();
 
-    //     let request_from_device_key = SignatureRequest {
-    //         message: message.to_string().into_bytes(),
-    //         auxilary_data: None,
-    //     };
+        let request_from_device_key = SignatureRequest {
+            message: message.to_string().into_bytes(),
+            auxilary_data: None,
+        };
 
-    //     assert!(DeviceKeyProxy::evaluate(request_from_device_key, Some(config_bytes)).is_err());
-    // }
+        assert!(DeviceKeyProxy::evaluate(request_from_device_key, Some(config_bytes)).is_err());
+    }
 
     /// Generates keys that can be used for testing
     fn generate_test_keys() -> TestKeys {
