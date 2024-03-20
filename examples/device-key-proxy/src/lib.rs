@@ -44,9 +44,7 @@ pub struct AuxDataJson {
     pub signature: String,
 }
 
-// pub struct AuxData<P: PublicKey> {
-
-trait Keysystem {
+trait DeviceKey {
     type PublicKey;
     type Signature;
     fn verify_signature(&self, message: &[u8]) -> Result<(), Error>;
@@ -57,22 +55,16 @@ trait Keysystem {
     fn confirm_in_config(&self, config: &Config) -> Result<(), Error>;
 }
 
-struct Ecdsa {
-    pub_key: EcdsaPublicKey,
-    signature: EcdsaSignature,
+struct VerificationParameters<P, S> {
+    pub_key: P,
+    signature: S,
 }
 
-struct Sr25519 {
-    pub_key: Sr25519PublicKey,
-    signature: Sr25519Signature,
-}
+type Ecdsa = VerificationParameters<EcdsaPublicKey, EcdsaSignature>;
+type Sr25519 = VerificationParameters<Sr25519PublicKey, Sr25519Signature>;
+type Ed25519 = VerificationParameters<Ed25519PublicKey, Ed25519Signature>;
 
-struct Ed25519 {
-    pub_key: Ed25519PublicKey,
-    signature: Ed25519Signature,
-}
-
-impl Keysystem for Ecdsa {
+impl DeviceKey for Ecdsa {
     type PublicKey = EcdsaPublicKey;
     type Signature = EcdsaSignature;
 
@@ -108,7 +100,7 @@ impl Keysystem for Ecdsa {
     }
 }
 
-impl Keysystem for Ed25519 {
+impl DeviceKey for Ed25519 {
     type PublicKey = Ed25519PublicKey;
     type Signature = Ed25519Signature;
 
@@ -145,7 +137,7 @@ impl Keysystem for Ed25519 {
 
 }
 
-impl Keysystem for Sr25519 {
+impl DeviceKey for Sr25519 {
     type PublicKey = Sr25519PublicKey;
     type Signature = Sr25519Signature;
 
