@@ -145,50 +145,6 @@ impl Keysystem for Ed25519 {
 
 }
 
-// struct VerificationParameters<K: Keysystem> {
-//     pub_key: K::PublicKey,
-//     signature: K::Signature,
-// }
-
-// impl <K: Keysystem> VerificationParameters<K> {
-//     pub fn verify(&self) -> Result<(), Error> {
-//         self.verify_signature(message)
-//     }
-// }
-
-
-/// Everything needed to verify a message against a signature/pubkey pair
-// pub struct VerificationParameters<K: Keysystem> {
-//     pub_key: K::PublicKey,
-//     signature: K::Signature,
-// }
-
-// impl From<AuxDataJson> for VerificationParameters {
-//     fn from(aux_data_json: AuxDataJson) -> VerificationParameters {
-//         let AuxDataJson { public_key_type, public_key, signature } = aux_data_json;
-
-//         match public_key_type.as_str() {
-//             "ecdsa" => {
-//                 let 
-
-//             }
-//             "sr25519" => {
-
-//             }
-//             _ => panic!("Invalid public key type"),
-//         }
-//     }
-// }
-
-// impl<P: PublicKey> VerificationParameters<P> {
-//     pub fn verify(&self, message: &[u8]) -> Result<(), Error> {
-//         match self {
-//             VerificationParameters::Ecdsa(public_key, signature) => public_key.verify_signature(message, signature),
-//             VerificationParameters::Sr25519(public_key, signature) => public_key.verify_signature(message, signature),
-//         }
-//     }
-// }
-
 impl Keysystem for Sr25519 {
     type PublicKey = Sr25519PublicKey;
     type Signature = Sr25519Signature;
@@ -258,24 +214,6 @@ impl Program for DeviceKeyProxy {
                 verification_parameters.verify_signature(signature_request.message.as_slice())?;
             }
             _ => return Err(Error::InvalidSignatureRequest("Invalid public key type".to_string())),
-            // VerificationParameters::Ecdsa(public_key, signature) => {
-            //     if !config.ecdsa_public_keys.contains(&public_key) {
-            //         return Err(Error::InvalidSignatureRequest("Public key not in config".to_string()));
-            //     }
-            //     if public_key.verify(signature_request.message.as_slice(), &signature).is_err() {
-            //         return Err(Error::InvalidSignatureRequest("Invalid signature".to_string()));
-            //     }
-            // }
-            // VerificationParameters::Sr25519(public_key, signature) => {
-            //     if !config.sr25519_public_keys.contains(&public_key) {
-            //         return Err(Error::InvalidSignatureRequest("Public key not in config".to_string()));
-            //     }
-            //     // `context` is required for sr25519 signature verification
-            //     let context = signing_context(b"");
-            //     if public_key.verify(context.bytes(signature_request.message.as_slice()), &signature).is_err() {
-            //         return Err(Error::InvalidSignatureRequest("Invalid signature".to_string()));
-            //     }
-            // }
         }
 
         Ok(())
@@ -330,34 +268,6 @@ impl From<Config> for ConfigJson {
         }
     }
 }
-
-// impl From<AuxDataJson> for AuxData {
-//     fn from(aux_data_json: AuxDataJson) -> AuxData {
-//         let AuxDataJson { public_key_type, public_key, signature } = aux_data_json;
-
-//         let verification_parameters = match public_key_type.as_str() {
-//             "ecdsa" => {
-//                 let decoded_signature = BASE64_STANDARD.decode(signature.as_bytes()).unwrap();
-//                 let decoded_public_key = BASE64_STANDARD.decode(public_key.as_bytes()).unwrap();
-//                 let public_key = EcdsaPublicKey::from_sec1_bytes(decoded_public_key.as_slice()).unwrap();
-//                 let signature = EcdsaSignature::from_slice(decoded_signature.as_slice()).unwrap();
-//                 VerificationParameters::Ecdsa(public_key, signature)
-//             }
-//             "sr25519" => {
-//                 let decoded_signature = BASE64_STANDARD.decode(signature.as_bytes()).unwrap();
-//                 let decoded_public_key = BASE64_STANDARD.decode(public_key.as_bytes()).unwrap();
-//                 let public_key = Sr25519PublicKey::from_bytes(decoded_public_key.as_slice()).unwrap();
-//                 let signature = Sr25519Signature::from_bytes(decoded_signature.as_slice()).unwrap();
-//                 VerificationParameters::Sr25519(public_key, signature)
-//             }
-//             _ => panic!("Invalid public key type"),
-//         };
-
-//         AuxData {
-//             verification_parameters
-//         }
-//     }
-// }
 
 export_program!(DeviceKeyProxy);
 
