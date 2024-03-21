@@ -450,11 +450,10 @@ mod tests {
         )
         .is_ok());
         let context = signing_context(b"");
-        // #[cfg(feature = "getrandom")]
+
         let sr25519_device_key_signature: Sr25519Signature =
             device_keys.sr25519_keys[0].sign(context.bytes(message.as_bytes()));
-        let signature_test =
-            Sr25519Signature::from_bytes(&sr25519_device_key_signature.to_bytes()).unwrap();
+
         let device_key_aux_data_json_sr25519 = AuxDataJson {
             public_key_type: "sr25519".to_string(),
             public_key: BASE64_STANDARD.encode(device_keys.sr25519_keys[0].public),
