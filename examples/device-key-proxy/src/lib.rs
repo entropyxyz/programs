@@ -92,7 +92,7 @@ impl DeviceKey for Ecdsa {
         let signature = EcdsaSignature::from_slice(
             BASE64_STANDARD
                 .decode(signature_encoded)
-                .unwrap()
+                .map_err(|_| Error::InvalidSignatureRequest("ecdsa from_base64 error".to_string()))?
                 .as_slice(),
         )
         .map_err(|_| Error::InvalidSignatureRequest("Invalid ecdsa signature".to_string()))?;
@@ -101,7 +101,12 @@ impl DeviceKey for Ecdsa {
 
     fn pub_key_from_base64(pub_key_encoded: &[u8]) -> Result<Self::PublicKey, Error> {
         let pub_key = EcdsaPublicKey::from_sec1_bytes(
-            BASE64_STANDARD.decode(pub_key_encoded).unwrap().as_slice(),
+            BASE64_STANDARD
+                .decode(pub_key_encoded)
+                .map_err(|_| {
+                    Error::InvalidSignatureRequest("ecdsa pub_key_from_base64 error".to_string())
+                })?
+                .as_slice(),
         )
         .map_err(|_| Error::InvalidSignatureRequest("Invalid ecdsa public key".to_string()))?;
         Ok(pub_key)
@@ -137,11 +142,15 @@ impl DeviceKey for Ed25519 {
     where
         Self: Sized,
     {
-        let pub_key =
-            Ed25519PublicKey::try_from(BASE64_STANDARD.decode(public_key).unwrap().as_slice())
+        let pub_key = Ed25519PublicKey::try_from(
+            BASE64_STANDARD
+                .decode(public_key)
                 .map_err(|_| {
-                    Error::InvalidSignatureRequest("Invalid ed25519 public key".to_string())
-                })?;
+                    Error::InvalidSignatureRequest("ed25519 pub_key_from_base64 error".to_string())
+                })?
+                .as_slice(),
+        )
+        .map_err(|_| Error::InvalidSignatureRequest("Invalid ed25519 public key".to_string()))?;
         Ok(pub_key)
     }
 
@@ -150,7 +159,9 @@ impl DeviceKey for Ed25519 {
         let signature = Ed25519Signature::try_from(
             BASE64_STANDARD
                 .decode(signature_encoded)
-                .unwrap()
+                .map_err(|_| {
+                    Error::InvalidSignatureRequest("ed25519 from_base64 error".to_string())
+                })?
                 .as_slice(),
         )
         .unwrap();
@@ -191,7 +202,9 @@ impl DeviceKey for Sr25519 {
         let signature = Sr25519Signature::from_bytes(
             BASE64_STANDARD
                 .decode(signature_encoded)
-                .unwrap()
+                .map_err(|_| {
+                    Error::InvalidSignatureRequest("sr25519 from_base64 error".to_string())
+                })?
                 .as_slice(),
         )
         .map_err(|_| Error::InvalidSignatureRequest("Invalid sr25519 signature".to_string()))?;
@@ -200,7 +213,12 @@ impl DeviceKey for Sr25519 {
 
     fn pub_key_from_base64(pub_key_encoded: &[u8]) -> Result<Self::PublicKey, Error> {
         let pub_key = Sr25519PublicKey::from_bytes(
-            BASE64_STANDARD.decode(pub_key_encoded).unwrap().as_slice(),
+            BASE64_STANDARD
+                .decode(pub_key_encoded)
+                .map_err(|_| {
+                    Error::InvalidSignatureRequest("sr25519 pub_key_from_base64 error".to_string())
+                })?
+                .as_slice(),
         )
         .map_err(|_| Error::InvalidSignatureRequest("Invalid sr25519 public key".to_string()))?;
         Ok(pub_key)
@@ -247,7 +265,7 @@ impl Program for DeviceKeyProxy {
             Error::InvalidSignatureRequest(format!("Failed to parse auxilary_data: {}", e))
         })?;
 
-        let config = Config::from(config_json);
+        let config = Config::try_from(config_json)?;
 
         // assert that the key in the aux data is in the config, and verify signature
         match aux_data_json.public_key_type.as_str() {
@@ -290,33 +308,43 @@ impl Program for DeviceKeyProxy {
     }
 }
 
-impl From<ConfigJson> for Config {
-    fn from(config_json: ConfigJson) -> Config {
+impl TryFrom<ConfigJson> for Config {
+    type Error = Error;
+
+    fn try_from(config_json: ConfigJson) -> Result<Config, Error> {
         let mut config = Config::default();
 
         if let Some(ecdsa_pub_keys) = config_json.ecdsa_public_keys {
             for encoded_key in ecdsa_pub_keys {
-                config
-                    .ecdsa_public_keys
-                    .push(Ecdsa::pub_key_from_base64(encoded_key.as_bytes()).unwrap());
+                config.ecdsa_public_keys.push(
+                    Ecdsa::pub_key_from_base64(encoded_key.as_bytes()).map_err(|_| {
+                        Error::InvalidSignatureRequest("config conversion ecdsa".to_string())
+                    })?,
+                );
             }
         }
 
         if let Some(sr25519_pub_keys) = config_json.sr25519_public_keys {
             for encoded_key in sr25519_pub_keys {
-                let public_key = Sr25519::pub_key_from_base64(encoded_key.as_bytes()).unwrap();
+                let public_key =
+                    Sr25519::pub_key_from_base64(encoded_key.as_bytes()).map_err(|_| {
+                        Error::InvalidSignatureRequest("config conversion sr25519".to_string())
+                    })?;
                 config.sr25519_public_keys.push(public_key);
             }
         }
 
         if let Some(ed25519_pub_keys) = config_json.ed25519_public_keys {
             for encoded_key in ed25519_pub_keys {
-                let public_key = Ed25519::pub_key_from_base64(encoded_key.as_bytes()).unwrap();
+                let public_key =
+                    Ed25519::pub_key_from_base64(encoded_key.as_bytes()).map_err(|_| {
+                        Error::InvalidSignatureRequest("config conversion ed25519".to_string())
+                    })?;
                 config.ed25519_public_keys.push(public_key);
             }
         }
 
-        config
+        Ok(config)
     }
 }
 
