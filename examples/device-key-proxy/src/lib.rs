@@ -45,7 +45,7 @@ pub struct Config {
 /// JSON representation of the auxiliary data
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct AuxDataJson {
-    /// "ecdsa" or "sr25519"
+    /// "ecdsa", "ed25519", "sr25519"
     pub public_key_type: String,
     /// base64-encoded public key
     pub public_key: String,
