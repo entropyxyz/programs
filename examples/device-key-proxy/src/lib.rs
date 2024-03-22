@@ -567,7 +567,7 @@ mod tests {
         );
     }
     #[test]
-    fn test_fails_with_empty_aux_data() {
+    fn test_fails_with_no_aux_or_config() {
         let device_keys = generate_test_keys();
 
         let config = ConfigJson {
@@ -593,12 +593,49 @@ mod tests {
             .try_sign(message.as_bytes())
             .unwrap();
 
-        let request_from_device_key = SignatureRequest {
+        let request_from_device_key_no_aux = SignatureRequest {
             message: message.to_string().into_bytes(),
             auxilary_data: None,
         };
 
-        assert!(DeviceKeyProxy::evaluate(request_from_device_key, Some(config_bytes)).is_err());
+        assert_eq!(
+            DeviceKeyProxy::evaluate(
+                request_from_device_key_no_aux.clone(),
+                Some(config_bytes.clone())
+            )
+            .unwrap_err()
+            .to_string(),
+            "Error::InvalidSignatureRequest(\"No auxilary_data provided\")"
+        );
+
+        let ecdsa_device_key_signature: EcdsaSignature = device_keys.ecdsa_keys[0]
+            .try_sign(message.as_bytes())
+            .unwrap();
+
+        let device_key_aux_data_json = AuxDataJson {
+            public_key_type: "ecdsa".to_string(),
+            public_key: BASE64_STANDARD.encode(
+                device_keys.ecdsa_keys[0]
+                    .verifying_key()
+                    .to_encoded_point(true)
+                    .as_bytes(),
+            ),
+            signature: BASE64_STANDARD.encode(ecdsa_device_key_signature.to_bytes()),
+        };
+        let request_from_device_key = SignatureRequest {
+            message: message.to_string().into_bytes(),
+            auxilary_data: Some(
+                serde_json::to_string(&device_key_aux_data_json)
+                    .unwrap()
+                    .into_bytes(),
+            ),
+        };
+        assert_eq!(
+            DeviceKeyProxy::evaluate(request_from_device_key, None)
+                .unwrap_err()
+                .to_string(),
+            "Error::Evaluation(\"No config provided.\")"
+        );
     }
 
     /// Generates keys that can be used for testing
