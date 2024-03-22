@@ -612,7 +612,7 @@ mod tests {
             .try_sign(message.as_bytes())
             .unwrap();
 
-        let device_key_aux_data_json = AuxDataJson {
+        let mut device_key_aux_data_json = AuxDataJson {
             public_key_type: "ecdsa".to_string(),
             public_key: BASE64_STANDARD.encode(
                 device_keys.ecdsa_keys[0]
@@ -622,7 +622,7 @@ mod tests {
             ),
             signature: BASE64_STANDARD.encode(ecdsa_device_key_signature.to_bytes()),
         };
-        let request_from_device_key = SignatureRequest {
+        let mut request_from_device_key = SignatureRequest {
             message: message.to_string().into_bytes(),
             auxilary_data: Some(
                 serde_json::to_string(&device_key_aux_data_json)
@@ -631,10 +631,23 @@ mod tests {
             ),
         };
         assert_eq!(
-            DeviceKeyProxy::evaluate(request_from_device_key, None)
+            DeviceKeyProxy::evaluate(request_from_device_key.clone(), None)
                 .unwrap_err()
                 .to_string(),
             "Error::Evaluation(\"No config provided.\")"
+        );
+
+        device_key_aux_data_json.public_key_type = "phish".to_string();
+        request_from_device_key.auxilary_data = Some(
+            serde_json::to_string(&device_key_aux_data_json)
+                .unwrap()
+                .into_bytes(),
+        );
+        assert_eq!(
+            DeviceKeyProxy::evaluate(request_from_device_key, Some(config_bytes.clone()))
+                .unwrap_err()
+                .to_string(),
+            "Error::InvalidSignatureRequest(\"Invalid public key type\")"
         );
     }
 
