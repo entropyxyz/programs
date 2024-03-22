@@ -293,7 +293,6 @@ impl From<ConfigJson> for Config {
 
         if let Some(ecdsa_pub_keys) = config_json.ecdsa_public_keys {
             for encoded_key in ecdsa_pub_keys {
-                // let key = EcdsaPublicKey::from_base64(encoded_key.as_bytes()).unwrap();
                 config
                     .ecdsa_public_keys
                     .push(Ecdsa::pub_key_from_base64(encoded_key.as_bytes()).unwrap());
@@ -373,7 +372,6 @@ mod tests {
     #[test]
     fn test_ok_for_only_device_key_signatures() {
         let device_keys = generate_test_keys();
-        let non_device_keys = generate_test_keys();
 
         let config = Config {
             ecdsa_public_keys: device_keys
@@ -419,28 +417,6 @@ mod tests {
                     .into_bytes(),
             ),
         };
-        // construct signature request from non-device key (for negative test)
-        let ecdsa_non_device_key_signature: EcdsaSignature = non_device_keys.ecdsa_keys[0]
-            .try_sign(message.as_bytes())
-            .unwrap();
-        let non_device_key_aux_data_json = AuxDataJson {
-            public_key_type: "ecdsa".to_string(),
-            public_key: BASE64_STANDARD.encode(
-                non_device_keys.ecdsa_keys[0]
-                    .verifying_key()
-                    .to_encoded_point(true)
-                    .as_bytes(),
-            ),
-            signature: BASE64_STANDARD.encode(ecdsa_non_device_key_signature.to_bytes()),
-        };
-        let request_from_non_device_key = SignatureRequest {
-            message: message.to_string().into_bytes(),
-            auxilary_data: Some(
-                serde_json::to_string(&non_device_key_aux_data_json)
-                    .unwrap()
-                    .into_bytes(),
-            ),
-        };
 
         let config_bytes = serde_json::to_vec(&json_config).unwrap();
         // positive for edcsa
@@ -449,6 +425,7 @@ mod tests {
             Some(config_bytes.clone())
         )
         .is_ok());
+        // positive for sr25519
         let context = signing_context(b"");
 
         let sr25519_device_key_signature: Sr25519Signature =
@@ -464,10 +441,11 @@ mod tests {
                 .unwrap()
                 .into_bytes(),
         );
-        // positive for sr25519
-        DeviceKeyProxy::evaluate(request_from_device_key.clone(), Some(config_bytes.clone()))
-            .unwrap();
-        // assert!(DeviceKeyProxy::evaluate(request_from_device_key.clone(), Some(config_bytes.clone())).is_ok());
+        assert!(DeviceKeyProxy::evaluate(
+            request_from_device_key.clone(),
+            Some(config_bytes.clone())
+        )
+        .is_ok());
         // positive for ed25519
         let ed25519_device_key_signature: Ed25519Signature =
             device_keys.ed25519_keys[0].sign(message.as_bytes());
@@ -482,11 +460,112 @@ mod tests {
                 .into_bytes(),
         );
         DeviceKeyProxy::evaluate(request_from_device_key, Some(config_bytes.clone())).unwrap();
-
-        // negative
-        assert!(DeviceKeyProxy::evaluate(request_from_non_device_key, Some(config_bytes)).is_err());
     }
 
+    #[test]
+    fn test_fails_pub_key_not_found() {
+        let device_keys = generate_test_keys();
+        let non_device_keys = generate_test_keys();
+
+        let config = Config {
+            ecdsa_public_keys: device_keys
+                .ecdsa_keys
+                .iter()
+                .map(|key| EcdsaPublicKey::from(key))
+                .collect(),
+            sr25519_public_keys: device_keys
+                .sr25519_keys
+                .iter()
+                .map(|key| key.public)
+                .collect(),
+            ed25519_public_keys: device_keys
+                .ed25519_keys
+                .iter()
+                .map(|key| key.verifying_key())
+                .collect(),
+        };
+        let json_config = ConfigJson::from(config.clone());
+        let config_bytes = serde_json::to_vec(&json_config).unwrap();
+
+        let message: &str =
+            "this is some message that we want to sign if its from a valid device key";
+        // construct signature request from non-device key (for negative test)
+        let ecdsa_non_device_key_signature: EcdsaSignature = non_device_keys.ecdsa_keys[0]
+            .try_sign(message.as_bytes())
+            .unwrap();
+        let non_device_key_aux_data_json = AuxDataJson {
+            public_key_type: "ecdsa".to_string(),
+            public_key: BASE64_STANDARD.encode(
+                non_device_keys.ecdsa_keys[0]
+                    .verifying_key()
+                    .to_encoded_point(true)
+                    .as_bytes(),
+            ),
+            signature: BASE64_STANDARD.encode(ecdsa_non_device_key_signature.to_bytes()),
+        };
+        let mut request_from_non_device_key = SignatureRequest {
+            message: message.to_string().into_bytes(),
+            auxilary_data: Some(
+                serde_json::to_string(&non_device_key_aux_data_json)
+                    .unwrap()
+                    .into_bytes(),
+            ),
+        };
+        assert_eq!(
+            DeviceKeyProxy::evaluate(
+                request_from_non_device_key.clone(),
+                Some(config_bytes.clone())
+            )
+            .unwrap_err()
+            .to_string(),
+            "Error::InvalidSignatureRequest(\"ECDSA Public key not in config\")"
+        );
+        //sr25519 fail
+        let context = signing_context(b"");
+
+        let sr25519_device_key_signature: Sr25519Signature =
+            non_device_keys.sr25519_keys[0].sign(context.bytes(message.as_bytes()));
+
+        let non_device_key_aux_data_json_sr25519 = AuxDataJson {
+            public_key_type: "sr25519".to_string(),
+            public_key: BASE64_STANDARD.encode(non_device_keys.sr25519_keys[0].public),
+            signature: BASE64_STANDARD.encode(sr25519_device_key_signature.to_bytes()),
+        };
+        request_from_non_device_key.auxilary_data = Some(
+            serde_json::to_string(&non_device_key_aux_data_json_sr25519.clone())
+                .unwrap()
+                .into_bytes(),
+        );
+        assert_eq!(
+            DeviceKeyProxy::evaluate(
+                request_from_non_device_key.clone(),
+                Some(config_bytes.clone())
+            )
+            .unwrap_err()
+            .to_string(),
+            "Error::InvalidSignatureRequest(\"Sr25519 Public key not in config\")"
+        );
+
+        //ed25519 fail
+        let ed25519_device_key_signature: Ed25519Signature =
+            non_device_keys.ed25519_keys[0].sign(message.as_bytes());
+        let device_key_aux_data_json_ed25519 = AuxDataJson {
+            public_key_type: "ed25519".to_string(),
+            public_key: BASE64_STANDARD.encode(non_device_keys.ed25519_keys[0].verifying_key()),
+            signature: BASE64_STANDARD.encode(ed25519_device_key_signature.to_bytes()),
+        };
+        request_from_non_device_key.auxilary_data = Some(
+            serde_json::to_string(&device_key_aux_data_json_ed25519)
+                .unwrap()
+                .into_bytes(),
+        );
+        assert_eq!(
+            DeviceKeyProxy::evaluate(request_from_non_device_key, Some(config_bytes))
+                .unwrap_err()
+                .to_string(),
+            "Error::InvalidSignatureRequest(\"Ed25519 Public key not in config\")"
+        );
+    }
     #[test]
     fn test_fails_with_empty_aux_data() {
         let device_keys = generate_test_keys();
