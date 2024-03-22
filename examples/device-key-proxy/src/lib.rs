@@ -463,6 +463,106 @@ mod tests {
     }
 
     #[test]
+    fn test_fail_bad_signatures() {
+        let device_keys = generate_test_keys();
+        let non_device_keys = generate_test_keys();
+
+        let config = Config {
+            ecdsa_public_keys: device_keys
+                .ecdsa_keys
+                .iter()
+                .map(|key| EcdsaPublicKey::from(key))
+                .collect(),
+            sr25519_public_keys: device_keys
+                .sr25519_keys
+                .iter()
+                .map(|key| key.public)
+                .collect(),
+            ed25519_public_keys: device_keys
+                .ed25519_keys
+                .iter()
+                .map(|key| key.verifying_key())
+                .collect(),
+        };
+        let json_config = ConfigJson::from(config.clone());
+
+        let message: &str =
+            "this is some message that we want to sign if its from a valid device key";
+        let context = signing_context(b"");
+
+        // constrtuct signature request from device key (for positive test)
+        let ecdsa_non_device_key_signature: EcdsaSignature = non_device_keys.ecdsa_keys[0]
+            .try_sign(message.as_bytes())
+            .unwrap();
+
+        let device_key_aux_data_json_edcsa = AuxDataJson {
+            public_key_type: "ecdsa".to_string(),
+            public_key: BASE64_STANDARD.encode(
+                device_keys.ecdsa_keys[0]
+                    .verifying_key()
+                    .to_encoded_point(true)
+                    .as_bytes(),
+            ),
+            signature: BASE64_STANDARD.encode(ecdsa_non_device_key_signature.to_bytes()),
+        };
+        let mut request_from_device_key = SignatureRequest {
+            message: message.to_string().into_bytes(),
+            auxilary_data: Some(
+                serde_json::to_string(&device_key_aux_data_json_edcsa)
+                    .unwrap()
+                    .into_bytes(),
+            ),
+        };
+
+        let config_bytes = serde_json::to_vec(&json_config).unwrap();
+        // fail for edcsa
+        assert_eq!(
+            DeviceKeyProxy::evaluate(request_from_device_key.clone(), Some(config_bytes.clone()))
+                .unwrap_err()
+                .to_string(),
+            "Error::InvalidSignatureRequest(\"Unable to verify ecdsa signature\")"
+        );
+        let sr25519_non_device_key_signature: Sr25519Signature =
+            non_device_keys.sr25519_keys[0].sign(context.bytes(message.as_bytes()));
+        // fail for sr25519
+        let device_key_aux_data_json_sr25519 = AuxDataJson {
+            public_key_type: "sr25519".to_string(),
+            public_key: BASE64_STANDARD.encode(device_keys.sr25519_keys[0].public),
+            signature: BASE64_STANDARD.encode(sr25519_non_device_key_signature.to_bytes()),
+        };
+        request_from_device_key.auxilary_data = Some(
+            serde_json::to_string(&device_key_aux_data_json_sr25519.clone())
+                .unwrap()
+                .into_bytes(),
+        );
+        assert_eq!(
+            DeviceKeyProxy::evaluate(request_from_device_key.clone(), Some(config_bytes.clone()))
+                .unwrap_err()
+                .to_string(),
+            "Error::InvalidSignatureRequest(\"Unable to verify sr25519 signature\")"
+        );
+        // fail for ed25519
+        let ed25519_non_device_key_signature: Ed25519Signature =
+            non_device_keys.ed25519_keys[0].sign(message.as_bytes());
+        let device_key_aux_data_json_ed25519 = AuxDataJson {
+            public_key_type: "ed25519".to_string(),
+            public_key: BASE64_STANDARD.encode(device_keys.ed25519_keys[0].verifying_key()),
+            signature: BASE64_STANDARD.encode(ed25519_non_device_key_signature.to_bytes()),
+        };
+        request_from_device_key.auxilary_data = Some(
+            serde_json::to_string(&device_key_aux_data_json_ed25519)
+                .unwrap()
+                .into_bytes(),
+        );
+        assert_eq!(
+            DeviceKeyProxy::evaluate(request_from_device_key.clone(), Some(config_bytes.clone()))
+                .unwrap_err()
+                .to_string(),
+            "Error::InvalidSignatureRequest(\"Unable to verify ed25519 signature\")"
+        );
+    }
+
+    #[test]
     fn test_fails_pub_key_not_found() {
         let device_keys = generate_test_keys();
         let non_device_keys = generate_test_keys();
