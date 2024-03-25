@@ -32,7 +32,7 @@ fn test_ok_for_only_device_key_signatures() {
             .map(|key| key.verifying_key())
             .collect(),
     };
-    let json_config = ConfigJson::from(config.clone());
+    let json_config = UserConfig::from(config.clone());
 
     let message: &str = "this is some message that we want to sign if its from a valid device key";
 
@@ -123,7 +123,7 @@ fn test_fail_bad_signatures() {
             .map(|key| key.verifying_key())
             .collect(),
     };
-    let json_config = ConfigJson::from(config.clone());
+    let json_config = UserConfig::from(config.clone());
 
     let message: &str = "this is some message that we want to sign if its from a valid device key";
     let context = signing_context(b"");
@@ -222,7 +222,7 @@ fn test_fails_pub_key_not_found() {
             .map(|key| key.verifying_key())
             .collect(),
     };
-    let json_config = ConfigJson::from(config.clone());
+    let json_config = UserConfig::from(config.clone());
     let config_bytes = serde_json::to_vec(&json_config).unwrap();
 
     let message: &str = "this is some message that we want to sign if its from a valid device key";
@@ -307,7 +307,7 @@ fn test_fails_pub_key_not_found() {
 fn test_fails_with_no_aux_or_config() {
     let device_keys = generate_test_keys();
 
-    let config = ConfigJson {
+    let config = UserConfig {
         ecdsa_public_keys: Some(
             device_keys
                 .ecdsa_keys

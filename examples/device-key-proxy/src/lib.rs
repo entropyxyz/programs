@@ -1,4 +1,4 @@
-#![cfg_attr(not(test), no_std)]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 extern crate alloc;
 
@@ -26,8 +26,9 @@ register_custom_getrandom!(always_fail);
 
 /// JSON-deserializable struct that will be used to derive the program-JSON interface.
 /// Note how this uses JSON-native types only.
+#[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
-pub struct ConfigJson {
+pub struct UserConfig {
     /// base64-encoded compressed point (33-byte) ECDSA public keys, (eg. "A572dqoue5OywY/48dtytQimL9WO0dpSObaFbAxoEWW9")
     pub ecdsa_public_keys: Option<Vec<String>>,
     pub sr25519_public_keys: Option<Vec<String>>,
@@ -247,7 +248,7 @@ impl Program for DeviceKeyProxy {
         signature_request: SignatureRequest,
         raw_config: Option<Vec<u8>>,
     ) -> Result<(), Error> {
-        let config_json = serde_json::from_slice::<ConfigJson>(
+        let config_json = serde_json::from_slice::<UserConfig>(
             raw_config
                 .ok_or(Error::Evaluation("No config provided.".to_string()))?
                 .as_slice(),
@@ -308,10 +309,10 @@ impl Program for DeviceKeyProxy {
     }
 }
 
-impl TryFrom<ConfigJson> for Config {
+impl TryFrom<UserConfig> for Config {
     type Error = Error;
 
-    fn try_from(config_json: ConfigJson) -> Result<Config, Error> {
+    fn try_from(config_json: UserConfig) -> Result<Config, Error> {
         let mut config = Config::default();
 
         if let Some(ecdsa_pub_keys) = config_json.ecdsa_public_keys {
@@ -348,8 +349,8 @@ impl TryFrom<ConfigJson> for Config {
     }
 }
 
-impl From<Config> for ConfigJson {
-    fn from(config: Config) -> ConfigJson {
+impl From<Config> for UserConfig {
+    fn from(config: Config) -> UserConfig {
         let ecdsa_public_keys = config
             .ecdsa_public_keys
             .iter()
@@ -375,7 +376,7 @@ impl From<Config> for ConfigJson {
             })
             .collect();
 
-        ConfigJson {
+        UserConfig {
             ecdsa_public_keys: Some(ecdsa_public_keys),
             sr25519_public_keys: Some(sr25519_public_keys),
             ed25519_public_keys: Some(ed25519_public_keys),
