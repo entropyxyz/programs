@@ -88,6 +88,22 @@ cargo component build --release -p template-barebones -p infinite-loop -p exampl
 
 This will create the components in `target/wasm32-unknown-unknown/release/`.
 
+## Generating types 
+
+Type genration is required when a program uses config or aux data. This is meant to be put on chain so user's can see and understand the types with ease. 
+
+They type generation followes https://json-schema.org/ and uses https://docs.rs/schemars/latest/schemars/index.html in rust. 
+
+First you need to import schemars to your program repo and add it to the feature std see ./examples/device_key_proxy/Cargo.toml for an example. The feature flag is bscause schemars does not compile to wasm but it only needed in generate types repo. 
+
+```
+schemars = {version = "0.8.16", optional = true}
+[features]
+std = ["schemars"]
+```
+
+Then go to the generate-types crate, add the desired config and then ```cargo run``` your new types will to be put on chain will be generated
+
 ## Licensing
 
 For the most part, the code in this repository is licensed under [AGPL-3.0](./LICENSE).
