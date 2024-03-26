@@ -18,19 +18,16 @@ rustup:
 rust:
 		export PATH="${PATH}:${HOME}/.cargo/bin" rustup default stable \
 		&& rustup show \
-		&& cargo install --git https://github.com/bytecodealliance/cargo-component --locked cargo-component
+		&& cargo install --git https://github.com/bytecodealliance/cargo-component --locked cargo-component \
+		&& apt update -y && apt-get install -y libssl-dev openssl pkg-config \
+		&& cargo install cargo-risczero \
+		&& cargo risczero install
 
 # This target is specifically for generating API documentation from
 # within a Vercel.com Project. It is used as the Projects `installCommand`.
 vercel-install-api-docs :: vercel-rustup rust
-		mkdir -p /root/.ssh
-		echo "Host github.com" > /root/.ssh/config
-		echo "	StrictHostKeyChecking no" >> /root/.ssh/config
-		echo "	IdentityFile /root/.ssh/id_ed25519" >> /root/.ssh/config
-		printenv github_ssh_deploy_key > /root/.ssh/id_ed25519
-		chmod 600 /root/.ssh/id_ed25519
 
 # The Vercel Project's `buildCommand` is defined here.
 vercel-build-api-docs ::
 		export PATH="${PATH}:${HOME}/.cargo/bin" \
-			&& cargo doc --release --no-deps
+			&& cargo doc --workspace --exclude example-risc0 --release --no-deps
