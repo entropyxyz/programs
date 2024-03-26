@@ -36,4 +36,4 @@ path = "../../wit"
 [package.metadata.component.dependencies]
 
 [features]
-std        =["schemars"]
+std = ["schemars"]

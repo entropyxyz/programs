@@ -40,7 +40,7 @@ fn test_ok_for_only_device_key_signatures() {
     let ecdsa_device_key_signature: EcdsaSignature = device_keys.ecdsa_keys[0]
         .try_sign(message.as_bytes())
         .unwrap();
-    let device_key_aux_data_json_edcsa = AuxDataJson {
+    let device_key_aux_data_json_edcsa = AuxData {
         public_key_type: "ecdsa".to_string(),
         public_key: BASE64_STANDARD.encode(
             device_keys.ecdsa_keys[0]
@@ -71,7 +71,7 @@ fn test_ok_for_only_device_key_signatures() {
     let sr25519_device_key_signature: Sr25519Signature =
         device_keys.sr25519_keys[0].sign(context.bytes(message.as_bytes()));
 
-    let device_key_aux_data_json_sr25519 = AuxDataJson {
+    let device_key_aux_data_json_sr25519 = AuxData {
         public_key_type: "sr25519".to_string(),
         public_key: BASE64_STANDARD.encode(device_keys.sr25519_keys[0].public),
         signature: BASE64_STANDARD.encode(sr25519_device_key_signature.to_bytes()),
@@ -88,7 +88,7 @@ fn test_ok_for_only_device_key_signatures() {
     // positive for ed25519
     let ed25519_device_key_signature: Ed25519Signature =
         device_keys.ed25519_keys[0].sign(message.as_bytes());
-    let device_key_aux_data_json_ed25519 = AuxDataJson {
+    let device_key_aux_data_json_ed25519 = AuxData {
         public_key_type: "ed25519".to_string(),
         public_key: BASE64_STANDARD.encode(device_keys.ed25519_keys[0].verifying_key()),
         signature: BASE64_STANDARD.encode(ed25519_device_key_signature.to_bytes()),
@@ -133,7 +133,7 @@ fn test_fail_bad_signatures() {
         .try_sign(message.as_bytes())
         .unwrap();
 
-    let device_key_aux_data_json_edcsa = AuxDataJson {
+    let device_key_aux_data_json_edcsa = AuxData {
         public_key_type: "ecdsa".to_string(),
         public_key: BASE64_STANDARD.encode(
             device_keys.ecdsa_keys[0]
@@ -163,7 +163,7 @@ fn test_fail_bad_signatures() {
     let sr25519_non_device_key_signature: Sr25519Signature =
         non_device_keys.sr25519_keys[0].sign(context.bytes(message.as_bytes()));
     // fail for sr25519
-    let device_key_aux_data_json_sr25519 = AuxDataJson {
+    let device_key_aux_data_json_sr25519 = AuxData {
         public_key_type: "sr25519".to_string(),
         public_key: BASE64_STANDARD.encode(device_keys.sr25519_keys[0].public),
         signature: BASE64_STANDARD.encode(sr25519_non_device_key_signature.to_bytes()),
@@ -182,7 +182,7 @@ fn test_fail_bad_signatures() {
     // fail for ed25519
     let ed25519_non_device_key_signature: Ed25519Signature =
         non_device_keys.ed25519_keys[0].sign(message.as_bytes());
-    let device_key_aux_data_json_ed25519 = AuxDataJson {
+    let device_key_aux_data_json_ed25519 = AuxData {
         public_key_type: "ed25519".to_string(),
         public_key: BASE64_STANDARD.encode(device_keys.ed25519_keys[0].verifying_key()),
         signature: BASE64_STANDARD.encode(ed25519_non_device_key_signature.to_bytes()),
@@ -230,7 +230,7 @@ fn test_fails_pub_key_not_found() {
     let ecdsa_non_device_key_signature: EcdsaSignature = non_device_keys.ecdsa_keys[0]
         .try_sign(message.as_bytes())
         .unwrap();
-    let non_device_key_aux_data_json = AuxDataJson {
+    let non_device_key_aux_data_json = AuxData {
         public_key_type: "ecdsa".to_string(),
         public_key: BASE64_STANDARD.encode(
             non_device_keys.ecdsa_keys[0]
@@ -263,7 +263,7 @@ fn test_fails_pub_key_not_found() {
     let sr25519_device_key_signature: Sr25519Signature =
         non_device_keys.sr25519_keys[0].sign(context.bytes(message.as_bytes()));
 
-    let non_device_key_aux_data_json_sr25519 = AuxDataJson {
+    let non_device_key_aux_data_json_sr25519 = AuxData {
         public_key_type: "sr25519".to_string(),
         public_key: BASE64_STANDARD.encode(non_device_keys.sr25519_keys[0].public),
         signature: BASE64_STANDARD.encode(sr25519_device_key_signature.to_bytes()),
@@ -286,7 +286,7 @@ fn test_fails_pub_key_not_found() {
     //ed25519 fail
     let ed25519_device_key_signature: Ed25519Signature =
         non_device_keys.ed25519_keys[0].sign(message.as_bytes());
-    let device_key_aux_data_json_ed25519 = AuxDataJson {
+    let device_key_aux_data_json_ed25519 = AuxData {
         public_key_type: "ed25519".to_string(),
         public_key: BASE64_STANDARD.encode(non_device_keys.ed25519_keys[0].verifying_key()),
         signature: BASE64_STANDARD.encode(ed25519_device_key_signature.to_bytes()),
@@ -349,7 +349,7 @@ fn test_fails_with_no_aux_or_config() {
         .try_sign(message.as_bytes())
         .unwrap();
 
-    let mut device_key_aux_data_json = AuxDataJson {
+    let mut device_key_aux_data_json = AuxData {
         public_key_type: "ecdsa".to_string(),
         public_key: BASE64_STANDARD.encode(
             device_keys.ecdsa_keys[0]

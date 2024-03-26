@@ -44,8 +44,9 @@ pub struct Config {
 }
 
 /// JSON representation of the auxiliary data
+#[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
-pub struct AuxDataJson {
+pub struct AuxData {
     /// "ecdsa", "ed25519", "sr25519"
     pub public_key_type: String,
     /// base64-encoded public key
@@ -254,7 +255,7 @@ impl Program for DeviceKeyProxy {
                 .as_slice(),
         )
         .map_err(|e| Error::Evaluation(format!("Failed to parse config: {}", e)))?;
-        let aux_data_json = serde_json::from_slice::<AuxDataJson>(
+        let aux_data_json = serde_json::from_slice::<AuxData>(
             signature_request
                 .auxilary_data
                 .ok_or(Error::InvalidSignatureRequest(
