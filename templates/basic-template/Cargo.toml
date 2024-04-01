@@ -11,6 +11,8 @@ crate-type = ["cdylib"]
 
 [dependencies]
 entropy-programs-core={ git="https://github.com/entropyxyz/programs.git", tag="v0.8.0" }
+schemars = {version = "0.8.16", optional = true}
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
 
 # strip debug info since that makes up a major part of Wasm blobs, see Wasm's `twiggy`
 [profile.release]
@@ -30,3 +32,6 @@ docker-image = "peg997/build-entropy-programs:version0.1"
 
 # Configuration interface description
 # interface-description = ""
+
+[features]
+std = ["schemars"]
