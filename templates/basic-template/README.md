@@ -1,3 +1,5 @@
+# {{project-name}}
+
 Congratulations on the first day of the rest of your life. Hold onto your pants cuz your mind is about to be blown 
 
 
