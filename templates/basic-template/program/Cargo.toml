@@ -14,10 +14,6 @@ entropy-programs-core={ git="https://github.com/entropyxyz/programs.git", tag="v
 schemars = {version = "0.8.16", optional = true}
 serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
 
-# strip debug info since that makes up a major part of Wasm blobs, see Wasm's `twiggy`
-[profile.release]
-strip = "debuginfo"
-
 # These are used by `cargo component`
 [package.metadata.component]
 package = "entropy:{{project-name}}"

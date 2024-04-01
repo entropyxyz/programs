@@ -66,6 +66,8 @@ You template program is now in the `./my-program` directory and ready to be edit
 
 You can compile your program with `cargo component`:
 
+You can generate your types by `cargo run generate-types` (if you change the type names of UserConfig or AuxData, you need to change it in generate types too)
+
 ```bash
 cargo component build --release --target wasm32-unknown-unknown
 ```
@@ -87,22 +89,6 @@ cargo component build --release -p template-barebones -p infinite-loop -p exampl
 ```
 
 This will create the components in `target/wasm32-unknown-unknown/release/`.
-
-## Generating types 
-
-Type genration is required when a program uses config or aux data. This is meant to be put on chain so user's can see and understand the types with ease. 
-
-They type generation followes https://json-schema.org/ and uses https://docs.rs/schemars/latest/schemars/index.html in rust. 
-
-First you need to import schemars to your program repo and add it to the feature std see ./examples/device_key_proxy/Cargo.toml for an example. The feature flag is bscause schemars does not compile to wasm but it only needed in generate types repo. 
-
-```
-schemars = {version = "0.8.16", optional = true}
-[features]
-std = ["schemars"]
-```
-
-Then go to the generate-types crate, add the desired config and then ```cargo run``` your new types will to be put on chain will be generated
 
 ## Licensing
 
