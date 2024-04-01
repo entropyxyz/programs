@@ -1,5 +1,5 @@
 [workspace]
-members = ["programs", "core", "acl", "evm", "runtime", "examples/*", "generate-types"]
+members = ["programs", "core", "acl", "evm", "runtime", "examples/*", "test/*",]
 exclude = ["templates/*", "examples/risczero-zkvm-verification"]
 resolver = "2"
 
@@ -9,7 +9,6 @@ entropy-programs-core = { path = "core", default-features = false }
 entropy-programs-acl = { path = "acl", default-features = false }
 entropy-programs-evm = { path = "evm", default-features = false }
 entropy-programs-runtime = { path = "runtime", default-features = false }
-entropy-generate-types = { path = "generate-types", default-features = false }
 wit-bindgen = { version = "0.7.0", default_features = false }
 
 # strip debug info since that makes up a major part of Wasm blobs, see Wasm's `twiggy`

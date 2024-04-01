@@ -1,6 +1,6 @@
 //! No-op program
 
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 extern crate alloc;
 

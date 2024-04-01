@@ -1,24 +1,25 @@
 use schemars::schema_for;
 use std::fs;
+use program::{UserConfig, AuxData};
 
 fn main() {
-    let schema_config_device_key_proxy = schema_for!(device_key_proxy::UserConfig);
+    let schema_config = schema_for!(UserConfig);
     fs::write(
-        "./device_key_proxy_config_type.txt",
+        "./config_type.txt",
         format!(
             "{:?}",
-            serde_json::to_vec(&schema_config_device_key_proxy)
+            serde_json::to_vec(&schema_config)
                 .expect("error converting user config for device key proxy")
         ),
     )
     .expect("Failed to write to device key proxy config");
 
-    let schema_aux_data_device_key_proxy = schema_for!(device_key_proxy::AuxData);
+    let schema_aux_data = schema_for!(AuxData);
     fs::write(
-        "./device_key_proxy_aux_data_type.txt",
+        "./aux_data_type.txt",
         format!(
             "{:?}",
-            serde_json::to_vec(&schema_aux_data_device_key_proxy)
+            serde_json::to_vec(&schema_aux_data)
                 .expect("error converting user aux_data for device key proxy")
         ),
     )

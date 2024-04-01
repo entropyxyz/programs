@@ -7,7 +7,7 @@ edition = "2021"
 
 # This is required to compile programs to a wasm module
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 entropy-programs-core={ git="https://github.com/entropyxyz/programs.git", tag="v0.8.0" }
