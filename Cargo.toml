@@ -1,5 +1,5 @@
 [workspace]
-members = ["programs", "core", "acl", "evm", "runtime", "examples/*", "test/*",]
+members = ["programs", "core", "acl", "evm", "runtime", "examples/*"]
 exclude = ["templates/*", "examples/risczero-zkvm-verification"]
 resolver = "2"
 
