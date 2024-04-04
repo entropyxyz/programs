@@ -1,15 +1,31 @@
 //! No-op program
 
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 extern crate alloc;
 
 use alloc::{string::ToString, vec::Vec};
 
 use entropy_programs_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
+use serde::{Deserialize, Serialize};
+
+#[cfg(test)]
+mod tests;
 
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
+
+/// JSON-deserializable struct that will be used to derive the program-JSON interface.
+#[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
+pub struct UserConfig {
+}
+
+/// JSON representation of the auxiliary data
+#[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
+pub struct AuxData {
+}
 
 pub struct {{project-name | upper_camel_case}};
 
@@ -33,28 +49,3 @@ impl Program for {{project-name | upper_camel_case}} {
 }
 
 export_program!({{project-name | upper_camel_case}});
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_should_sign() {
-        let signature_request = SignatureRequest {
-            message: b"some_message".to_vec(),
-            auxilary_data: None,
-        };
-
-        assert!({{project-name | upper_camel_case}}::evaluate(signature_request, None).is_ok());
-    }
-
-    #[test]
-    fn test_should_fail() {
-        let signature_request = SignatureRequest {
-            message: Vec::new(),
-            auxilary_data: None,
-        };
-
-        assert!({{project-name | upper_camel_case}}::evaluate(signature_request, None).is_err());
-    }
-}

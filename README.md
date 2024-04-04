@@ -66,6 +66,8 @@ You template program is now in the `./my-program` directory and ready to be edit
 
 You can compile your program with `cargo component`:
 
+You can generate your types by `cargo run generate-types` (if you change the type names of UserConfig or AuxData, you need to change it in generate types too)
+
 ```bash
 cargo component build --release --target wasm32-unknown-unknown
 ```
