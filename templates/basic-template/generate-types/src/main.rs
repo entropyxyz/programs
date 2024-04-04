@@ -5,7 +5,7 @@ use program::{UserConfig, AuxData};
 fn main() {
     let schema_config = schema_for!(UserConfig);
     fs::write(
-        "./config_type.txt",
+        "./{{project-name}}_serialized_config_type.txt",
         format!(
             "{:?}",
             serde_json::to_vec(&schema_config)
@@ -16,7 +16,7 @@ fn main() {
 
     let schema_aux_data = schema_for!(AuxData);
     fs::write(
-        "./aux_data_type.txt",
+        "./{{project-name}}_serialized_aux_data_type.txt",
         format!(
             "{:?}",
             serde_json::to_vec(&schema_aux_data)

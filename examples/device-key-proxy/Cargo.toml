@@ -9,7 +9,7 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-# This is required to compile programs to a wasm module
+# This is required to compile programs to a wasm module and for use in rust libs
 [lib]
 crate-type = ["cdylib", "rlib"]
 

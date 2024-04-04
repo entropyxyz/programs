@@ -13,7 +13,7 @@ resolver = "2"
 [profile.release]
 strip = "debuginfo"
 
-# This is required to compile programs to a wasm module
+# This is required to compile programs to a wasm module and for use in rust libs
 [lib]
 crate-type = ["cdylib", "rlib"]
 
