@@ -49,6 +49,7 @@ fn test_ok_for_only_device_key_signatures() {
                 .as_bytes(),
         ),
         signature: BASE64_STANDARD.encode(ecdsa_device_key_signature.to_bytes()),
+        context: "".to_string(),
     };
     let mut request_from_device_key = SignatureRequest {
         message: message.to_string().into_bytes(),
@@ -75,6 +76,7 @@ fn test_ok_for_only_device_key_signatures() {
         public_key_type: "sr25519".to_string(),
         public_key: BASE64_STANDARD.encode(device_keys.sr25519_keys[0].public),
         signature: BASE64_STANDARD.encode(sr25519_device_key_signature.to_bytes()),
+        context: "".to_string(),
     };
     request_from_device_key.auxilary_data = Some(
         serde_json::to_string(&device_key_aux_data_json_sr25519.clone())
@@ -92,6 +94,7 @@ fn test_ok_for_only_device_key_signatures() {
         public_key_type: "ed25519".to_string(),
         public_key: BASE64_STANDARD.encode(device_keys.ed25519_keys[0].verifying_key()),
         signature: BASE64_STANDARD.encode(ed25519_device_key_signature.to_bytes()),
+        context: "".to_string(),
     };
     request_from_device_key.auxilary_data = Some(
         serde_json::to_string(&device_key_aux_data_json_ed25519)
@@ -142,6 +145,7 @@ fn test_fail_bad_signatures() {
                 .as_bytes(),
         ),
         signature: BASE64_STANDARD.encode(ecdsa_non_device_key_signature.to_bytes()),
+        context: "".to_string(),
     };
     let mut request_from_device_key = SignatureRequest {
         message: message.to_string().into_bytes(),
@@ -167,6 +171,7 @@ fn test_fail_bad_signatures() {
         public_key_type: "sr25519".to_string(),
         public_key: BASE64_STANDARD.encode(device_keys.sr25519_keys[0].public),
         signature: BASE64_STANDARD.encode(sr25519_non_device_key_signature.to_bytes()),
+        context: "".to_string(),
     };
     request_from_device_key.auxilary_data = Some(
         serde_json::to_string(&device_key_aux_data_json_sr25519.clone())
@@ -186,6 +191,7 @@ fn test_fail_bad_signatures() {
         public_key_type: "ed25519".to_string(),
         public_key: BASE64_STANDARD.encode(device_keys.ed25519_keys[0].verifying_key()),
         signature: BASE64_STANDARD.encode(ed25519_non_device_key_signature.to_bytes()),
+        context: "".to_string(),
     };
     request_from_device_key.auxilary_data = Some(
         serde_json::to_string(&device_key_aux_data_json_ed25519)
@@ -239,6 +245,7 @@ fn test_fails_pub_key_not_found() {
                 .as_bytes(),
         ),
         signature: BASE64_STANDARD.encode(ecdsa_non_device_key_signature.to_bytes()),
+        context: "".to_string(),
     };
     let mut request_from_non_device_key = SignatureRequest {
         message: message.to_string().into_bytes(),
@@ -267,6 +274,7 @@ fn test_fails_pub_key_not_found() {
         public_key_type: "sr25519".to_string(),
         public_key: BASE64_STANDARD.encode(non_device_keys.sr25519_keys[0].public),
         signature: BASE64_STANDARD.encode(sr25519_device_key_signature.to_bytes()),
+        context: "".to_string(),
     };
     request_from_non_device_key.auxilary_data = Some(
         serde_json::to_string(&non_device_key_aux_data_json_sr25519.clone())
@@ -290,6 +298,7 @@ fn test_fails_pub_key_not_found() {
         public_key_type: "ed25519".to_string(),
         public_key: BASE64_STANDARD.encode(non_device_keys.ed25519_keys[0].verifying_key()),
         signature: BASE64_STANDARD.encode(ed25519_device_key_signature.to_bytes()),
+        context: "".to_string(),
     };
     request_from_non_device_key.auxilary_data = Some(
         serde_json::to_string(&device_key_aux_data_json_ed25519)
@@ -358,6 +367,7 @@ fn test_fails_with_no_aux_or_config() {
                 .as_bytes(),
         ),
         signature: BASE64_STANDARD.encode(ecdsa_device_key_signature.to_bytes()),
+        context: "".to_string(),
     };
     let mut request_from_device_key = SignatureRequest {
         message: message.to_string().into_bytes(),

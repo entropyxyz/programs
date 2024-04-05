@@ -53,12 +53,14 @@ pub struct AuxData {
     pub public_key: String,
     /// base64-encoded signature
     pub signature: String,
+    /// The context for the signature only needed in sr25519 signature type
+    pub context: String,
 }
 
 trait DeviceKey {
     type PublicKey;
     type Signature;
-    fn verify_signature(&self, message: &[u8]) -> Result<(), Error>;
+    fn verify_signature(&self, message: &[u8], context: &[u8]) -> Result<(), Error>;
     fn from_base64(public_key: &[u8], signature: &[u8]) -> Result<Self, Error>
     where
         Self: Sized;
@@ -83,7 +85,7 @@ impl DeviceKey for Ecdsa {
     type PublicKey = EcdsaPublicKey;
     type Signature = EcdsaSignature;
 
-    fn verify_signature(&self, message: &[u8]) -> Result<(), Error> {
+    fn verify_signature(&self, message: &[u8], _context: &[u8]) -> Result<(), Error> {
         self.pub_key.verify(message, &self.signature).map_err(|_| {
             Error::InvalidSignatureRequest("Unable to verify ecdsa signature".to_string())
         })
@@ -134,7 +136,7 @@ impl DeviceKey for Ed25519 {
     type PublicKey = Ed25519PublicKey;
     type Signature = Ed25519Signature;
 
-    fn verify_signature(&self, message: &[u8]) -> Result<(), Error> {
+    fn verify_signature(&self, message: &[u8], _context: &[u8]) -> Result<(), Error> {
         self.pub_key.verify(message, &self.signature).map_err(|_| {
             Error::InvalidSignatureRequest("Unable to verify ed25519 signature".to_string())
         })
@@ -190,8 +192,8 @@ impl DeviceKey for Sr25519 {
     type PublicKey = Sr25519PublicKey;
     type Signature = Sr25519Signature;
 
-    fn verify_signature(&self, message: &[u8]) -> Result<(), Error> {
-        let context = signing_context(b"");
+    fn verify_signature(&self, message: &[u8], context: &[u8]) -> Result<(), Error> {
+        let context = signing_context(context);
         self.pub_key
             .verify(context.bytes(message), &self.signature)
             .map_err(|_| {
@@ -277,7 +279,8 @@ impl Program for DeviceKeyProxy {
                     aux_data_json.signature.as_bytes(),
                 )?;
                 verification_parameters.confirm_in_config(&config)?;
-                verification_parameters.verify_signature(signature_request.message.as_slice())?;
+                verification_parameters
+                    .verify_signature(signature_request.message.as_slice(), b"")?;
             }
             "sr25519" => {
                 let verification_parameters = Sr25519::from_base64(
@@ -285,7 +288,10 @@ impl Program for DeviceKeyProxy {
                     aux_data_json.signature.as_bytes(),
                 )?;
                 verification_parameters.confirm_in_config(&config)?;
-                verification_parameters.verify_signature(signature_request.message.as_slice())?;
+                verification_parameters.verify_signature(
+                    signature_request.message.as_slice(),
+                    aux_data_json.context.as_bytes(),
+                )?;
             }
             "ed25519" => {
                 let verification_parameters = Ed25519::from_base64(
@@ -293,7 +299,8 @@ impl Program for DeviceKeyProxy {
                     aux_data_json.signature.as_bytes(),
                 )?;
                 verification_parameters.confirm_in_config(&config)?;
-                verification_parameters.verify_signature(signature_request.message.as_slice())?;
+                verification_parameters
+                    .verify_signature(signature_request.message.as_slice(), b"")?;
             }
             _ => {
                 return Err(Error::InvalidSignatureRequest(
