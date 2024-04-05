@@ -53,7 +53,7 @@ pub struct AuxData {
     pub public_key: String,
     /// base64-encoded signature
     pub signature: String,
-    /// The context for the signature
+    /// The context for the signature only needed in sr25519 signature type
     pub context: String,
 }
 
