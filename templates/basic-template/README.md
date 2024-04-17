@@ -15,7 +15,7 @@ cargo install wasm-tools
 
 Then build with:
 ```bash
-cargo component build --release --target wasm32-unknown-unknown`
+cargo component build --release --target wasm32-unknown-unknown
 ```
 
 The `.wasm` binary can be found in `./target/wasm32-unknown-unknown/release`
@@ -38,3 +38,18 @@ Types are meant top be posted with the program, it is how people know how to int
 ```cargo run -p generate-types ``` 
 
 Will generate two files that will hold both the aux_data_schema and config_schema
+
+## Upload program 
+
+The basic template is shipped with a cli to upload a program, after compiling the program then generating the types
+you upload the program to chain. 
+
+Create a .env file with two variables  
+
+```
+DEPLOYER_MNEMONIC="<Your Deployer Mnemonic>"
+CHAIN_ENDPOINT="<Chain Endpoint>"
+```
+
+Then run
+```cargo run -p cli store-program```

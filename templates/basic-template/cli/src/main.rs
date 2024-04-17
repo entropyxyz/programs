@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use clap::{Parser, Subcommand};
 use colored::Colorize;
-use std::{fs, path::PathBuf};
+use std::{fs};
 use subxt::{
     backend::legacy::LegacyRpcMethods,
     backend::rpc::RpcClient,
@@ -11,32 +11,24 @@ use subxt::{
     tx::{PairSigner, TxPayload, TxStatus},
     Config, OnlineClient, PolkadotConfig as EntropyConfig,
 };
+use dotenv::dotenv;
 
 #[derive(Parser, Debug, Clone)]
 #[clap(version, about = "CLI tool for uploading entropy programs")]
 struct Cli {
     #[clap(subcommand)]
     command: CliCommand,
-    /// The chain endpoint to use.
-    ///
-    /// The format should be in the form of `scheme://hostname:port`.
-    ///
-    /// Default to `ws://localhost:9944`. If a value exists for `ENTROPY_DEVNET`, that takes
-    /// priority.
-    #[arg(short, long)]
-    chain_endpoint: Option<String>,
 }
 #[derive(Subcommand, Debug, Clone)]
 enum CliCommand {
     /// Store a given program on chain
     StoreProgram {
-        /// The menmonic for the deployer key
-        mnemonic: String,
     },
 }
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    dotenv().ok();
     match run_command().await {
         Ok(output) => {
             println!("Success: {}", output.green());
@@ -51,16 +43,14 @@ async fn main() -> anyhow::Result<()> {
 
 async fn run_command() -> anyhow::Result<String> {
     let cli = Cli::parse();
+    let mnemonic = std::env::var("DEPLOYER_MNEMONIC").expect("DEPLOYER_MNEMONIC must be set.");
+    let endpoint_addr = std::env::var("CHAIN_ENDPOINT").expect("CHAIN_ENDPOINT must be set.");
 
-    let endpoint_addr = cli.chain_endpoint.unwrap_or_else(|| {
-        std::env::var("ENTROPY_DEVNET").unwrap_or("ws://localhost:9944".to_string())
-    });
     let api = get_api(&endpoint_addr).await?;
     let rpc = get_rpc(&endpoint_addr).await?;
 
     match cli.command {
         CliCommand::StoreProgram {
-            mnemonic,
         } => {
             let keypair = <sr25519::Pair as Pair>::from_string(&mnemonic, None).unwrap();
             println!("Uploading program using account: {}", keypair.public());
