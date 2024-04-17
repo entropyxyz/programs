@@ -6,7 +6,7 @@ license = "Unlicense"
 edition = "2021"
 
 [workspace]
-members = ["generate-types", "."]
+members = ["generate-types", ".", "cli"]
 resolver = "2"
 
 # strip debug info since that makes up a major part of Wasm blobs, see Wasm's `twiggy`

@@ -32,12 +32,6 @@ enum CliCommand {
     StoreProgram {
         /// The menmonic for the deployer key
         mnemonic: String,
-        /// The path to a .wasm file containing the program (defaults to a test program)
-        program_file: Option<PathBuf>,
-        /// The path to a file containing the program config interface (defaults to empty)
-        config_interface_file: Option<PathBuf>,
-        /// The path to a file containing the program aux interface (defaults to empty)
-        aux_data_interface_file: Option<PathBuf>,
     },
 }
 
@@ -67,27 +61,13 @@ async fn run_command() -> anyhow::Result<String> {
     match cli.command {
         CliCommand::StoreProgram {
             mnemonic,
-            program_file,
-            config_interface_file,
-            aux_data_interface_file,
         } => {
             let keypair = <sr25519::Pair as Pair>::from_string(&mnemonic, None).unwrap();
             println!("Uploading program using account: {}", keypair.public());
 
-            let program = match program_file {
-                Some(file_name) => fs::read(file_name)?,
-                None => return Err(anyhow!("No program found")),
-            };
-
-            let config_interface = match config_interface_file {
-                Some(file_name) => fs::read(file_name)?,
-                None => vec![],
-            };
-
-            let aux_data_interface = match aux_data_interface_file {
-                Some(file_name) => fs::read(file_name)?,
-                None => vec![],
-            };
+            let program = include_bytes!("../../target/wasm32-unknown-unknown/release/{{project-name}}.wasm").to_vec();
+            let config_interface = fs::read("{{project-name}}_serialized_config_type.txt")?;
+            let aux_data_interface = fs::read("{{project-name}}_serialized_aux_data_type.txt")?;
 
             let hash = store_program(
                 &api,
