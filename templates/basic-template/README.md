@@ -35,7 +35,7 @@ This will compile your program and put the `.wasm` binary file in `./binary-dir`
 
 Types are meant top be posted with the program, it is how people know how to interact with your program 
 
-```cargo run -p generate-types ``` 
+```cargo run -p generate-types``` 
 
 Will generate two files that will hold both the aux_data_schema and config_schema
 
