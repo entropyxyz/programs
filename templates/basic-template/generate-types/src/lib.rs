@@ -2,7 +2,7 @@ use schemars::schema_for;
 use std::fs;
 use program::{UserConfig, AuxData};
 
-fn main() {
+pub fn generate_types() {
     let schema_config = schema_for!(UserConfig);
     fs::write(
         "./{{project-name}}_serialized_config_type.txt",

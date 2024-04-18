@@ -1,3 +1,4 @@
 /target
 {{project-name}}_serialized_config_type.txt
 {{project-name}}_serialized_aux_data_type.txt
+.env
