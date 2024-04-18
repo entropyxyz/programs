@@ -23,8 +23,9 @@ struct Cli {
 #[derive(Subcommand, Debug, Clone)]
 enum CliCommand {
     /// Store a given program on chain
-    StoreProgram {
-    },
+    StoreProgram {},
+    /// Generate the types for the program
+    GenerateTypes{},
 }
 
 #[tokio::main]
@@ -71,6 +72,10 @@ async fn run_command() -> anyhow::Result<String> {
             )
             .await?;
             Ok(format!("Program stored {hash}"))
+        },
+        CliCommand::GenerateTypes {}  =>  {
+            generate_types();
+            Ok(format!("Types Generated"))
         }
     }
 }
