@@ -12,6 +12,7 @@ use subxt::{
     Config, OnlineClient, PolkadotConfig as EntropyConfig,
 };
 use dotenv::dotenv;
+use generate_types::generate_types;
 
 #[derive(Parser, Debug, Clone)]
 #[clap(version, about = "CLI tool for uploading entropy programs")]
@@ -56,6 +57,7 @@ async fn run_command() -> anyhow::Result<String> {
             println!("Uploading program using account: {}", keypair.public());
 
             let program = include_bytes!("../../target/wasm32-unknown-unknown/release/{{project-name}}.wasm").to_vec();
+            generate_types();
             let config_interface = fs::read("{{project-name}}_serialized_config_type.txt")?;
             let aux_data_interface = fs::read("{{project-name}}_serialized_aux_data_type.txt")?;
 
