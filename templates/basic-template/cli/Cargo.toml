@@ -13,3 +13,4 @@ tokio                ={ version="1.16", features=["macros", "rt-multi-thread", "
 anyhow               ="1.0.82"
 dotenv = "0.15.0"
 generate-types = { path = "../generate-types" }
+project-root = "0.2.2"
