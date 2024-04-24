@@ -24,7 +24,11 @@ const ALLOWED_DOMAIN: &str = "localhost";
 pub struct Siwe;
 
 impl Program for Siwe {
-    fn evaluate(signature_request: SignatureRequest, _config: Option<Vec<u8>>) -> Result<(), Error> {
+    fn evaluate(
+        signature_request: SignatureRequest,
+        _config: Option<Vec<u8>>,
+        _oracle_data: Option<Vec<u8>>,
+    ) -> Result<(), Error> {
         let string_message = String::from_utf8(signature_request.message)
             .map_err(|err| Error::Evaluation(err.to_string()))?;
         let siwe_message = string_message
@@ -71,7 +75,7 @@ Issued At: 2022-01-28T23:28:16.013Z"
             auxilary_data: None,
         };
 
-        assert!(Siwe::evaluate(signature_request, None).is_ok());
+        assert!(Siwe::evaluate(signature_request, None, None).is_ok());
     }
 
     #[test]
@@ -92,7 +96,7 @@ Issued At: 2022-01-28T23:28:16.013Z"
             auxilary_data: None,
         };
 
-        assert!(Siwe::evaluate(signature_request, None).is_err());
+        assert!(Siwe::evaluate(signature_request, None, None).is_err());
     }
 
     #[test]
@@ -113,6 +117,6 @@ Issued At: 2022-01-28T23:28:16.013Z"
             auxilary_data: None,
         };
 
-        assert!(Siwe::evaluate(signature_request, None).is_err());
+        assert!(Siwe::evaluate(signature_request, None, None).is_err());
     }
 }

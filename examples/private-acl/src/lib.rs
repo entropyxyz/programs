@@ -24,7 +24,11 @@ register_custom_getrandom!(always_fail);
 impl Program for PrivateTransactionAcl {
     /// Allow any address given in the pre-defined list (addresses.txt)
     // #[no_mangle]
-    fn evaluate(signature_request: SignatureRequest, _config: Option<Vec<u8>>) -> Result<(), CoreError> {
+    fn evaluate(
+        signature_request: SignatureRequest,
+        _config: Option<Vec<u8>>,
+        _oracle_data: Option<Vec<u8>>,
+    ) -> Result<(), CoreError> {
         // parse the raw tx into some type
         let parsed_tx = <Evm as Architecture>::TransactionRequest::try_parse(
             signature_request.message.as_slice(),
@@ -72,7 +76,7 @@ mod tests {
             auxilary_data: None,
         };
 
-        assert!(PrivateTransactionAcl::evaluate(signature_request, None).is_ok());
+        assert!(PrivateTransactionAcl::evaluate(signature_request, None, None).is_ok());
     }
 
     #[test]
@@ -83,6 +87,6 @@ mod tests {
             auxilary_data: None,
         };
 
-        assert!(PrivateTransactionAcl::evaluate(signature_request, None).is_err());
+        assert!(PrivateTransactionAcl::evaluate(signature_request, None, None).is_err());
     }
 }
