@@ -4,7 +4,6 @@
 pub mod bindgen {
     wit_bindgen::generate!({
         world: "program",
-        path: "../wit/application.wit",
         macro_export
     });
 }
