@@ -12,7 +12,6 @@ mod bindgen {
 
     bindgen!({
         world: "program",
-        path: "../wit/application.wit"
     });
 }
 pub use bindgen::{Error as ProgramError, Program, SignatureRequest};

@@ -9,7 +9,7 @@ edition = "2021"
 
 [dependencies]
 wasmtime = { version = "12.0.1", features = ["component-model"] }
-entropy-programs-core = { path = "../core" }
+entropy-programs-core = { version = "0.9.0", path = "../core" }
 thiserror = "1.0.47"
 
 [dev-dependencies]

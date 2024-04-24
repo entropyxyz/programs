@@ -1,11 +1,12 @@
 [package]
 name = "entropy-programs-core"
-version = "0.1.0"
+version = "0.9.0"
 authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
 homepage = "https://entropy.xyz/"
 license = "AGPL-3.0-or-later"
 repository = "https://github.com/entropyxyz/programs"
 edition = "2021"
+description = "Core traits and types for building programs on the Entropy network."
 
 [dependencies]
 getrandom = { version = "0.2", default-features = false, features = ["custom"] }
