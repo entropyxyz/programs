@@ -7,7 +7,7 @@ fn test_should_sign() {
         auxilary_data: None,
     };
 
-    assert!({{project-name | upper_camel_case}}::evaluate(signature_request, None).is_ok());
+    assert!({{project-name | upper_camel_case}}::evaluate(signature_request, None, None).is_ok());
 }
 
 #[test]
@@ -17,5 +17,5 @@ fn test_should_fail() {
         auxilary_data: None,
     };
 
-    assert!({{project-name | upper_camel_case}}::evaluate(signature_request, None).is_err());
+    assert!({{project-name | upper_camel_case}}::evaluate(signature_request, None, None).is_err());
 }

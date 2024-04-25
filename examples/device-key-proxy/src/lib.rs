@@ -250,6 +250,7 @@ impl Program for DeviceKeyProxy {
     fn evaluate(
         signature_request: SignatureRequest,
         raw_config: Option<Vec<u8>>,
+        _oracle_data: Option<Vec<u8>>,
     ) -> Result<(), Error> {
         let config_json = serde_json::from_slice::<UserConfig>(
             raw_config

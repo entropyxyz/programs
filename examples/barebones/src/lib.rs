@@ -16,7 +16,11 @@ pub struct BarebonesProgram;
 impl Program for BarebonesProgram {
     /// This is the only function required by the program runtime. `message` is the preimage of the curve element to be
     /// signed, eg. RLP-serialized Ethereum transaction request, raw x86_64 executable, etc.
-    fn evaluate(signature_request: SignatureRequest, _config: Option<Vec<u8>>) -> Result<(), Error> {
+    fn evaluate(
+        signature_request: SignatureRequest,
+        _config: Option<Vec<u8>>,
+        _oracle_data: Option<Vec<u8>>,
+    ) -> Result<(), Error> {
         let message: Vec<u8> = signature_request.message;
 
         // our program just checks that the length of the message is greater than 10
@@ -49,7 +53,7 @@ mod tests {
             auxilary_data: None,
         };
 
-        assert!(BarebonesProgram::evaluate(signature_request, None).is_ok());
+        assert!(BarebonesProgram::evaluate(signature_request, None, None).is_ok());
     }
 
     #[test]
@@ -60,6 +64,6 @@ mod tests {
             auxilary_data: None,
         };
 
-        assert!(BarebonesProgram::evaluate(signature_request, None).is_err());
+        assert!(BarebonesProgram::evaluate(signature_request, None, None).is_err());
     }
 }

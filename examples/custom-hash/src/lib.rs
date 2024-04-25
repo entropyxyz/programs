@@ -16,7 +16,11 @@ register_custom_getrandom!(always_fail);
 pub struct CustomHashExample;
 
 impl Program for CustomHashExample {
-    fn evaluate(signature_request: SignatureRequest, _config: Option<Vec<u8>>) -> Result<(), Error> {
+    fn evaluate(
+        signature_request: SignatureRequest,
+        _config: Option<Vec<u8>>,
+        _oracle_data: Option<Vec<u8>>,
+    ) -> Result<(), Error> {
         if signature_request.message.len() < 1 {
             return Err(Error::Evaluation(
                 "You need to give me SOME data to sign!".to_string(),

@@ -62,10 +62,12 @@ fn test_ok_for_only_device_key_signatures() {
 
     let config_bytes = serde_json::to_vec(&json_config).unwrap();
     // positive for edcsa
-    assert!(
-        DeviceKeyProxy::evaluate(request_from_device_key.clone(), Some(config_bytes.clone()))
-            .is_ok()
-    );
+    assert!(DeviceKeyProxy::evaluate(
+        request_from_device_key.clone(),
+        Some(config_bytes.clone()),
+        None
+    )
+    .is_ok());
     // positive for sr25519
     let context = signing_context(b"");
 
@@ -83,10 +85,12 @@ fn test_ok_for_only_device_key_signatures() {
             .unwrap()
             .into_bytes(),
     );
-    assert!(
-        DeviceKeyProxy::evaluate(request_from_device_key.clone(), Some(config_bytes.clone()))
-            .is_ok()
-    );
+    assert!(DeviceKeyProxy::evaluate(
+        request_from_device_key.clone(),
+        Some(config_bytes.clone()),
+        None
+    )
+    .is_ok());
     // positive for ed25519
     let ed25519_device_key_signature: Ed25519Signature =
         device_keys.ed25519_keys[0].sign(message.as_bytes());
@@ -101,7 +105,7 @@ fn test_ok_for_only_device_key_signatures() {
             .unwrap()
             .into_bytes(),
     );
-    DeviceKeyProxy::evaluate(request_from_device_key, Some(config_bytes.clone())).unwrap();
+    DeviceKeyProxy::evaluate(request_from_device_key, Some(config_bytes.clone()), None).unwrap();
 }
 
 #[test]
@@ -159,9 +163,13 @@ fn test_fail_bad_signatures() {
     let config_bytes = serde_json::to_vec(&json_config).unwrap();
     // fail for edcsa
     assert_eq!(
-        DeviceKeyProxy::evaluate(request_from_device_key.clone(), Some(config_bytes.clone()))
-            .unwrap_err()
-            .to_string(),
+        DeviceKeyProxy::evaluate(
+            request_from_device_key.clone(),
+            Some(config_bytes.clone()),
+            None
+        )
+        .unwrap_err()
+        .to_string(),
         "Error::InvalidSignatureRequest(\"Unable to verify ecdsa signature\")"
     );
     let sr25519_non_device_key_signature: Sr25519Signature =
@@ -179,9 +187,13 @@ fn test_fail_bad_signatures() {
             .into_bytes(),
     );
     assert_eq!(
-        DeviceKeyProxy::evaluate(request_from_device_key.clone(), Some(config_bytes.clone()))
-            .unwrap_err()
-            .to_string(),
+        DeviceKeyProxy::evaluate(
+            request_from_device_key.clone(),
+            Some(config_bytes.clone()),
+            None
+        )
+        .unwrap_err()
+        .to_string(),
         "Error::InvalidSignatureRequest(\"Unable to verify sr25519 signature\")"
     );
     // fail for ed25519
@@ -199,9 +211,13 @@ fn test_fail_bad_signatures() {
             .into_bytes(),
     );
     assert_eq!(
-        DeviceKeyProxy::evaluate(request_from_device_key.clone(), Some(config_bytes.clone()))
-            .unwrap_err()
-            .to_string(),
+        DeviceKeyProxy::evaluate(
+            request_from_device_key.clone(),
+            Some(config_bytes.clone()),
+            None
+        )
+        .unwrap_err()
+        .to_string(),
         "Error::InvalidSignatureRequest(\"Unable to verify ed25519 signature\")"
     );
 }
@@ -258,7 +274,8 @@ fn test_fails_pub_key_not_found() {
     assert_eq!(
         DeviceKeyProxy::evaluate(
             request_from_non_device_key.clone(),
-            Some(config_bytes.clone())
+            Some(config_bytes.clone()),
+            None
         )
         .unwrap_err()
         .to_string(),
@@ -284,7 +301,8 @@ fn test_fails_pub_key_not_found() {
     assert_eq!(
         DeviceKeyProxy::evaluate(
             request_from_non_device_key.clone(),
-            Some(config_bytes.clone())
+            Some(config_bytes.clone()),
+            None
         )
         .unwrap_err()
         .to_string(),
@@ -306,7 +324,7 @@ fn test_fails_pub_key_not_found() {
             .into_bytes(),
     );
     assert_eq!(
-        DeviceKeyProxy::evaluate(request_from_non_device_key, Some(config_bytes))
+        DeviceKeyProxy::evaluate(request_from_non_device_key, Some(config_bytes), None)
             .unwrap_err()
             .to_string(),
         "Error::InvalidSignatureRequest(\"Ed25519 Public key not in config\")"
@@ -347,7 +365,8 @@ fn test_fails_with_no_aux_or_config() {
     assert_eq!(
         DeviceKeyProxy::evaluate(
             request_from_device_key_no_aux.clone(),
-            Some(config_bytes.clone())
+            Some(config_bytes.clone()),
+            None
         )
         .unwrap_err()
         .to_string(),
@@ -378,7 +397,7 @@ fn test_fails_with_no_aux_or_config() {
         ),
     };
     assert_eq!(
-        DeviceKeyProxy::evaluate(request_from_device_key.clone(), None)
+        DeviceKeyProxy::evaluate(request_from_device_key.clone(), None, None)
             .unwrap_err()
             .to_string(),
         "Error::Evaluation(\"No config provided.\")"
@@ -391,7 +410,7 @@ fn test_fails_with_no_aux_or_config() {
             .into_bytes(),
     );
     assert_eq!(
-        DeviceKeyProxy::evaluate(request_from_device_key, Some(config_bytes.clone()))
+        DeviceKeyProxy::evaluate(request_from_device_key, Some(config_bytes.clone()), None)
             .unwrap_err()
             .to_string(),
         "Error::InvalidSignatureRequest(\"Invalid public key type\")"

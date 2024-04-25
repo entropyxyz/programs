@@ -41,9 +41,7 @@ pub struct Config {
 
 impl Default for Config {
     fn default() -> Self {
-        Self {
-            fuel: 10_000,
-        }
+        Self { fuel: 10_000 }
     }
 }
 
@@ -86,7 +84,8 @@ impl Runtime {
         &mut self,
         program: &[u8],
         signature_request: &SignatureRequest,
-        config: Option<&[u8]>
+        config: Option<&[u8]>,
+        oracle_data: Option<&[u8]>,
     ) -> Result<(), RuntimeError> {
         if program.len() == 0 {
             return Err(RuntimeError::EmptyBytecode);
@@ -98,13 +97,17 @@ impl Runtime {
             .map_err(|_| RuntimeError::InvalidBytecode)?;
 
         bindings
-            .call_evaluate(&mut self.store, signature_request, config)
+            .call_evaluate(&mut self.store, signature_request, config, oracle_data)
             .map_err(|_| RuntimeError::OutOfFuel)?
             .map_err(RuntimeError::Runtime)
     }
 
     /// Compute the `custom-hash` of a `message` from the program.
-    pub fn custom_hash(&mut self, program: &[u8], message: &[u8]) -> Result<[u8; 32], RuntimeError> {
+    pub fn custom_hash(
+        &mut self,
+        program: &[u8],
+        message: &[u8],
+    ) -> Result<[u8; 32], RuntimeError> {
         if program.len() == 0 {
             return Err(RuntimeError::EmptyBytecode);
         }
@@ -118,7 +121,12 @@ impl Runtime {
             .call_custom_hash(&mut self.store, message)
             .unwrap().ok_or(RuntimeError::Runtime(ProgramError::InvalidSignatureRequest("`custom-hash` returns `None`. Implement the hash function in your program, or select a predefined `hash` in your signature request.".to_string())))?;
         if hash_as_vec.len() != 32 {
-            return Err(RuntimeError::Runtime(ProgramError::InvalidSignatureRequest(format!("`custom-hash` must returns a Vec<u8> of length 32, not {}.", hash_as_vec.len()))));
+            return Err(RuntimeError::Runtime(
+                ProgramError::InvalidSignatureRequest(format!(
+                    "`custom-hash` must returns a Vec<u8> of length 32, not {}.",
+                    hash_as_vec.len()
+                )),
+            ));
         }
 
         let mut hash = [0u8; 32];

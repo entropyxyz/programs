@@ -21,7 +21,7 @@ fn test_barebones_component() {
         auxilary_data: None,
     };
 
-    let res = runtime.evaluate(BAREBONES_COMPONENT_WASM, &signature_request, None);
+    let res = runtime.evaluate(BAREBONES_COMPONENT_WASM, &signature_request, None, None);
     assert!(res.is_ok());
 }
 
@@ -36,7 +36,7 @@ fn test_barebones_component_fails_with_data_length_less_than_10() {
         auxilary_data: None,
     };
 
-    let res = runtime.evaluate(BAREBONES_COMPONENT_WASM, &signature_request, None);
+    let res = runtime.evaluate(BAREBONES_COMPONENT_WASM, &signature_request, None, None);
     assert!(res.is_err());
 }
 
@@ -49,7 +49,7 @@ fn test_empty_bytecode_fails() {
         auxilary_data: None,
     };
 
-    let res = runtime.evaluate(&[], &signature_request, None);
+    let res = runtime.evaluate(&[], &signature_request, None, None);
     assert_eq!(res.unwrap_err().to_string(), "Bytecode length is zero");
 }
 
@@ -62,7 +62,7 @@ fn test_infinite_loop() {
         auxilary_data: None,
     };
 
-    let res = runtime.evaluate(INFINITE_LOOP_WASM, &signature_request, None);
+    let res = runtime.evaluate(INFINITE_LOOP_WASM, &signature_request, None, None);
     assert_eq!(res.unwrap_err().to_string(), "Out of fuel");
 }
 
