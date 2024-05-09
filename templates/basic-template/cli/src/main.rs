@@ -93,6 +93,8 @@ pub async fn store_program(
         program,
         configuration_interface,
         auxiliary_data_interface,
+        // used for oracle data currently set to nothing
+        vec![]
     );
     let deployer = PairSigner::<EntropyConfig, sr25519::Pair>::new(deployer_pair.clone());
 
