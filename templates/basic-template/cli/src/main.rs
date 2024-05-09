@@ -58,7 +58,7 @@ async fn run_command() -> anyhow::Result<String> {
             let keypair = <sr25519::Pair as Pair>::from_string(&mnemonic, None).unwrap();
             println!("Uploading program using account: {}", keypair.public());
 
-            let program = fs::read(format!("{}/target/wasm32-unknown-unknown/release/{{project-name}.wasm", get_project_root()?.to_string_lossy()))?.to_vec();
+            let program = fs::read(format!("{}/target/wasm32-unknown-unknown/release/{{project-name}}.wasm", get_project_root()?.to_string_lossy()))?.to_vec();
             generate_types();
             let config_interface = fs::read("{{project-name}}_serialized_config_type.txt")?;
             let aux_data_interface = fs::read("{{project-name}}_serialized_aux_data_type.txt")?;
