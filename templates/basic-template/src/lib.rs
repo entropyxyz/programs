@@ -33,6 +33,7 @@ impl Program for {{project-name | upper_camel_case}} {
     fn evaluate(
         signature_request: SignatureRequest,
         _config: Option<Vec<u8>>,
+        _oracle_data: Option<Vec<u8>>,
     ) -> Result<(), Error> {
         if signature_request.message.is_empty() {
             return Err(Error::Evaluation(
