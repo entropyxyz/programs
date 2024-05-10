@@ -3,14 +3,15 @@ name = "example-custom-hash"
 version = "0.1.0"
 edition = "2021"
 
-# This is required to compile programs to a wasm module
+# This is required to compile programs to a wasm module and for use in rust libs
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 blake3 = "1.5.0"
 entropy-programs-core = { workspace = true }
-
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
+schemars = {version = "0.8.16", optional = true}
 # These are used by `cargo component`
 [package.metadata.component]
 package = "entropy:example-custom-hash"
@@ -19,3 +20,6 @@ package = "entropy:example-custom-hash"
 path = "../../wit"
 
 [package.metadata.component.dependencies]
+
+[features]
+std = ["schemars"]

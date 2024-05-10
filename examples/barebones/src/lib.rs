@@ -1,12 +1,22 @@
 //! This example shows how to write a contrieved and basic program: checking the length of the data to be signed.
 
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 extern crate alloc;
 
 use alloc::{string::ToString, vec::Vec};
-
 use entropy_programs_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
+use serde::{Deserialize, Serialize};
+
+/// JSON-deserializable struct that will be used to derive the program-JSON interface.
+#[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
+pub struct UserConfig {}
+
+/// JSON representation of the auxiliary data
+#[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
+pub struct AuxData {}
 
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
