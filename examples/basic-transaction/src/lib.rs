@@ -1,4 +1,4 @@
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 extern crate alloc;
 
@@ -18,10 +18,17 @@ use serde_json;
 
 pub struct BasicTransaction;
 
+/// JSON-deserializable struct that will be used to derive the program-JSON interface.
+#[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
-pub struct BasicTransactionConfig {
+pub struct UserConfig {
     pub allowlisted_addresses: Vec<String>,
 }
+
+/// JSON representation of the auxiliary data
+#[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
+pub struct AuxData {}
 
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
@@ -41,7 +48,7 @@ impl Program for BasicTransaction {
         )?;
 
         // construct a allowlist ACL from the config
-        let typed_config = serde_json::from_slice::<BasicTransactionConfig>(
+        let typed_config = serde_json::from_slice::<UserConfig>(
             config
                 .ok_or(CoreError::Evaluation("No config provided.".to_string()))?
                 .as_slice(),
