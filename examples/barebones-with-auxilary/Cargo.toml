@@ -7,12 +7,14 @@ license = "Unlicense"
 repository = "https://github.com/entropyxyz/programs"
 edition = "2021"
 
-# This is required to compile programs to a wasm module
+# This is required to compile programs to a wasm module and for use in rust libs
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 entropy-programs-core = { workspace = true }
+schemars = {version = "0.8.16", optional = true}
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
 
 # These are used by `cargo component`
 [package.metadata.component]
@@ -22,3 +24,6 @@ package = "entropy:example-barebones-with-auxilary"
 path = "../../wit"
 
 [package.metadata.component.dependencies]
+
+[features]
+std = ["schemars"]

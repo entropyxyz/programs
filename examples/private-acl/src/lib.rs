@@ -13,6 +13,17 @@ use entropy_programs::{
     core::{bindgen::*, export_program, prelude::*, TryParse},
     programs::acl::*,
 };
+use serde::{Deserialize, Serialize};
+
+/// JSON-deserializable struct that will be used to derive the program-JSON interface.
+#[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
+pub struct UserConfig {}
+
+/// JSON representation of the auxiliary data
+#[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
+pub struct AuxData {}
 
 pub struct PrivateTransactionAcl;
 

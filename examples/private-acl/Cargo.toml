@@ -3,13 +3,15 @@ name = "example-private-acl"
 version = "0.1.0"
 edition = "2021"
 
-# This is required to compile programs to a wasm module
+# This is required to compile programs to a wasm module and for use in rust libs
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 blake2 = "0.10.6"
 entropy-programs = { workspace = true }
+schemars = {version = "0.8.16", optional = true}
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
 
 [build-dependencies]
 hex = "0.4.3"
@@ -23,3 +25,6 @@ package = "entropy:example-private-acl"
 path = "../../wit"
 
 [package.metadata.component.dependencies]
+
+[features]
+std = ["schemars"]

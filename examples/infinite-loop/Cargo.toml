@@ -9,12 +9,14 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-# This is required to compile constraints to a wasm module
+# This is required to compile programs to a wasm module and for use in rust libs
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 entropy-programs-core = { workspace = true }
+schemars = {version = "0.8.16", optional = true}
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
 
 # These are used by `cargo component`
 [package.metadata.component]
@@ -24,3 +26,6 @@ package = "entropy:infinite-loop"
 path = "../../wit"
 
 [package.metadata.component.dependencies]
+
+[features]
+std = ["schemars"]

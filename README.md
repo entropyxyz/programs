@@ -2,35 +2,57 @@
 
 Entropy allows the creation of decentralized signing authorities. Signing authorities exist as WebAssembly programs that can ingest a signature request, and a valid request is signed via a threshold signature scheme from a set of at-stake validators. These requests might include cryptocurrency-based transaction requests, certificate signing requests, or other mediums for cryptographic authentication.
 
-This repository contains libraries, toolchains, utilities, and specifications for writing, configuring, building, and testing the Wasm-based applications for Entropy. In theory, programs can be written in any language that compiles to WebAssembly, which includes all LLVM-supported languages like Rust, AssemblyScript, Zig, C, etc. Thanks to the WebAssembly [Component Model](https://component-model.bytecodealliance.org), programs can even be reused languages, with the rich typing provided by the component model interfaces.
+This repository contains libraries, toolchains, utilities, and specifications for writing, configuring, building, and testing the Wasm-based applications for Entropy. Programs can be written in any language that compiles to WebAssembly, which includes all LLVM-supported languages like Rust, AssemblyScript, Zig, and C. All the examples in this repository are written in Rust.
 
-## Example Programs
+## Prerequisites
 
-### Build Requirements
+To edit and compile the programs in the repository, you will need the following tools:
 
-Besides the latest stable Rust toolchain, you will also need to install:
+1. The lastest stable Rust toolchain. This can be installed with:
 
-- [cargo component v0.2.0](https://github.com/bytecodealliance/cargo-component#installation), a Cargo extension for building Wasm components.
-- [wasm-tools](https://github.com/bytecodealliance/wasm-tools#installation), to be used by `cargo-component`.
+  ```shell
+  curl https://sh.rustup.rs -sSf | sh
+  ```
 
-These can be installed as follows:
+1. The [cargo-component v0.2.0](https://github.com/bytecodealliance/cargo-component#installation) extension; used for building Wasm components:
 
-```bash
-cargo install cargo-component --version 0.2.0 &&
-cargo install wasm-tools
-```
+  ```shell
+  cargo install cargo-component --locked
+  ```
 
-Alternatively you can build them using the included Dockerfile:
-```bash
-docker build --build-arg PACKAGE=<example name> --output=example-binary .
-```
-This will build the specified example and put compiled `.wasm` in the director `./example-binary`.
+1. The [cargo-generate](https://github.com/cargo-generate/cargo-generate) extension; used to generate project templates:
 
-### A Barebones Program: [`template-barebones`](./examples/barebones/src/lib.rs)
+  ```shell
+  cargo install cargo-generate
+  ```
 
-An example of a barebones program is at [`examples/barebones/src/lib.rs`](./examples/barebones/src/lib.rs). This example does a simple check on the length of the message to be signed.
+1. The [wasm-tools](https://github.com/bytecodealliance/wasm-tools#installation) package. This is used by `cargo-component`:
 
-You can compile the program by running:
+  ```shell
+  cargo install wasm-tools
+  ```
+
+1. Verify that you have everything installed by running:
+
+  ```shell
+  rustc --version && cargo-component --version && cargo-generate --version && wasm-tools --version
+  ```
+
+  This should output something like:
+
+  ```plaintext
+  rustc 1.78.0 (9b00956e5 2024-04-29)
+  cargo-component 0.11.0 (wasi:040ec92)
+  cargo generate 0.21.0
+  wasm-tools 1.207.0
+  ```
+
+1. [Optional] Install [Docker](https://docs.docker.com/get-docker/) to run the associated Dockerfiles found within the repository.
+  
+
+### Basic length-check program 
+
+An example of a barebones program can be found at [`examples/barebones/src/lib.rs`](./examples/barebones/src/lib.rs). This example does a simple check on the length of the message to be signed. You can compile the program by running:
 
 ```bash
 cargo component build --release -p template-barebones --target wasm32-unknown-unknown
@@ -38,9 +60,9 @@ cargo component build --release -p template-barebones --target wasm32-unknown-un
 
 This builds the program as a Wasm component at `target/wasm32-unknown-unknown/release/template_barebones.wasm`.
 
-### Example Custody Program with Config: [`example-basic-transaction`](./examples/basic-transaction/src/lib.rs)
+### Custody program with configuration
 
-This example validates that an an EVM transaction request recipient exists on a list of allowlisted addresses. It also uses a configuration, which allows the user to modify the allowlisted addresses without having to recompile the program (i.e. update the allowlist from the browser).
+This example validates that an an EVM transaction request recipient exists on a list of allow-listed addresses. It also uses a configuration which allows the user to modify the allow-listed addresses without having to recompile the program.
 
 You can compile the program by running:
 
@@ -50,23 +72,19 @@ cargo component build --release -p example-basic-transaction --target wasm32-unk
 
 ## Writing your own programs
 
-You can get started with a template program using cargo-generate.
-
-Install cargo-generate:
+You can get started with a template program using `cargo-generate`:
 
 ```bash
-cargo install cargo-generate
+cargo generate entropyxyz/programs --name my-program --tag testnet
 ```
 
-```bash
-cargo generate entropyxyz/programs --name my-program
-```
+Make sure to attach the `--tag testnet` argument. This tells Cargo to use the `testnet` tag in the `github.com/entropyxyz/core` repository.
 
-You template program is now in the `./my-program` directory and ready to be edited. You can run tests as you would a normal rust project with `cargo test`.
+Your template program is now in the `./my-program` directory and ready to be edited. You can run tests as you would a normal rust project with `cargo test`.
 
 You can compile your program with `cargo component`:
 
-You can generate your types by `cargo run generate-types` (if you change the type names of UserConfig or AuxData, you need to change it in generate types too)
+You can generate your types by `cargo run generate-types`. If you change the type names of `UserConfig` or `AuxData`, you will need to change those names in `generate-types`.
 
 ```bash
 cargo component build --release --target wasm32-unknown-unknown
