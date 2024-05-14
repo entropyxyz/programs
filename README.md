@@ -10,42 +10,42 @@ To edit and compile the programs in the repository, you will need the following 
 
 1. The lastest stable Rust toolchain. This can be installed with:
 
-  ```shell
-  curl https://sh.rustup.rs -sSf | sh
-  ```
+    ```shell
+    curl https://sh.rustup.rs -sSf | sh
+    ```
 
 1. The [cargo-component v0.2.0](https://github.com/bytecodealliance/cargo-component#installation) extension; used for building Wasm components:
 
-  ```shell
-  cargo install cargo-component --locked
-  ```
+    ```shell
+    cargo install cargo-component --locked
+    ```
 
 1. The [cargo-generate](https://github.com/cargo-generate/cargo-generate) extension; used to generate project templates:
 
-  ```shell
-  cargo install cargo-generate
-  ```
+    ```shell
+    cargo install cargo-generate
+    ```
 
 1. The [wasm-tools](https://github.com/bytecodealliance/wasm-tools#installation) package. This is used by `cargo-component`:
 
-  ```shell
-  cargo install wasm-tools
-  ```
+    ```shell
+    cargo install wasm-tools
+    ```
 
 1. Verify that you have everything installed by running:
 
-  ```shell
-  rustc --version && cargo-component --version && cargo-generate --version && wasm-tools --version
-  ```
+    ```shell
+    rustc --version && cargo-component --version && cargo-generate --version && wasm-tools --version
+    ```
 
-  This should output something like:
+    This should output something like:
 
-  ```plaintext
-  rustc 1.78.0 (9b00956e5 2024-04-29)
-  cargo-component 0.11.0 (wasi:040ec92)
-  cargo generate 0.21.0
-  wasm-tools 1.207.0
-  ```
+    ```plaintext
+    rustc 1.78.0 (9b00956e5 2024-04-29)
+    cargo-component 0.11.0 (wasi:040ec92)
+    cargo generate 0.21.0
+    wasm-tools 1.207.0
+    ```
 
 1. [Optional] Install [Docker](https://docs.docker.com/get-docker/) to run the associated Dockerfiles found within the repository.
   
