@@ -1,6 +1,6 @@
 # To build this program, and put the .wasm binary in the directory 'output':
 # docker build --output=binary-dir .
-FROM peg997/build-entropy-programs:version0.1 AS base
+FROM entropyxyz/build-entropy-programs:v0.0.1 AS base
 
 WORKDIR /usr/src/programs
 COPY . .
