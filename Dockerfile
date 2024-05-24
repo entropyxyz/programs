@@ -1,5 +1,5 @@
 # This is for building the example programs in this repo.
-FROM peg997/build-entropy-programs:version0.1 AS base
+FROM entropyxyz/build-entropy-programs:v0.0.1 AS base
 ARG PACKAGE=template-barebones
 
 WORKDIR /usr/src/programs
