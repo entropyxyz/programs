@@ -14,7 +14,6 @@ use blake3;
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
 
-
 /// JSON-deserializable struct that will be used to derive the program-JSON interface.
 #[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]

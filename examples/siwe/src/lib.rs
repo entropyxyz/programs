@@ -13,8 +13,8 @@ use alloc::{
 };
 
 use entropy_programs_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
-use siwe::Message;
 use serde::{Deserialize, Serialize};
+use siwe::Message;
 
 /// JSON-deserializable struct that will be used to derive the program-JSON interface.
 #[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
