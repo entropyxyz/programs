@@ -17,7 +17,7 @@ To edit and compile the programs in the repository, you will need the following 
 1. The [cargo-component v0.2.0](https://github.com/bytecodealliance/cargo-component#installation) extension; used for building Wasm components:
 
     ```shell
-    cargo install cargo-component --locked
+    cargo install cargo-component --version 0.2.0
     ```
 
 1. The [cargo-generate](https://github.com/cargo-generate/cargo-generate) extension; used to generate project templates:
@@ -41,10 +41,10 @@ To edit and compile the programs in the repository, you will need the following 
     This should output something like:
 
     ```plaintext
-    rustc 1.78.0 (9b00956e5 2024-04-29)
-    cargo-component 0.11.0 (wasi:040ec92)
-    cargo generate 0.21.0
-    wasm-tools 1.207.0
+    rustc 1.79.0 (129f3b996 2024-06-10)
+    cargo-component 0.2.0 (wasi:aec4b25)
+    cargo generate 0.21.1
+    wasm-tools 1.211.1
     ```
 
 1. [Optional] Install [Docker](https://docs.docker.com/get-docker/) to run the associated Dockerfiles found within the repository.
