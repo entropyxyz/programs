@@ -2,7 +2,7 @@
 
 extern crate alloc;
 
-use alloc::{string::String, vec::Vec};
+use alloc::{format, string::String, vec::Vec};
 use entropy_programs::core::{bindgen::*, export_program, prelude::*};
 use entropy_programs_substrate::{
     check_message_against_transaction, HasFieldsAux, HasFieldsConfig,
@@ -17,7 +17,6 @@ register_custom_getrandom!(always_fail);
 #[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct UserConfig {
-    max_transfer_amount: u128,
     genesis_hash: String,
 }
 
@@ -67,10 +66,15 @@ impl Program for SubstrateProgram {
         config: Option<Vec<u8>>,
         _oracle_data: Option<Vec<u8>>,
     ) -> Result<(), Error> {
-        let (_aux_data, _user_config, _api) =
-            check_message_against_transaction::<AuxData, UserConfig>(signature_request, config)
-                .unwrap();
+        let (_aux_data, _user_config, _api) = check_message_against_transaction::<
+            AuxData,
+            UserConfig,
+        >(signature_request, config)
+        .map_err(|e| {
+            Error::InvalidSignatureRequest(format!("Error comparing tx request and message: {}", e))
+        })?;
 
+        // can now use aux data and user configto apply constraints
         Ok(())
     }
 
