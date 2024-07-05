@@ -2,20 +2,13 @@
 
 extern crate alloc;
 
-use alloc::{
-    format,
-    string::{String, ToString},
-    vec::Vec,
-};
-use entropy_programs::core::{
-    bindgen::*, export_program, prelude::*, SatisfiableForArchitecture, TryParse,
-};
+use alloc::{string::String, vec::Vec};
+use entropy_programs::core::{bindgen::*, export_program, prelude::*};
 use entropy_programs_substrate::{
     check_message_against_transaction, HasFieldsAux, HasFieldsConfig,
 };
 
 use serde::{Deserialize, Serialize};
-use serde_json;
 
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
@@ -74,8 +67,9 @@ impl Program for SubstrateProgram {
         config: Option<Vec<u8>>,
         _oracle_data: Option<Vec<u8>>,
     ) -> Result<(), Error> {
-        check_message_against_transaction::<AuxData, UserConfig>(signature_request, config)
-            .unwrap();
+        let (_aux_data, _user_config, _api) =
+            check_message_against_transaction::<AuxData, UserConfig>(signature_request, config)
+                .unwrap();
 
         Ok(())
     }
