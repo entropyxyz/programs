@@ -8,6 +8,10 @@ pub use subxt::{
     utils::{AccountId32, H256},
     Metadata, OfflineClient, PolkadotConfig,
 };
+#[cfg(test)]
+mod tests;
+#[cfg(test)]
+use serde::Serialize;
 
 include!(concat!(env!("OUT_DIR"), "/metadata.rs"));
 
@@ -23,8 +27,9 @@ pub trait HasFieldsAux {
     fn amount(&self) -> &u128;
 }
 
+#[cfg_attr(test, derive(Serialize, Debug, PartialEq))]
 #[derive(Deserialize)]
-struct AuxDataStruct {
+pub struct AuxDataStruct {
     spec_version: u32,
     transaction_version: u32,
     string_account_id: String,
@@ -58,8 +63,9 @@ pub trait HasFieldsConfig {
     fn genesis_hash(&self) -> &String;
 }
 
+#[cfg_attr(test, derive(Serialize, Debug, PartialEq))]
 #[derive(Deserialize)]
-struct UserConfigStruct {
+pub struct UserConfigStruct {
     genesis_hash: String,
 }
 
@@ -105,6 +111,7 @@ where
         *aux_data_json.spec_version(),
         *aux_data_json.transaction_version(),
     )?;
+
     // TODO: generalize this
     let account_id = AccountId32::from_str(aux_data_json.string_account_id())
         .map_err(|e| Error::InvalidSignatureRequest(format!("account id issue: {}", e)))?;
