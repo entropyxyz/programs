@@ -1,0 +1,24 @@
+[package]
+name = "entropy-programs-substrate"
+version = "0.1.0"
+authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
+homepage = "https://entropy.xyz/"
+license = "AGPL-3.0-or-later"
+repository = "https://github.com/entropyxyz/programs"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+entropy-programs-core = { path = "../core" }
+subxt = { version = "0.35.3", default-features=false, features=["native"], target_arch = "wasm32" }
+codec = { package = "parity-scale-codec", version = "3.6.9", default-features = false }
+hex             ={ version="0.4.3" }
+serde_json = "1.0.48"
+serde              ={ version="1.0", default-features=false, features=["derive"] }
+
+
+
+[features]
+default = []
+std = []
