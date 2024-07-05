@@ -1,27 +1,41 @@
 use codec::Decode;
+use core::str::FromStr;
 use entropy_programs_core::{bindgen::SignatureRequest, Error};
 use serde::{de::DeserializeOwned, Deserialize};
-pub use subxt::{utils::H256, Metadata, OfflineClient, PolkadotConfig};
+pub use subxt::{
+    dynamic::tx,
+    ext::scale_value::Value,
+    utils::{AccountId32, H256},
+    Metadata, OfflineClient, PolkadotConfig,
+};
 
 include!(concat!(env!("OUT_DIR"), "/metadata.rs"));
 
 pub trait HasFieldsAux {
     type SpecVersionType;
     type TransactionVersionType;
+    type StringAccountIdType;
+    type AmountType;
 
     fn spec_version(&self) -> &u32;
     fn transaction_version(&self) -> &u32;
+    fn string_account_id(&self) -> &String;
+    fn amount(&self) -> &u128;
 }
 
 #[derive(Deserialize)]
 struct AuxDataStruct {
     spec_version: u32,
     transaction_version: u32,
+    string_account_id: String,
+    amount: u128,
 }
 
 impl HasFieldsAux for AuxDataStruct {
     type SpecVersionType = u32;
     type TransactionVersionType = u32;
+    type StringAccountIdType = String;
+    type AmountType = u128;
 
     fn spec_version(&self) -> &u32 {
         &self.spec_version
@@ -29,6 +43,12 @@ impl HasFieldsAux for AuxDataStruct {
 
     fn transaction_version(&self) -> &u32 {
         &self.transaction_version
+    }
+    fn string_account_id(&self) -> &String {
+        &self.string_account_id
+    }
+    fn amount(&self) -> &u128 {
+        &self.amount
     }
 }
 
@@ -51,10 +71,10 @@ impl HasFieldsConfig for UserConfigStruct {
     }
 }
 
-pub fn check_message_against_transaction<AuxData, ConfigData, UserConfig>(
+pub fn check_message_against_transaction<AuxData, UserConfig>(
     signature_request: SignatureRequest,
     config: Option<Vec<u8>>,
-) -> Result<(), Error>
+) -> Result<(AuxData, UserConfig, OfflineClient<PolkadotConfig>), Error>
 where
     AuxData: DeserializeOwned + HasFieldsAux,
     UserConfig: DeserializeOwned + HasFieldsConfig,
@@ -85,8 +105,33 @@ where
         *aux_data_json.spec_version(),
         *aux_data_json.transaction_version(),
     )?;
+    // TODO: generalize this
+    let account_id = AccountId32::from_str(aux_data_json.string_account_id())
+        .map_err(|e| Error::InvalidSignatureRequest(format!("account id issue: {}", e)))?;
 
-    Ok(())
+    let balance_transfer_tx = tx(
+        "Balances",
+        "transfer_allow_death",
+        vec![
+            Value::unnamed_variant("Id", vec![Value::from_bytes(account_id)]),
+            Value::u128(*aux_data_json.amount()),
+        ],
+    );
+
+    let call_data = api.tx().call_data(&balance_transfer_tx).unwrap();
+
+    let hex_message = hex::encode(message);
+    let hex_call_data = hex::encode(call_data);
+    let hex_genesis_hash = hex::encode(typed_config.genesis_hash());
+
+    if !&hex_message.contains(&hex_call_data) && !&hex_message.contains(&hex_genesis_hash) {
+        return Err(Error::Evaluation(format!(
+            "Signatures don't match, message: {:?}, calldata: {:?}, genesis_hash: {:?}",
+            hex_message, hex_call_data, hex_genesis_hash,
+        )));
+    }
+
+    Ok((aux_data_json, typed_config, api))
 }
 
 /// Creates an offline api instance
