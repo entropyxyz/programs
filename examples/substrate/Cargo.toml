@@ -19,6 +19,9 @@ serde = { version = "1.0", default-features = false, features = ["alloc", "deriv
 serde_json = { version = "1.0", default-features = false, features = ["alloc"]}
 schemars = {version = "0.8.16", optional = true}
 entropy-programs-substrate = { path = "../../substrate", default-features = false }
+
+[dev-dependencies]
+subxt = { version = "0.35.3", default-features=false, features=["native"], target_arch = "wasm32" }
 # These are used by `cargo component`
 [package.metadata.component]
 package = "entropy:template-basic-transaction"

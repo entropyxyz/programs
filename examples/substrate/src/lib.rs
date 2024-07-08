@@ -8,6 +8,9 @@ use entropy_programs_substrate::{
     check_message_against_transaction, HasFieldsAux, HasFieldsConfig,
 };
 
+#[cfg(test)]
+mod tests;
+
 use serde::{Deserialize, Serialize};
 
 // TODO confirm this isn't an issue for audit
