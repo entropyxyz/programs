@@ -3,10 +3,9 @@ use alloc::{
     string::{String, ToString},
     vec,
 };
-use core::str::FromStr;
 use entropy_programs_substrate::{get_offline_api, handle_encoding};
 use subxt::config::PolkadotExtrinsicParamsBuilder as Params;
-use subxt::{dynamic::tx, ext::scale_value::Value, utils::AccountId32};
+use subxt::dynamic::tx;
 
 const CONFIG: &[u8] = r#"
         {
@@ -100,7 +99,6 @@ pub fn create_aux_data() -> (AuxData, String) {
     let string_account_id = "5FA9nQDVg267DEd8m1ZypXLBnvN7SFxYwV7ndqSYGiN9TTpu";
     let amount = 100u128;
     let binding = amount.to_string();
-    let account_id = AccountId32::from_str(&string_account_id).unwrap();
     let values: Vec<(&str, &str)> = vec![("account", string_account_id), ("amount", &binding)];
 
     let aux_data = AuxData {

@@ -1,7 +1,7 @@
-use codec::{Decode, Encode};
+use codec::{Decode};
 use core::str::FromStr;
 use entropy_programs_core::{bindgen::SignatureRequest, Error};
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize};
 pub use subxt::{
     dynamic::tx,
     ext::scale_value::{self, Composite, Value},
@@ -10,6 +10,8 @@ pub use subxt::{
 };
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+use serde::Serialize;
 
 include!(concat!(env!("OUT_DIR"), "/metadata.rs"));
 
