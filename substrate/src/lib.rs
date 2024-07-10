@@ -1,30 +1,24 @@
-use codec::Decode;
+use codec::{Decode, Encode};
 use core::str::FromStr;
 use entropy_programs_core::{bindgen::SignatureRequest, Error};
-use serde::{de::DeserializeOwned, Deserialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 pub use subxt::{
     dynamic::tx,
-    ext::scale_value::Value,
+    ext::scale_value::{self, Composite, Value},
     utils::{AccountId32, H256},
     Metadata, OfflineClient, PolkadotConfig,
 };
 #[cfg(test)]
 mod tests;
-#[cfg(test)]
-use serde::Serialize;
 
 include!(concat!(env!("OUT_DIR"), "/metadata.rs"));
 
 pub trait HasFieldsAux {
-    type SpecVersionType;
-    type TransactionVersionType;
-    type StringAccountIdType;
-    type AmountType;
-
     fn spec_version(&self) -> &u32;
     fn transaction_version(&self) -> &u32;
-    fn string_account_id(&self) -> &String;
-    fn amount(&self) -> &u128;
+    fn pallet(&self) -> &String;
+    fn function(&self) -> &String;
+    fn values(&self) -> &String;
 }
 
 #[cfg_attr(test, derive(Serialize, Debug, PartialEq))]
@@ -32,16 +26,12 @@ pub trait HasFieldsAux {
 pub struct AuxDataStruct {
     spec_version: u32,
     transaction_version: u32,
-    string_account_id: String,
-    amount: u128,
+    pallet: String,
+    function: String,
+    values: String,
 }
 
 impl HasFieldsAux for AuxDataStruct {
-    type SpecVersionType = u32;
-    type TransactionVersionType = u32;
-    type StringAccountIdType = String;
-    type AmountType = u128;
-
     fn spec_version(&self) -> &u32 {
         &self.spec_version
     }
@@ -49,17 +39,18 @@ impl HasFieldsAux for AuxDataStruct {
     fn transaction_version(&self) -> &u32 {
         &self.transaction_version
     }
-    fn string_account_id(&self) -> &String {
-        &self.string_account_id
+    fn pallet(&self) -> &String {
+        &self.pallet
     }
-    fn amount(&self) -> &u128 {
-        &self.amount
+    fn function(&self) -> &String {
+        &self.function
+    }
+    fn values(&self) -> &String {
+        &self.values
     }
 }
 
 pub trait HasFieldsConfig {
-    type GenesisHashType;
-
     fn genesis_hash(&self) -> &String;
 }
 
@@ -70,8 +61,6 @@ pub struct UserConfigStruct {
 }
 
 impl HasFieldsConfig for UserConfigStruct {
-    type GenesisHashType = String;
-
     fn genesis_hash(&self) -> &String {
         &self.genesis_hash
     }
@@ -112,20 +101,16 @@ where
         *aux_data_json.transaction_version(),
     )?;
 
-    // TODO: generalize this
-    let account_id = AccountId32::from_str(aux_data_json.string_account_id())
-        .map_err(|e| Error::InvalidSignatureRequest(format!("account id issue: {}", e)))?;
+    let deserialized: Vec<(&str, &str)> = serde_json::from_str(&aux_data_json.values())
+        .map_err(|e| Error::Evaluation(format!("Failed to parse values: {}", e)))?;
+    let encoding = handle_encoding(deserialized.clone())?;
 
-    let balance_transfer_tx = tx(
-        "Balances",
-        "transfer_allow_death",
-        vec![
-            Value::unnamed_variant("Id", vec![Value::from_bytes(account_id)]),
-            Value::u128(*aux_data_json.amount()),
-        ],
-    );
+    let balance_transfer_tx = tx(aux_data_json.pallet(), aux_data_json.function(), encoding);
 
-    let call_data = api.tx().call_data(&balance_transfer_tx).unwrap();
+    let call_data = api
+        .tx()
+        .call_data(&balance_transfer_tx)
+        .map_err(|e| Error::Evaluation(format!("Failed to create transaction: {}", e)))?;
 
     let hex_message = hex::encode(message);
     let hex_call_data = hex::encode(call_data);
@@ -171,4 +156,36 @@ pub fn get_offline_api(
         runtime_version,
         metadata,
     ))
+}
+
+pub fn handle_encoding(encodings: Vec<(&str, &str)>) -> Result<Vec<Value>, Error> {
+    let mut values: Vec<Value> = vec![];
+    for encoding in encodings {
+        let value = match encoding.0 {
+            "account" => {
+                let account_id = AccountId32::from_str(&encoding.1).map_err(|e| {
+                    Error::InvalidSignatureRequest(format!("account id issue: {}", e))
+                })?;
+                Ok(Value::unnamed_variant(
+                    "Id",
+                    vec![Value::from_bytes(account_id)],
+                ))
+            }
+            "true" => Ok(Value::bool(true)),
+            "false" => Ok(Value::bool(false)),
+            "string" => Ok(Value::string(encoding.1.to_string())),
+            "amount" => {
+                let number: u128 = encoding.1.parse().map_err(|e| {
+                    Error::InvalidSignatureRequest(format!("parse number issue: {}", e))
+                })?;
+                Ok(Value::u128(number))
+            }
+            // TODO proper Error
+            _ => Err(Error::InvalidSignatureRequest(
+                "Incorrect value heading".to_string(),
+            )),
+        }?;
+        values.push(value);
+    }
+    Ok(values)
 }

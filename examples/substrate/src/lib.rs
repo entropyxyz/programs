@@ -24,8 +24,6 @@ pub struct UserConfig {
 }
 
 impl HasFieldsConfig for UserConfig {
-    type GenesisHashType = String;
-
     fn genesis_hash(&self) -> &String {
         &self.genesis_hash
     }
@@ -36,16 +34,12 @@ impl HasFieldsConfig for UserConfig {
 pub struct AuxData {
     pub spec_version: u32,
     pub transaction_version: u32,
-    pub string_account_id: String,
-    pub amount: u128,
+    pub values: String,
+    pub pallet: String,
+    pub function: String,
 }
 
 impl HasFieldsAux for AuxData {
-    type SpecVersionType = u32;
-    type TransactionVersionType = u32;
-    type StringAccountIdType = String;
-    type AmountType = u128;
-
     fn spec_version(&self) -> &u32 {
         &self.spec_version
     }
@@ -53,11 +47,14 @@ impl HasFieldsAux for AuxData {
     fn transaction_version(&self) -> &u32 {
         &self.transaction_version
     }
-    fn string_account_id(&self) -> &String {
-        &self.string_account_id
+    fn values(&self) -> &String {
+        &self.values
     }
-    fn amount(&self) -> &u128 {
-        &self.amount
+    fn pallet(&self) -> &String {
+        &self.pallet
+    }
+    fn function(&self) -> &String {
+        &self.function
     }
 }
 
