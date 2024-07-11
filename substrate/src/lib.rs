@@ -1,4 +1,4 @@
-use codec::{Decode};
+use codec::Decode;
 use core::str::FromStr;
 use entropy_programs_core::{bindgen::SignatureRequest, Error};
 use serde::{de::DeserializeOwned, Deserialize};
@@ -16,6 +16,7 @@ use serde::Serialize;
 include!(concat!(env!("OUT_DIR"), "/metadata.rs"));
 
 pub trait HasFieldsAux {
+    fn genesis_hash(&self) -> &String;
     fn spec_version(&self) -> &u32;
     fn transaction_version(&self) -> &u32;
     fn pallet(&self) -> &String;
@@ -27,6 +28,8 @@ pub trait HasFieldsAux {
 #[cfg_attr(test, derive(Serialize, Debug, PartialEq))]
 #[derive(Deserialize)]
 pub struct AuxDataStruct {
+    /// Genesis hash of the chain you are trying to talk to
+    genesis_hash: String,
     /// Spec version of the chain to call
     spec_version: u32,
     /// Transaction version of the chain to call
@@ -55,33 +58,16 @@ impl HasFieldsAux for AuxDataStruct {
     fn values(&self) -> &String {
         &self.values
     }
-}
-
-/// Info needed in UserConfig to use these substrate helpers
-pub trait HasFieldsConfig {
-    fn genesis_hash(&self) -> &String;
-}
-
-#[cfg_attr(test, derive(Serialize, Debug, PartialEq))]
-#[derive(Deserialize)]
-pub struct UserConfigStruct {
-    genesis_hash: String,
-}
-
-impl HasFieldsConfig for UserConfigStruct {
-    // The genesis hash for the chain you are talking to
     fn genesis_hash(&self) -> &String {
         &self.genesis_hash
     }
 }
 /// Checks message request against passed info to make sure they match
-pub fn check_message_against_transaction<AuxData, UserConfig>(
+pub fn check_message_against_transaction<AuxData>(
     signature_request: SignatureRequest,
-    config: Option<Vec<u8>>,
-) -> Result<(AuxData, UserConfig, OfflineClient<PolkadotConfig>), Error>
+) -> Result<(AuxData, OfflineClient<PolkadotConfig>), Error>
 where
     AuxData: DeserializeOwned + HasFieldsAux,
-    UserConfig: DeserializeOwned + HasFieldsConfig,
 {
     let SignatureRequest {
         message,
@@ -97,15 +83,8 @@ where
     )
     .map_err(|e| Error::InvalidSignatureRequest(format!("Failed to parse auxilary_data: {}", e)))?;
 
-    let typed_config = serde_json::from_slice::<UserConfig>(
-        config
-            .ok_or(Error::Evaluation("No config provided.".to_string()))?
-            .as_slice(),
-    )
-    .map_err(|e| Error::Evaluation(format!("Failed to parse config: {}", e)))?;
-
     let api = get_offline_api(
-        typed_config.genesis_hash().clone().to_string(),
+        aux_data_json.genesis_hash().clone().to_string(),
         *aux_data_json.spec_version(),
         *aux_data_json.transaction_version(),
     )?;
@@ -123,7 +102,7 @@ where
 
     let hex_message = hex::encode(message);
     let hex_call_data = hex::encode(call_data);
-    let hex_genesis_hash = hex::encode(typed_config.genesis_hash());
+    let hex_genesis_hash = hex::encode(aux_data_json.genesis_hash());
 
     if !&hex_message.contains(&hex_call_data) && !&hex_message.contains(&hex_genesis_hash) {
         return Err(Error::Evaluation(format!(
@@ -132,7 +111,7 @@ where
         )));
     }
 
-    Ok((aux_data_json, typed_config, api))
+    Ok((aux_data_json, api))
 }
 
 /// Creates an offline api instance

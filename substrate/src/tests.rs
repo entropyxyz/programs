@@ -1,23 +1,15 @@
 use crate::{
-    check_message_against_transaction, get_offline_api, handle_encoding, tx, AccountId32,
-    AuxDataStruct, Composite, SignatureRequest, UserConfigStruct, Value,
+    check_message_against_transaction, get_offline_api, handle_encoding, tx,
+    AuxDataStruct, SignatureRequest,
 };
-use codec::Encode;
-use std::str::FromStr;
 use subxt::config::PolkadotExtrinsicParamsBuilder as Params;
-const CONFIG: &[u8] = r#"
-        {
-            "genesis_hash": "44670a68177821a6166b25f8d86b45e0f1c3b280ff576eea64057e4b0dd9ff4a"
-        }
-    "#
-.as_bytes();
 
 #[test]
 fn test_should_sign() {
-    let (aux_data, genesis_hash) = create_aux_data();
+    let aux_data = create_aux_data();
 
     let api = get_offline_api(
-        genesis_hash.clone(),
+        aux_data.genesis_hash.clone(),
         aux_data.spec_version,
         aux_data.transaction_version,
     )
@@ -40,23 +32,17 @@ fn test_should_sign() {
         message: partial.to_vec(),
         auxilary_data: Some(serde_json::to_string(&aux_data).unwrap().into_bytes()),
     };
-    let config = UserConfigStruct { genesis_hash };
-    let (aux_data_result, config_result, _api_result) =
-        check_message_against_transaction::<AuxDataStruct, UserConfigStruct>(
-            signature_request,
-            Some(CONFIG.to_vec()),
-        )
-        .unwrap();
+    let (aux_data_result, _api_result) =
+        check_message_against_transaction::<AuxDataStruct>(signature_request).unwrap();
     assert_eq!(aux_data_result, aux_data);
-    assert_eq!(config_result, config);
 }
 
 #[test]
 fn test_should_fail() {
-    let (aux_data, genesis_hash) = create_aux_data();
+    let aux_data = create_aux_data();
 
     let api = get_offline_api(
-        genesis_hash.clone(),
+        aux_data.genesis_hash.clone(),
         aux_data.spec_version,
         aux_data.transaction_version,
     )
@@ -88,9 +74,8 @@ fn test_should_fail() {
     };
 
     assert_eq!(
-        check_message_against_transaction::<AuxDataStruct, UserConfigStruct>(
+        check_message_against_transaction::<AuxDataStruct>(
             signature_request,
-            Some(CONFIG.to_vec())
         )
         .unwrap_err()
         .to_string(),
@@ -98,7 +83,7 @@ fn test_should_fail() {
     );
 }
 
-pub fn create_aux_data() -> (AuxDataStruct, String) {
+pub fn create_aux_data() -> AuxDataStruct {
     let genesis_hash =
         "44670a68177821a6166b25f8d86b45e0f1c3b280ff576eea64057e4b0dd9ff4a".to_string();
     let spec_version = 10;
@@ -106,15 +91,15 @@ pub fn create_aux_data() -> (AuxDataStruct, String) {
     let string_account_id = "5FA9nQDVg267DEd8m1ZypXLBnvN7SFxYwV7ndqSYGiN9TTpu";
     let amount = 100u128;
     let binding = amount.to_string();
-    let account_id = AccountId32::from_str(&string_account_id).unwrap();
     let values: Vec<(&str, &str)> = vec![("account", string_account_id), ("amount", &binding)];
 
     let aux_data = AuxDataStruct {
+        genesis_hash,
         spec_version,
         transaction_version,
         pallet: "Balances".to_string(),
         function: "transfer_allow_death".to_string(),
         values: serde_json::to_string(&values).unwrap(),
     };
-    (aux_data, genesis_hash)
+    aux_data
 }
