@@ -23,13 +23,19 @@ pub trait HasFieldsAux {
     fn values(&self) -> &String;
 }
 
+/// Info needed in AuxData to use these substrate helpers
 #[cfg_attr(test, derive(Serialize, Debug, PartialEq))]
 #[derive(Deserialize)]
 pub struct AuxDataStruct {
+    /// Spec version of the chain to call
     spec_version: u32,
+    /// Transaction version of the chain to call
     transaction_version: u32,
+    /// Pallet name to call (ex: Balances)
     pallet: String,
+    /// Function name to call (ex: transfer_allow_death)
     function: String,
+    /// Values string encoded in a tuple Vec<(type_string, value_string)> (ex: vec![("account", "5x5......"), ("amount", "100")];)
     values: String,
 }
 
@@ -37,7 +43,6 @@ impl HasFieldsAux for AuxDataStruct {
     fn spec_version(&self) -> &u32 {
         &self.spec_version
     }
-
     fn transaction_version(&self) -> &u32 {
         &self.transaction_version
     }
@@ -52,6 +57,7 @@ impl HasFieldsAux for AuxDataStruct {
     }
 }
 
+/// Info needed in UserConfig to use these substrate helpers
 pub trait HasFieldsConfig {
     fn genesis_hash(&self) -> &String;
 }
@@ -63,11 +69,12 @@ pub struct UserConfigStruct {
 }
 
 impl HasFieldsConfig for UserConfigStruct {
+    // The genesis hash for the chain you are talking to
     fn genesis_hash(&self) -> &String {
         &self.genesis_hash
     }
 }
-
+/// Checks message request against passed info to make sure they match
 pub fn check_message_against_transaction<AuxData, UserConfig>(
     signature_request: SignatureRequest,
     config: Option<Vec<u8>>,
@@ -160,6 +167,7 @@ pub fn get_offline_api(
     ))
 }
 
+/// Hacky way to handle encoding takes a tuple of (string_type, string) see TODO: Make Issue
 pub fn handle_encoding(encodings: Vec<(&str, &str)>) -> Result<Vec<Value>, Error> {
     let mut values: Vec<Value> = vec![];
     for encoding in encodings {
@@ -182,7 +190,6 @@ pub fn handle_encoding(encodings: Vec<(&str, &str)>) -> Result<Vec<Value>, Error
                 })?;
                 Ok(Value::u128(number))
             }
-            // TODO proper Error
             _ => Err(Error::InvalidSignatureRequest(
                 "Incorrect value heading".to_string(),
             )),
