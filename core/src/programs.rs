@@ -1,5 +1,4 @@
-//! Contains traits that programs should implement, including Architecture-agnostic programs and generic programs.
-//!
+ Contains traits that programs should implement, including Architecture-agnostic programs and generic programs.!
 //! For runtime and binary size optimizations, program construction should be done at compile time by using `const` types, if possible. This can be done by using `const` generic parameters,
 //! or by using a `const` builder. Both methods are described nicely here: https://wapl.es/rust/2022/07/03/const-builder-pattern.html
 
