@@ -29,7 +29,7 @@ impl Program for BarebonesProgram {
     fn evaluate(
         signature_request: SignatureRequest,
         _config: Option<Vec<u8>>,
-        _oracle_data: Option<Vec<u8>>,
+        _oracle_data: Option<Vec<Vec<u8>>>,
     ) -> Result<(), Error> {
         let message: Vec<u8> = signature_request.message;
 

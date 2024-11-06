@@ -30,7 +30,7 @@ impl Program for CustomHashExample {
     fn evaluate(
         signature_request: SignatureRequest,
         _config: Option<Vec<u8>>,
-        _oracle_data: Option<Vec<u8>>,
+        _oracle_data: Option<Vec<Vec<u8>>>,
     ) -> Result<(), Error> {
         if signature_request.message.len() < 1 {
             return Err(Error::Evaluation(

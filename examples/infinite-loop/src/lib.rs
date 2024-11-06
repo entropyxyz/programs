@@ -27,7 +27,7 @@ impl Program for InfiniteLoop {
     fn evaluate(
         _signature_request: SignatureRequest,
         _config: Option<Vec<u8>>,
-        _oracle_data: Option<Vec<u8>>,
+        _oracle_data: Option<Vec<Vec<u8>>>,
     ) -> Result<(), Error> {
         loop {}
         #[allow(unreachable_code)]

@@ -85,7 +85,7 @@ impl Runtime {
         program: &[u8],
         signature_request: &SignatureRequest,
         config: Option<&[u8]>,
-        oracle_data: Option<&[u8]>,
+        oracle_data: Option<&[Vec<u8>]>,
     ) -> Result<(), RuntimeError> {
         if program.len() == 0 {
             return Err(RuntimeError::EmptyBytecode);
