@@ -40,7 +40,7 @@ impl Program for BasicTransaction {
     fn evaluate(
         signature_request: SignatureRequest,
         config: Option<Vec<u8>>,
-        _oracle_data: Option<Vec<u8>>,
+        _oracle_data: Option<Vec<Vec<u8>>>,
     ) -> Result<(), CoreError> {
         // parse the raw tx into some type supported by the Acl check
         let parsed_tx = <Evm as Architecture>::TransactionRequest::try_parse(
