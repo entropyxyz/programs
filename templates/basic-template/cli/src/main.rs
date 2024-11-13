@@ -1,6 +1,7 @@
+use clap::Parser;
 use colored::Colorize;
 use dotenv::dotenv;
-use entropy_test_cli::{run_command, PROGRAM_VERSION_NUMBER};
+use entropy_test_cli::{run_command, Cli, PROGRAM_VERSION_NUMBER};
 use generate_types::generate_types;
 use project_root::get_project_root;
 
