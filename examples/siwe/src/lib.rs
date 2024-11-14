@@ -38,7 +38,7 @@ impl Program for Siwe {
     fn evaluate(
         signature_request: SignatureRequest,
         _config: Option<Vec<u8>>,
-        _oracle_data: Option<Vec<u8>>,
+        _oracle_data: Option<Vec<Vec<u8>>>,
     ) -> Result<(), Error> {
         let string_message = String::from_utf8(signature_request.message)
             .map_err(|err| Error::Evaluation(err.to_string()))?;

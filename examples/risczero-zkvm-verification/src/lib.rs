@@ -17,7 +17,7 @@ register_custom_getrandom!(always_fail);
 pub struct ZkVmVerificationProgram;
 
 impl Program for ZkVmVerificationProgram {
-    fn evaluate(signature_request: SignatureRequest, _config: Option<Vec<u8>>, _oracle_data: Option<Vec<u8>>) -> Result<(), Error> {
+    fn evaluate(signature_request: SignatureRequest, _config: Option<Vec<u8>>, _oracle_data: Option<Vec<Vec<u8>>>) -> Result<(), Error> {
         let image_id: [u32; 8] = bincode::deserialize(&signature_request.message)
             .map_err(|_| Error::InvalidSignatureRequest("Could not parse image_id".to_string()))?;
 

@@ -8,7 +8,7 @@ world program {
     evaluation(string)
   }
   /// Evaluates the program given the user's signature request and the program's configuration.
-  export evaluate: func(signature-request: signature-request, config: option<list<u8>>, oracle-data: option<list<u8>>) -> result<_, error>
+  export evaluate: func(signature-request: signature-request, config: option<list<u8>>, oracle-data: option<list<list<u8>>>) -> result<_, error>
   
   /// Programs that use custom hash functions can a custom 32-byte curve point to be signed.
   export custom-hash: func(data: list<u8>) -> option<list<u8>>
