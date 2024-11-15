@@ -69,7 +69,6 @@ mod tests {
 
     #[test]
     fn test_should_error() {
-        // data being checked is under 10 bytes in length
         let signature_request = SignatureRequest {
             message: "".to_string().into_bytes(),
             auxilary_data: None,
