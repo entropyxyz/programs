@@ -1,0 +1,31 @@
+[package]
+name = "oracle-example"
+version = "0.1.0"
+authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
+homepage = "https://entropy.xyz/"
+license = "Unlicense"
+repository = "https://github.com/entropyxyz/programs"
+edition = "2021"
+
+
+# This is required to compile programs to a wasm module and for use in rust libs
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+entropy-programs-core = { workspace = true }
+schemars = {version = "0.8.16", optional = true}
+serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
+codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
+# These are used by `cargo component`
+[package.metadata.component]
+package = "entropy:oracle-example"
+
+[package.metadata.component.target]
+path = "../../wit"
+
+[package.metadata.component.dependencies]
+
+
+[features]
+std = ["schemars"]
