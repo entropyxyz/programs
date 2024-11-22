@@ -1,6 +1,6 @@
 [package]
 name = "entropy-programs-runtime"
-version = "0.10.0"
+version = "0.11.0"
 authors = ["Entropy Cryptography <engineering@entropy.xyz>"]
 homepage = "https://entropy.xyz/"
 license = "AGPL-3.0-or-later"
@@ -10,7 +10,7 @@ description = "Webassembly runtime for running Entropy programs"
 
 [dependencies]
 wasmtime = { version = "12.0.1", features = ["component-model"] }
-entropy-programs-core = { version = "0.10.0", path = "../core" }
+entropy-programs-core = { version = "0.11.0", path = "../core" }
 thiserror = "1.0.47"
 
 [dev-dependencies]
