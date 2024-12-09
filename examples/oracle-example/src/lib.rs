@@ -4,8 +4,12 @@
 
 extern crate alloc;
 
-use alloc::{string::ToString, vec::Vec};
-use codec::Decode;
+use alloc::{
+    string::{String, ToString},
+    vec,
+    vec::Vec,
+};
+use codec::{Decode, Encode};
 use entropy_programs_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 use serde::{Deserialize, Serialize};
 /// JSON-deserializable struct that will be used to derive the program-JSON interface.
@@ -18,6 +22,7 @@ pub struct UserConfig {}
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct AuxData {}
 
+pub const Oracle_Data: [&str; 1] = ["block_number_entropy"];
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
 
