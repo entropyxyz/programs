@@ -22,6 +22,11 @@ async fn main() -> anyhow::Result<()> {
         get_project_root()?.to_string_lossy()
     );
 
+    let oracle_data = format!(
+        "{}/{{project-name}}_serialized_oracle_data_type.txt",
+        get_project_root()?.to_string_lossy()
+    );
+
     let cli = Cli::parse();
     let json_ouput = cli.json;
     match run_command(
@@ -29,6 +34,7 @@ async fn main() -> anyhow::Result<()> {
         Some(program.into()),
         Some(config_interface.into()),
         Some(aux_data_interface.into()),
+        Some(oracle_data.into()),
         Some(PROGRAM_VERSION_NUMBER),
     )
     .await

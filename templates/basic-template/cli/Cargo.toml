@@ -17,4 +17,4 @@ anyhow = "1.0.82"
 dotenv = "0.15.0"
 generate-types = { path = "../generate-types" }
 project-root = "0.2.2"
-entropy-test-cli = { git = "https://github.com/entropyxyz/entropy-core.git", branch = "master" }
+entropy-test-cli = { git = "https://github.com/entropyxyz/entropy-core.git", branch = "add-oracle-data-to-store-program" }

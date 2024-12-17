@@ -22,7 +22,7 @@ pub struct UserConfig {}
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct AuxData {}
 
-pub const Oracle_Data: [&str; 1] = ["block_number_entropy"];
+pub const ORACLE_DATA: [&str; 1] = ["block_number_entropy"];
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
 
