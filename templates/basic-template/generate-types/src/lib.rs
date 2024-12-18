@@ -29,7 +29,7 @@ pub fn generate_types() {
     let oracle_data = ORACLE_DATA.iter().map(|x| x.encode()).collect::<Vec<_>>();
     fs::write(
         "./tests_serialized_oracle_data_type.txt",
-        serde_json::to_vec(&oracle_data).expect("error converting user oracle_data")
+        oracle_data.encode()
     )
     .expect("Failed to write oracle_data");
 }

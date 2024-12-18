@@ -4,6 +4,7 @@ use dotenv::dotenv;
 use entropy_test_cli::{run_command, Cli, PROGRAM_VERSION_NUMBER};
 use generate_types::generate_types;
 use project_root::get_project_root;
+use std::fs;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -27,6 +28,14 @@ async fn main() -> anyhow::Result<()> {
         get_project_root()?.to_string_lossy()
     );
 
+    // length is 1 if empty and can ignore, scale codec length
+    let pre = fs::read(oracle_data.clone()).unwrap();
+    let oracle_option = if pre.len() == 1 {
+        None
+    } else { 
+        Some(oracle_data.into())
+    };
+
     let cli = Cli::parse();
     let json_ouput = cli.json;
     match run_command(
@@ -34,7 +43,7 @@ async fn main() -> anyhow::Result<()> {
         Some(program.into()),
         Some(config_interface.into()),
         Some(aux_data_interface.into()),
-        Some(oracle_data.into()),
+        oracle_option,
         Some(PROGRAM_VERSION_NUMBER),
     )
     .await
