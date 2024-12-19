@@ -18,7 +18,7 @@ strip = "debuginfo"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-entropy-programs-core = { git = "https://github.com/entropyxyz/programs.git", tag = "v0.10.0" }
+entropy-programs-core = { git = "https://github.com/entropyxyz/programs.git", branch = "master" }
 schemars = { version = "0.8.16", optional = true }
 serde = { version = "1.0", default-features = false, features = [
   "alloc",
