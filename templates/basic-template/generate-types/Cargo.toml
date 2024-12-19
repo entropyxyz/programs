@@ -11,4 +11,4 @@ program = { package = "{{project-name}}", path = "..", default-features = false,
 ] }
 schemars = "0.8.16"
 serde_json = { version = "1.0" }
-codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
+codec = { package = "parity-scale-codec", version = "3.7.0", default-features = false }
