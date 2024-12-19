@@ -22,6 +22,7 @@ pub struct UserConfig {}
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct AuxData {}
 
+// Oracle data is heading block_number_entropy as I expect that to be passed below to the evaluate function.
 pub const ORACLE_DATA: [&str; 1] = ["block_number_entropy"];
 
 // TODO confirm this isn't an issue for audit

@@ -29,8 +29,8 @@ async fn main() -> anyhow::Result<()> {
     );
 
     // length is 1 if empty and can ignore, scale codec length
-    let pre = fs::read(oracle_data.clone()).unwrap();
-    let oracle_option = if pre.len() == 1 {
+    let decoded_oracle_data = fs::read(oracle_data.clone()).unwrap();
+    let oracle_option = if decoded_oracle_data.len() == 1 {
         None
     } else { 
         Some(oracle_data.into())
