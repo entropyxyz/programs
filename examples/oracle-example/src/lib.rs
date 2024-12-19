@@ -23,6 +23,7 @@ pub struct UserConfig {}
 pub struct AuxData {}
 
 pub const ORACLE_DATA: [&str; 1] = ["block_number_entropy"];
+
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
 
