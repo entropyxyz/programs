@@ -27,6 +27,9 @@ pub struct UserConfig {
 pub struct AuxData {
 }
 
+/// Oracle data used, (change 0 to amount of items in vector)
+pub const ORACLE_DATA: [&str; 0] = [];
+
 pub struct {{project-name | upper_camel_case}};
 
 impl Program for {{project-name | upper_camel_case}} {

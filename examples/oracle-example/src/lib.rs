@@ -4,8 +4,12 @@
 
 extern crate alloc;
 
-use alloc::{string::ToString, vec::Vec};
-use codec::Decode;
+use alloc::{
+    string::{String, ToString},
+    vec,
+    vec::Vec,
+};
+use codec::{Decode, Encode};
 use entropy_programs_core::{bindgen::Error, bindgen::*, export_program, prelude::*};
 use serde::{Deserialize, Serialize};
 /// JSON-deserializable struct that will be used to derive the program-JSON interface.
@@ -17,6 +21,9 @@ pub struct UserConfig {}
 #[cfg_attr(feature = "std", derive(schemars::JsonSchema))]
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct AuxData {}
+
+// Oracle data is heading block_number_entropy as I expect that to be passed below to the evaluate function.
+pub const ORACLE_DATA: [&str; 1] = ["block_number_entropy"];
 
 // TODO confirm this isn't an issue for audit
 register_custom_getrandom!(always_fail);
